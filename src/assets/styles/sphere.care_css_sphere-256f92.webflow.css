@@ -1,10 +1,85 @@
 /*отсутствующие:*/
-/*.w-container*/
 /*main-logo-wrapper*/
 /*main-logo*/
-/*w-form*/
-/*w-embed*/
-/*w-button*/
+
+.w-container {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 940px;
+}
+.w-container:before,
+.w-container:after {
+    content: " ";
+    display: table;
+    grid-column-start: 1;
+    grid-row-start: 1;
+    grid-column-end: 2;
+    grid-row-end: 2;
+}
+.w-container:after {
+    clear: both;
+}
+.w-container .w-row {
+    margin-left: -10px;
+    margin-right: -10px;
+}
+
+.w-form {
+    margin: 0 0 15px;
+}
+
+.w-embed:before,
+.w-embed:after {
+    content: " ";
+    display: table;
+    grid-column-start: 1;
+    grid-row-start: 1;
+    grid-column-end: 2;
+    grid-row-end: 2;
+}
+.w-embed:after {
+    clear: both;
+}
+
+.w-button {
+    display: inline-block;
+    padding: 9px 15px;
+    background-color: #3898EC;
+    color: white;
+    border: 0;
+    line-height: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 0;
+}
+
+input.w-button {
+    -webkit-appearance: button;
+}
+/*.w-form-done {*/
+/*    display: none;*/
+/*    padding: 20px;*/
+/*    text-align: center;*/
+/*    background-color: #dddddd;*/
+/*}*/
+/*.w-form-fail {*/
+/*    display: none;*/
+/*    margin-top: 10px;*/
+/*    padding: 10px;*/
+/*    background-color: #ffdede;*/
+/*}*/
+/*.w-form-label {*/
+/*    display: inline-block;*/
+/*    cursor: pointer;*/
+/*    font-weight: normal;*/
+/*    margin-bottom: 0px;*/
+/*}*/
+
+
+
+
+
+
 
 .body {
     border-bottom: 1px none #4f4e4e;
@@ -31,70 +106,6 @@
 
 .section-case.player2 {
     padding-top: 0px;
-}
-
-@media screen and (max-width: 767px) {
-    .section-case {
-        padding-right: 20px;
-        padding-left: 20px;
-    }
-
-    .container-player2-0 {
-        padding-right: 0px;
-        padding-left: 0px;
-    }
-
-    .player2-0_hero {
-        width: 100%;
-    }
-
-    .player2-0_hero.offline_player {
-        width: 100%;
-    }
-}
-
-@media screen and (max-width: 479px) {
-    .section-case {
-        padding-top: 15px;
-        padding-right: 10px;
-        padding-left: 10px;
-    }
-
-    .container-player2-0 {
-        margin-top: 50px;
-    }
-
-    .image-19 {
-        width: 108px;
-        align-self: flex-start;
-    }
-
-    .image-19.offline-player {
-        width: 140px;
-        -ms-grid-row-align: center;
-        align-self: center;
-    }
-
-    .player2-0_hero {
-        margin-top: 30px;
-        padding: 20px 11px;
-    }
-
-    .display_player2-0 {
-        padding: 13px 14px;
-    }
-
-    .play-button {
-        margin-left: 10px;
-    }
-
-    .like-dislike-form-block {
-        flex: 1;
-    }
-
-    .list {
-        padding-left: 23px;
-    }
 }
 
 .playlist-hero.case.player2 {
@@ -309,3 +320,80 @@
 .list-item {
     margin-bottom: 7px;
 }
+
+
+@media screen and (max-width: 479px) {
+    .section-case {
+        padding-top: 15px;
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+
+    .container-player2-0 {
+        margin-top: 50px;
+    }
+
+    .image-19 {
+        width: 108px;
+        align-self: flex-start;
+    }
+
+    .image-19.offline-player {
+        width: 140px;
+        -ms-grid-row-align: center;
+        align-self: center;
+    }
+
+    .player2-0_hero {
+        margin-top: 30px;
+        padding: 20px 11px;
+    }
+
+    .display_player2-0 {
+        padding: 13px 14px;
+    }
+
+    .play-button {
+        margin-left: 10px;
+    }
+
+    .like-dislike-form-block {
+        flex: 1;
+    }
+
+    .list {
+        padding-left: 23px;
+    }
+}
+
+
+@media screen and (max-width: 767px) {
+    .w-container .w-row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .section-case {
+        padding-right: 20px;
+        padding-left: 20px;
+    }
+
+    .container-player2-0 {
+        padding-right: 0px;
+        padding-left: 0px;
+    }
+
+    .player2-0_hero {
+        width: 100%;
+    }
+
+    .player2-0_hero.offline_player {
+        width: 100%;
+    }
+}
+
+
+@media screen and (max-width: 991px) {
+    .w-container {
+        max-width: 728px;
+    }
