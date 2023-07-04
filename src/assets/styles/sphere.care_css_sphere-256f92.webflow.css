@@ -1,7 +1,3 @@
-/*отсутствующие:*/
-/*main-logo-wrapper*/
-/*main-logo*/
-
 .w-container {
     margin-left: auto;
     margin-right: auto;
@@ -18,10 +14,6 @@
 }
 .w-container:after {
     clear: both;
-}
-.w-container .w-row {
-    margin-left: -10px;
-    margin-right: -10px;
 }
 
 .w-form {
@@ -81,9 +73,8 @@ input.w-button {
 
 
 
-.body {
+body {
     border-bottom: 1px none #4f4e4e;
-    background-color: #f3f2f1;
     background-image: url('~/src/assets/media/images/bg-lines-003-light.png'), url('~/src/assets/media/images/777-55-4-monochrome-min.png');
     background-position: 50% 50%, 0px 0px;
     background-size: cover, auto;
@@ -91,40 +82,11 @@ input.w-button {
     font-family: Favoritpro, sans-serif;
     color: #0e0e0e;
     font-size: 20px;
-}
-
-.body.player2-0 {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     background-color: #ddd;
-}
-
-.section-case {
-    padding-top: 40px;
-}
-
-.section-case.player2 {
-    padding-top: 0px;
-}
-
-.playlist-hero.case.player2 {
-    min-height: 200px;
-    margin-top: 40px;
-    border-style: solid;
-    border-color: rgba(139, 160, 180, 0.23);
-    background-color: hsla(0, 0%, 100%, 0.51);
-}
-
-/*.playlist-hero.case.player2.jsplayer {*/
-/*    !*background-image: url('../images/bg-for-player.svg');*!*/
-/*    background-position: 50% 0%;*/
-/*    background-size: cover;*/
-/*    background-repeat: repeat;*/
-/*}*/
-
-.section-case.player2 {
-    padding-top: 0px;
+    overflow: auto;
 }
 
 .container-player2-0 {
@@ -140,7 +102,6 @@ input.w-button {
 
 .image-19 {
     width: 156px;
-    -ms-grid-row-align: center;
     align-self: center;
     opacity: 0.86;
 }
@@ -163,10 +124,6 @@ input.w-button {
     font-size: 19px;
     line-height: 21px;
     font-weight: 300;
-}
-
-.player2-0_hero.offline_player {
-    width: 500px;
 }
 
 .display_player2-0 {
@@ -323,25 +280,9 @@ input.w-button {
 
 
 @media screen and (max-width: 479px) {
-    .section-case {
-        padding-top: 15px;
-        padding-right: 10px;
-        padding-left: 10px;
-    }
-
-    .container-player2-0 {
-        margin-top: 50px;
-    }
-
     .image-19 {
         width: 108px;
         align-self: flex-start;
-    }
-
-    .image-19.offline-player {
-        width: 140px;
-        -ms-grid-row-align: center;
-        align-self: center;
     }
 
     .player2-0_hero {
@@ -368,11 +309,6 @@ input.w-button {
 
 
 @media screen and (max-width: 767px) {
-    .w-container .w-row {
-        margin-left: 0;
-        margin-right: 0;
-    }
-
     .section-case {
         padding-right: 20px;
         padding-left: 20px;
@@ -386,10 +322,6 @@ input.w-button {
     .player2-0_hero {
         width: 100%;
     }
-
-    .player2-0_hero.offline_player {
-        width: 100%;
-    }
 }
 
 
@@ -397,3 +329,4 @@ input.w-button {
     .w-container {
         max-width: 728px;
     }
+}
