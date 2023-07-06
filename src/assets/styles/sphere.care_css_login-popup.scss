@@ -1,0 +1,311 @@
+/* hello, this is */
+/* a modified version of original styles */
+/*
+@font-face {
+    font-family: 'Favoritpro';
+    src: url('../fonts/FavoritPro-Light.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: auto;
+}
+
+@font-face {
+    font-family: 'Favoritpro';
+    src: url('../fonts/FavoritPro-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: auto;
+}
+
+/*@font-face {*/
+/*    font-family: 'Favoritpro';*/
+/*    src: url('fonts/FavoritPro-Medium.otf') format('opentype');*/
+/*    font-weight: 500;*/
+/*    font-style: normal;*/
+/*    font-display: auto;*/
+/*}*/
+/*
+@font-face {
+    font-family: 'Favoritpro';
+    src: url('../fonts/FavoritPro-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: auto;
+}
+*/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.initial-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  font-family: Favoritpro, sans-serif;
+  font-weight: 300;
+  transition-property: visibility, opacity;
+  z-index: 2;
+  color: #333;
+  padding: 0 19px;
+  /*visibility: hidden; */
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    /*background-color: rgba(10, 10, 10, 1);*/
+    background-color: #424242;
+  }
+
+  .login-form-wrapper {
+    max-width: 337px;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+    transition-property: visibility, opacity;
+    /*visibility: hidden;*/
+    /*opacity: 0;*/
+    margin-top: -51px;
+
+
+    @media screen and (min-width: 695px) {
+      max-width: 420px;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 12px;
+      background-image: url('~/src/assets/media/images/blurry-background_(login-popup).svg');
+      width: 358px;
+      height: 278px;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      z-index: 1;
+      transform: scale(1.4);
+
+      @media screen and (min-width: 695px) {
+        width: 496px;
+        height: 385.16px;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin-top: -77px;
+        margin-left: -60px;
+        transform: scale(1.3);
+      }
+    }
+  }
+
+  .loading-placeholder {
+    font-size: 2rem;
+    font-weight: 400;
+    color: #fff;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    line-height: 100%;
+  }
+}
+
+.login-form__popup {
+  padding: 27px 0 29px;
+  position: relative;
+  z-index: 3;
+  background: #E8E8E8;
+  box-shadow: 1px 4px 4px rgba(0, 0, 0, 0.1), inset 3px 2px 9px rgba(255, 255, 255, 0.39);
+  border-radius: 20px;
+
+  transition-property: opacity, visibility;
+  //visibility: hidden;
+  //opacity: 0;
+}
+
+
+.login-form__popup-wrapper {
+  max-width: 297px;
+  width: 88%; /* 297 / 337 */
+  /* wrapper-width / popup-width */
+  margin: 0 auto;
+
+  @media screen and (min-width: 695px) {
+    max-width: 373px;
+  }
+}
+
+.login-form__title {
+  font-size: 27px;
+  font-weight: 500;
+  line-height: 32px;
+  color: #181818;
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.login-form__description {
+  font-size: 18px;
+  font-weight: 350;
+  line-height: 21px;
+  margin-bottom: 15px;
+}
+
+.input-field__wrapper {
+  margin-bottom: 10px;
+}
+
+.input-field {
+  display: block;
+  width: 100%;
+  padding: 9px 15px;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+  font-size: 19px;
+  line-height: 22px;
+  background-color: #E8E8E8;
+  color: #181818;
+  margin-bottom: 10px;
+
+  &::placeholder {
+    color: #8F8F8F;
+  }
+}
+
+.login-form__inner-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.login-form__sign-in-button {
+  padding: 9px 15px;
+  background-color: transparent;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+  color: #D97F5F;
+  font-style: normal;
+  font-weight: 350;
+  font-size: 19px;
+  line-height: 23px;
+  cursor: pointer;
+}
+
+.login-form__error-message {
+  font-size: 18px;
+  /*font-weight: 300;*/
+  font-weight: 350;
+  line-height: 21px;
+  transition-property: visibility, opacity;
+  visibility: hidden;
+  opacity: 0;
+  color: #999999;
+}
+
+.login-form {
+  &__popup {
+    padding: 27px 0 29px;
+    position: relative;
+    z-index: 3;
+    background: #E8E8E8;
+    box-shadow: 1px 4px 4px rgba(0, 0, 0, 0.1), inset 3px 2px 9px rgba(255, 255, 255, 0.39);
+    border-radius: 20px;
+
+    transition-property: opacity, visibility;
+    //visibility: hidden;
+    //opacity: 0;
+  }
+
+
+  &__popup-wrapper {
+    max-width: 297px;
+    width: 88%; /* 297 / 337 */
+    /* wrapper-width / popup-width */
+    margin: 0 auto;
+
+    @media screen and (min-width: 695px) {
+      max-width: 373px;
+    }
+  }
+
+  &__title {
+    font-size: 27px;
+    font-weight: 500;
+    line-height: 32px;
+    color: #181818;
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+
+  &__description {
+    font-size: 18px;
+    font-weight: 350;
+    line-height: 21px;
+    margin-bottom: 15px;
+  }
+
+  .input-field__wrapper {
+    margin-bottom: 10px;
+  }
+
+  .input-field {
+    display: block;
+    width: 100%;
+    padding: 9px 15px;
+    border: 1px solid #CCCCCC;
+    border-radius: 4px;
+    font-size: 19px;
+    line-height: 22px;
+    background-color: #E8E8E8;
+    color: #181818;
+    margin-bottom: 10px;
+
+    &::placeholder {
+      color: #8F8F8F;
+    }
+  }
+
+  &__inner-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__sign-in-button {
+    padding: 9px 15px;
+    background-color: transparent;
+    border: 1px solid #CCCCCC;
+    border-radius: 4px;
+    color: #D97F5F;
+    font-style: normal;
+    font-weight: 350;
+    font-size: 19px;
+    line-height: 23px;
+    cursor: pointer;
+  }
+
+  &__error-message {
+    font-size: 18px;
+    /*font-weight: 300;*/
+    font-weight: 350;
+    line-height: 21px;
+    transition-property: visibility, opacity;
+    visibility: hidden;
+    opacity: 0;
+    color: #999999;
+  }
+}
+
