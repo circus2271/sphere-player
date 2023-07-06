@@ -35,12 +35,12 @@ body {
   overflow: auto;
 }
 
-.container-player2-0 {
-  display: flex;
+.page {
   max-width: 1000px;
-  margin: 50px auto 80px;
+  padding: 50px 10px 80px;
+  display: flex;
   flex-direction: column;
-  align-items: stretch;
+  align-items: center;
 }
 
 .image-19 {
@@ -49,15 +49,18 @@ body {
   opacity: 0.86;
 }
 
-.player2-0_hero {
+.section {
   width: 100%;
   max-width: 630px;
-  margin-top: 30px;
   padding: 20px 11px;
   align-self: center;
   border-radius: 20px;
   background-color: #eaeaea;
   box-shadow: inset 2px 2px 4px 0 hsla(0, 0%, 100%, 0.4), 3px 3px 4px 0 rgba(0, 0, 0, 0.1);
+
+  &:first-of-type {
+    margin-top: 30px;
+  }
 
   &:nth-of-type(2) {
     margin-top: 25px;
@@ -68,103 +71,105 @@ body {
   }
 }
 
-.display_player2-0 {
+.player__header {
   margin-bottom: 20px;
   padding: 13px 14px;
   border-radius: 16px;
   background-color: #404a53;
   box-shadow: inset -4px -4px 10px 0 #575c72, inset 6px 6px 10px 1px #333647;
-}
-
-.text-block-18 {
-  padding-bottom: 7px;
-  color: #929292;
-  font-size: 17px;
   line-height: 20px;
-  font-weight: 300;
+
+  .text-block-18 {
+    padding-bottom: 7px;
+    color: #929292;
+    font-size: 17px;
+    line-height: 20px;
+    font-weight: 300;
+  }
+
+  .text-block-19 {
+    color: #bdbdbd;
+    font-size: 27px;
+    font-weight: 300;
+  }
 }
 
-.text-block-19 {
-  color: #bdbdbd;
-  font-size: 27px;
-  font-weight: 300;
-}
-
-.player2-0-interface {
+.player__actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  .play-button {
+    display: flex;
+    width: 68px;
+    height: 68px;
+    margin-left: 10px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50px;
+    box-shadow: inset 2px 2px 8px 0 #fff, inset -3px -3px 4px 0 #cecece, 3px 3px 10px 0 hsla(0, 0%, 79.6%, 0.65), -4px -4px 5px 1px #fdfdfd, 2px -2px 8px 0 hsla(0, 0%, 84.3%, 0.3), -2px 2px 9px 0 hsla(0, 0%, 91.8%, 0.3);
+    transition: box-shadow 400ms cubic-bezier(.25, .46, .45, .94);
+    cursor: pointer;
+
+    &:active {
+      box-shadow: inset 3px 3px 8px 0 hsla(0, 0%, 69.8%, 0.66), inset -2px -2px 6px 0 #fefefe, 3px 3px 10px 0 hsla(0, 0%, 79.6%, 0.65), -3px -3px 7px 0 hsla(0, 0%, 99.2%, 0.97), 2px -2px 8px 0 hsla(0, 0%, 84.3%, 0.3), -2px 2px 9px 0 hsla(0, 0%, 91.8%, 0.3);
+    }
+
+    .play-icon {
+      display: block;
+      margin-left: 4px;
+    }
+
+    .pause-icon {
+      display: none;
+      margin-left: -2px;
+    }
+  }
 }
 
-.play-button {
-  display: flex;
-  width: 68px;
-  height: 68px;
-  margin-left: 10px;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50px;
-  box-shadow: inset 2px 2px 8px 0 #fff, inset -3px -3px 4px 0 #cecece, 3px 3px 10px 0 hsla(0, 0%, 79.6%, 0.65), -4px -4px 5px 1px #fdfdfd, 2px -2px 8px 0 hsla(0, 0%, 84.3%, 0.3), -2px 2px 9px 0 hsla(0, 0%, 91.8%, 0.3);
-  transition: box-shadow 400ms cubic-bezier(.25, .46, .45, .94);
-  cursor: pointer;
-}
-
-.play-button:active {
-  box-shadow: inset 3px 3px 8px 0 hsla(0, 0%, 69.8%, 0.66), inset -2px -2px 6px 0 #fefefe, 3px 3px 10px 0 hsla(0, 0%, 79.6%, 0.65), -3px -3px 7px 0 hsla(0, 0%, 99.2%, 0.97), 2px -2px 8px 0 hsla(0, 0%, 84.3%, 0.3), -2px 2px 9px 0 hsla(0, 0%, 91.8%, 0.3);
-}
-
-.play-icon {
-  display: block;
-  margin-left: 4px;
-}
-
-.pause-icon {
-  display: none;
-  margin-left: -2px;
-}
 
 .like-dislike-div {
   display: flex;
-}
 
-.like-dislike-form-block {
-  width: 100%;
-  margin-right: 10px;
-  margin-bottom: 0px;
-  align-self: center;
-}
+  .like-dislike-form-block {
+    width: 100%;
+    margin-right: 10px;
+    margin-bottom: 0px;
+    align-self: center;
+  }
 
-.div-forl-like-dislike {
-  position: relative;
-}
+  .div-forl-like-dislike {
+    position: relative;
 
-.like-pushed-img {
-  position: absolute;
-  display: none;
-}
+    .dislike-pushed-img {
+      position: absolute;
+      left: 7%;
+      top: 6%;
+      right: 0%;
+      bottom: 0%;
+      display: none;
+      width: 41px;
+    }
 
-.dislike-pushed-img {
-  position: absolute;
-  left: 7%;
-  top: 6%;
-  right: 0%;
-  bottom: 0%;
-  display: none;
-  width: 41px;
-}
+    .like-pushed-img {
+      position: absolute;
+      display: none;
+    }
+  }
 
-.like-dislike-submit {
-  width: 44px;
-  height: 38px;
-  background-color: transparent;
-  background-image: url('~/src/assets/media/icons/like.svg');
-  background-position: 50% 50%;
-  background-size: contain;
-  background-repeat: no-repeat;
-}
+  .like-dislike-submit {
+    width: 44px;
+    height: 38px;
+    background-color: transparent;
+    background-image: url('~/src/assets/media/icons/like.svg');
+    background-position: 50% 50%;
+    background-size: contain;
+    background-repeat: no-repeat;
 
-.like-dislike-submit:hover {
-  filter: contrast(200%);
+    &:hover {
+      filter: contrast(200%);
+    }
+  }
 }
 
 .like-dislike-submit.dislike {
@@ -182,47 +187,45 @@ body {
   width: 43px;
 }
 
+.section.description {
+  .heading-micro {
+    margin-bottom: 11px;
+    color: #7a7a7a;
+    font-size: 19px;
+    font-weight: 400;
+  }
 
-.heading-micro {
-  margin-bottom: 11px;
-  color: #7a7a7a;
-  font-size: 19px;
-  font-weight: 400;
-}
+  .list {
+    margin-bottom: 15px;
+    padding-left: 23px;
+    list-style-type: disc;
 
-.list {
-  margin-bottom: 15px;
-  padding-left: 23px;
-  list-style-type: disc;
-}
-
-.list-item {
-  margin-bottom: 7px;
-}
-
-
-.section-case {
-  padding-right: 10px;
-  padding-left: 10px;
+    &-item {
+      margin-bottom: 7px;
+    }
+  }
 }
 
 @media screen and (min-width: 479px) {
+  .page {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
   .image-19 {
     width: 156px;
     align-self: center;
   }
 
-  .section-case {
-    padding-right: 20px;
-    padding-left: 20px;
-  }
-
-  .player2-0_hero {
-    margin-top: 40px;
+  .section {
     padding: 17px;
+
+    &:first-of-type {
+      margin-top: 40px;
+     }
   }
 
-  .display_player2-0 {
+  .player__header {
     padding: 18px 21px;
   }
 
@@ -236,16 +239,8 @@ body {
 }
 
 @media screen and (min-width: 767px) {
-  .container-player2-0 {
+  .page {
     padding-right: 30px;
     padding-left: 30px;
-  }
-
-  .section-case {
-    padding-right: 0px;
-    padding-left: 0px;
-  }
-
-  .player2-0_hero {
   }
 }
