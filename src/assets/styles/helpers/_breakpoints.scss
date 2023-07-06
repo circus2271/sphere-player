@@ -1,0 +1,20 @@
+$extra-small-end: 426px;
+$medium-start: 768px;
+
+@mixin extra-small() {
+  @media screen and (max-width: $extra-small-end) {
+    @content;
+  }
+}
+
+@mixin small() {
+  @media screen and (max-width: $medium-start - 1px) {
+    @content;
+  }
+}
+
+@mixin medium() {
+  @media screen and (min-width: $medium-start) {
+    @content;
+  }
+}

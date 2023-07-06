@@ -41,11 +41,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: 0 auto;
 }
 
-.image-19 {
+.logo {
   width: 108px;
-  align-self: flex-start;
   opacity: 0.86;
 }
 
@@ -79,7 +79,7 @@ body {
   box-shadow: inset -4px -4px 10px 0 #575c72, inset 6px 6px 10px 1px #333647;
   line-height: 20px;
 
-  .text-block-18 {
+  .place {
     padding-bottom: 7px;
     color: #929292;
     font-size: 17px;
@@ -87,7 +87,7 @@ body {
     font-weight: 300;
   }
 
-  .text-block-19 {
+  .current-playlist {
     color: #bdbdbd;
     font-size: 27px;
     font-weight: 300;
@@ -208,13 +208,12 @@ body {
 
 @media screen and (min-width: 479px) {
   .page {
-    padding-right: 20px;
     padding-left: 20px;
+    padding-right: 20px;
   }
 
-  .image-19 {
+  .logo {
     width: 156px;
-    align-self: center;
   }
 
   .section {
@@ -234,13 +233,6 @@ body {
   }
 
   .list {
-    padding-left: 30px;
-  }
-}
-
-@media screen and (min-width: 767px) {
-  .page {
-    padding-right: 30px;
     padding-left: 30px;
   }
 }
