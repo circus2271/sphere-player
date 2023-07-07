@@ -12,33 +12,33 @@
 </head>
 <body>
   <div class="page">
-    <div class="initial-login">
+    <div class="initial-login-screen" id="login-screen">
       <div class="overlay"></div>
       <div class="login-form-wrapper">
-        <div class="loading-placeholder">
+        <div class="loading-placeholder" id="loading-placeholder">
           <svg width="133" height="30" viewBox="0 0 133 30" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
                 d="M18.0781 16.9219C18.0781 13.9844 16.625 12.2969 13.7656 11.6875C16.3281 10.8594 17.6875 8.875 17.6875 6.48438C17.7344 2.64062 14.3438 0.25 9.71875 0.28125C4.125 0.21875 1.01562 3.76562 0.59375 7.73438H3.89062C4.32812 4.6875 6.04688 3.125 9.71875 3.125C12.625 3.125 14.4844 4.48438 14.4844 6.71875C14.4844 8.85938 12.7812 10.2344 10.0156 10.2344H6.90625V13.1094H9.90625C13.1406 13.1094 14.875 14.375 14.875 16.625C14.875 19.1875 13.0938 20.4375 9.46875 20.4375C6.01562 20.4375 4.125 18.9531 3.70312 15.8906H0.4375C1 20.7812 3.85938 23.3125 9.46875 23.3125C14.9844 23.3594 18.125 20.4844 18.0781 16.9219ZM34.625 23C34.5156 22.25 34.4688 21.0781 34.4688 19.4844V12.7656C34.5 9.46875 32.1094 6.64062 27.9688 6.6875C24.4219 6.65625 21.6562 8.75 21.5156 11.6406H24.5469C24.7344 10.0938 26.0938 9.23438 27.8438 9.23438H28.1094C30.1719 9.23438 31.4375 10.5312 31.4375 12.7656V13.2812L27.0156 13.625C25.4062 13.7656 24.0312 14.2031 22.8906 14.9688C21.75 15.7344 21.1875 16.9375 21.1875 18.5781C21.1406 21.25 23.4844 23.3594 26.4688 23.3125C28.9375 23.3125 30.9375 21.9219 31.5938 20.4375C31.5938 21.6094 31.6406 22.4688 31.75 23H34.625ZM31.4375 17.2344C31.5 19.0625 29 20.8125 27.0781 20.7656H26.8281C25.3281 20.7656 24.2344 19.7656 24.2344 18.4531C24.2344 17.0156 25.5156 16.1094 27.4375 15.9219L31.4375 15.625V17.2344ZM48.9062 7H39.125V23H42.1562V9.5H48.9062V7ZM51.7812 29.4062H54.8125V20.7656C55.2188 21.5 55.875 22.1094 56.7812 22.5938C57.6875 23.0781 58.6875 23.3125 59.7812 23.3125C63.7812 23.3594 67.0312 20.125 66.9688 15C67.0156 9.84375 64.0938 6.64062 60.0938 6.6875C57.9062 6.6875 55.5938 7.79688 54.8125 9.23438V7H51.7812V29.4062ZM59.3281 20.7656C57.0312 20.7969 54.7656 18.7031 54.8125 15C54.7656 11.2969 57.0312 9.20312 59.3281 9.23438H59.5781C62.0625 9.23438 63.9375 11.25 63.9375 15C63.9375 18.75 62.0625 20.7656 59.5781 20.7656H59.3281ZM84.8281 7H81.6875L76.8906 18.7969L71.9062 7H68.6719L75.3906 22.6719V24.9219C75.3906 25.875 75.0625 26.2031 74.1094 26.2031H69.625V28.9219H74.9062C77.1406 28.9219 78.2656 27.7969 78.2656 25.5625V22.6875L84.8281 7ZM99.6562 18.4844C99.6562 16.4688 98.4375 15.1875 96.2344 14.8281C97.125 14.625 97.875 14.2031 98.4688 13.5625C99.0781 12.9219 99.375 12.0938 99.375 11.0938C99.375 8.57812 97.2812 6.6875 93.1875 6.6875C88.5781 6.64062 86.4375 9.57812 86.3438 12.3125H89.4844C89.625 10.25 90.9375 9.17188 93.1875 9.17188C95.1875 9.17188 96.3281 10 96.3281 11.3906C96.3281 12.7812 95.25 13.75 93.1875 13.75H91.2344V16.1562H93.1875C95.4531 16.1562 96.5781 16.9375 96.5781 18.4844C96.5781 19.7969 95.3594 20.8281 93.1875 20.8281C90.6094 20.8281 89.4219 19.8594 89.25 17.6875H86.125C86.3594 21.375 88.5625 23.3125 93.1875 23.3125C96.7031 23.3281 99.7031 21.5781 99.6562 18.4844ZM114.406 23H118.047L111.359 13.3281L117.734 7H113.953L106.594 14.6562V7H103.562V23H106.594V18.0469L109.188 15.4688L114.406 23ZM132.656 23C132.547 22.25 132.5 21.0781 132.5 19.4844V12.7656C132.531 9.46875 130.141 6.64062 126 6.6875C122.453 6.65625 119.688 8.75 119.547 11.6406H122.578C122.766 10.0938 124.125 9.23438 125.875 9.23438H126.141C128.203 9.23438 129.469 10.5312 129.469 12.7656V13.2812L125.047 13.625C123.438 13.7656 122.062 14.2031 120.922 14.9688C119.781 15.7344 119.219 16.9375 119.219 18.5781C119.172 21.25 121.516 23.3594 124.5 23.3125C126.969 23.3125 128.969 21.9219 129.625 20.4375C129.625 21.6094 129.672 22.4688 129.781 23H132.656ZM129.469 17.2344C129.531 19.0625 127.031 20.8125 125.109 20.7656H124.859C123.359 20.7656 122.266 19.7656 122.266 18.4531C122.266 17.0156 123.547 16.1094 125.469 15.9219L129.469 15.625V17.2344Z"
                 fill="white"/>
           </svg>
         </div>
-        <div class="login-form__popup">
-          <div class="login-form__popup-wrapper">
-            <header class="login-form__header">
-              <h2 class="login-form__title">Вэлкам!</h2>
-              <p class="login-form__description">
+        <div class="login-popup" id="login-popup">
+          <div class="login-popup__wrapper">
+            <header class="login-popup__header">
+              <h2 class="login-popup__title">Вэлкам!</h2>
+              <p class="login-popup__description">
                 Введите, пожалуйста, ваш пароль, чтобы открыть страницу плеера
               </p>
             </header>
-            <form class="login-form js-login-form">
-              <input type="text" class="js-password-input input-field" placeholder="Логин">
-              <input type="password" class="js-password-input input-field" placeholder="Пароль">
+            <form class="login-form" id="login-form">
+              <input type="text" class="login-form__input-field js-login-input" placeholder="Логин">
+              <input type="password" class="login-form__input-field js-password-input" placeholder="Пароль">
 
               <div class="login-form__inner-wrapper">
                 <button type="submit" class="button login-form__sign-in-button js-submit-button">
                   Зайти
                 </button>
-                <div class="login-form__error-message">
+                <div class="login-form__error-message" id="error-message">
                   Неверный пароль
                 </div>
               </div>
@@ -47,50 +47,8 @@
         </div>
       </div>
     </div>
-    <!-- !!! login-popup start -->
-    <div class="login-fullpage-popup js-login-fullpage-popup">
-      <!--      <div class="login-fullpage-popup js-login-fullpage-popup" style="display: none">-->
-      <div class="overlay"></div>
-      <div class="login-form-popup-wrapper">
-        <div class="loading-text-placeholder js-loading-text-placeholder">
-          <div class="loading-text-placeholder__content">
-            <!--  Загрузка  -->
-            <svg width="133" height="30" viewBox="0 0 133 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                  d="M18.0781 16.9219C18.0781 13.9844 16.625 12.2969 13.7656 11.6875C16.3281 10.8594 17.6875 8.875 17.6875 6.48438C17.7344 2.64062 14.3438 0.25 9.71875 0.28125C4.125 0.21875 1.01562 3.76562 0.59375 7.73438H3.89062C4.32812 4.6875 6.04688 3.125 9.71875 3.125C12.625 3.125 14.4844 4.48438 14.4844 6.71875C14.4844 8.85938 12.7812 10.2344 10.0156 10.2344H6.90625V13.1094H9.90625C13.1406 13.1094 14.875 14.375 14.875 16.625C14.875 19.1875 13.0938 20.4375 9.46875 20.4375C6.01562 20.4375 4.125 18.9531 3.70312 15.8906H0.4375C1 20.7812 3.85938 23.3125 9.46875 23.3125C14.9844 23.3594 18.125 20.4844 18.0781 16.9219ZM34.625 23C34.5156 22.25 34.4688 21.0781 34.4688 19.4844V12.7656C34.5 9.46875 32.1094 6.64062 27.9688 6.6875C24.4219 6.65625 21.6562 8.75 21.5156 11.6406H24.5469C24.7344 10.0938 26.0938 9.23438 27.8438 9.23438H28.1094C30.1719 9.23438 31.4375 10.5312 31.4375 12.7656V13.2812L27.0156 13.625C25.4062 13.7656 24.0312 14.2031 22.8906 14.9688C21.75 15.7344 21.1875 16.9375 21.1875 18.5781C21.1406 21.25 23.4844 23.3594 26.4688 23.3125C28.9375 23.3125 30.9375 21.9219 31.5938 20.4375C31.5938 21.6094 31.6406 22.4688 31.75 23H34.625ZM31.4375 17.2344C31.5 19.0625 29 20.8125 27.0781 20.7656H26.8281C25.3281 20.7656 24.2344 19.7656 24.2344 18.4531C24.2344 17.0156 25.5156 16.1094 27.4375 15.9219L31.4375 15.625V17.2344ZM48.9062 7H39.125V23H42.1562V9.5H48.9062V7ZM51.7812 29.4062H54.8125V20.7656C55.2188 21.5 55.875 22.1094 56.7812 22.5938C57.6875 23.0781 58.6875 23.3125 59.7812 23.3125C63.7812 23.3594 67.0312 20.125 66.9688 15C67.0156 9.84375 64.0938 6.64062 60.0938 6.6875C57.9062 6.6875 55.5938 7.79688 54.8125 9.23438V7H51.7812V29.4062ZM59.3281 20.7656C57.0312 20.7969 54.7656 18.7031 54.8125 15C54.7656 11.2969 57.0312 9.20312 59.3281 9.23438H59.5781C62.0625 9.23438 63.9375 11.25 63.9375 15C63.9375 18.75 62.0625 20.7656 59.5781 20.7656H59.3281ZM84.8281 7H81.6875L76.8906 18.7969L71.9062 7H68.6719L75.3906 22.6719V24.9219C75.3906 25.875 75.0625 26.2031 74.1094 26.2031H69.625V28.9219H74.9062C77.1406 28.9219 78.2656 27.7969 78.2656 25.5625V22.6875L84.8281 7ZM99.6562 18.4844C99.6562 16.4688 98.4375 15.1875 96.2344 14.8281C97.125 14.625 97.875 14.2031 98.4688 13.5625C99.0781 12.9219 99.375 12.0938 99.375 11.0938C99.375 8.57812 97.2812 6.6875 93.1875 6.6875C88.5781 6.64062 86.4375 9.57812 86.3438 12.3125H89.4844C89.625 10.25 90.9375 9.17188 93.1875 9.17188C95.1875 9.17188 96.3281 10 96.3281 11.3906C96.3281 12.7812 95.25 13.75 93.1875 13.75H91.2344V16.1562H93.1875C95.4531 16.1562 96.5781 16.9375 96.5781 18.4844C96.5781 19.7969 95.3594 20.8281 93.1875 20.8281C90.6094 20.8281 89.4219 19.8594 89.25 17.6875H86.125C86.3594 21.375 88.5625 23.3125 93.1875 23.3125C96.7031 23.3281 99.7031 21.5781 99.6562 18.4844ZM114.406 23H118.047L111.359 13.3281L117.734 7H113.953L106.594 14.6562V7H103.562V23H106.594V18.0469L109.188 15.4688L114.406 23ZM132.656 23C132.547 22.25 132.5 21.0781 132.5 19.4844V12.7656C132.531 9.46875 130.141 6.64062 126 6.6875C122.453 6.65625 119.688 8.75 119.547 11.6406H122.578C122.766 10.0938 124.125 9.23438 125.875 9.23438H126.141C128.203 9.23438 129.469 10.5312 129.469 12.7656V13.2812L125.047 13.625C123.438 13.7656 122.062 14.2031 120.922 14.9688C119.781 15.7344 119.219 16.9375 119.219 18.5781C119.172 21.25 121.516 23.3594 124.5 23.3125C126.969 23.3125 128.969 21.9219 129.625 20.4375C129.625 21.6094 129.672 22.4688 129.781 23H132.656ZM129.469 17.2344C129.531 19.0625 127.031 20.8125 125.109 20.7656H124.859C123.359 20.7656 122.266 19.7656 122.266 18.4531C122.266 17.0156 123.547 16.1094 125.469 15.9219L129.469 15.625V17.2344Z"
-                  fill="white"/>
-            </svg>
-          </div>
-        </div>
-        <div class="login-form-popup js-login-form-popup">
-          <div class="login-form-popup__container">
-            <header class="login-form-popup__header">
-              <h2 class="login-form-popup__main-title">Вэлкам!</h2>
-              <p class="login-form-popup__greetings-instructions">
-                Введите, пожалуйста, ваш пароль, чтобы открыть страницу плеера
-              </p>
-            </header>
-            <form class="login-form js-login-form">
-              <div class="password-input-wrapper">
-                <input type="text" class="password-input js-password-input" placeholder="Логин">
-              </div>
-              <div class="password-input-wrapper">
-                <input type="password" class="password-input js-password-input" placeholder="Пароль">
-              </div>
-              <div class="login-form__inner-wrapper">
-                <button type="submit" class="button submit-button js-submit-button">
-                  Зайти
-                </button>
-                <div class="login-request-status-hint js-login-request-status-hint">
-                  Неверный пароль
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- login-popup end !!! -->
+
+
     <div class="logo-wrapper">
       <img src="~/src/assets/media/icons/sphere-logo.svg"
            loading="lazy"
@@ -125,59 +83,6 @@
                class="pause-icon">
         </div>
         <form class="like-dislike-div">
-          <!--            <div class="like-dislike-form-block w-form">-->
-          <!--              <div id="dislike-wrapper">-->
-          <!--&lt;!&ndash;                <form id="formDislike" name="email-form" data-name="Email Form" aria-label="Email Form">&ndash;&gt;-->
-          <!--&lt;!&ndash;                <div class="w-embed">&ndash;&gt;-->
-          <!--&lt;!&ndash;                  <input type="text" name="place" value="place undefined" style="display: none;">&ndash;&gt;-->
-          <!--&lt;!&ndash;                  <input type="text" name="value" value="dislike" style="display: none;">&ndash;&gt;-->
-          <!--&lt;!&ndash;                  <input type="text" name="songname" value="testName" id="songnameIdDislike" style="display: none;">&ndash;&gt;-->
-          <!--&lt;!&ndash;                  <input type="text" name="playlistname" value="testName" style="display: none;">&ndash;&gt;-->
-          <!--&lt;!&ndash;                </div>&ndash;&gt;-->
-          <!--                <div class="div-forl-like-dislike">-->
-          <!--                  <img src="~/src/assets/media/icons/dislike-pushed.svg"-->
-          <!--                       loading="lazy"-->
-          <!--                       style="opacity: 1; filter: blur(5px); display: none;"-->
-          <!--                       data-w-id="0f2f440f-ddc6-6aeb-9e8b-22d4840a05f7"-->
-          <!--                       alt=""-->
-          <!--                       class="dislike-pushed-img">-->
-          <!--&lt;!&ndash;                  <input type="submit"&ndash;&gt;-->
-          <!--&lt;!&ndash;                         value=""&ndash;&gt;-->
-          <!--&lt;!&ndash;                         data-wait=""&ndash;&gt;-->
-          <!--&lt;!&ndash;                         id="submitDislike"&ndash;&gt;-->
-          <!--&lt;!&ndash;                         data-w-id="6179d6c7-18cb-d304-5e17-70307f405550"&ndash;&gt;-->
-          <!--&lt;!&ndash;                         class="like-dislike-submit dislike w-button">&ndash;&gt;-->
-          <!--                </div>-->
-          <!--&lt;!&ndash;              </form>&ndash;&gt;-->
-          <!--              </div>-->
-          <!--            </div>-->
-          <!--            <div class="like-dislike-form-block w-form">-->
-          <!--              <div id="like-wrapper">-->
-          <!--&lt;!&ndash;                <form id="formLike" name="email-form" data-name="Email Form" aria-label="Email Form">&ndash;&gt;-->
-          <!--&lt;!&ndash;                <div class="w-embed">&ndash;&gt;-->
-          <!--&lt;!&ndash;                  <input type="text" name="place" value="place undefined" style="display: none;">&ndash;&gt;-->
-          <!--&lt;!&ndash;                  <input type="text" name="value" value="like" style="display: none;">&ndash;&gt;-->
-          <!--&lt;!&ndash;                  <input type="text" name="songname" value="testName" id="songnameIdLike" style="display: none;">&ndash;&gt;-->
-          <!--&lt;!&ndash;                  <input type="text" name="playlistname" value="testName" style="display: none;">&ndash;&gt;-->
-          <!--&lt;!&ndash;                </div>&ndash;&gt;-->
-          <!--                <div class="div-forl-like-dislike">-->
-          <!--                  <img src="~/src/assets/media/icons/like-pushed.svg"-->
-          <!--                       loading="lazy"-->
-          <!--                       style="opacity: 1; filter: blur(5px); display: none;"-->
-          <!--                       data-w-id="560eea8f-c6f2-483b-cace-244f1c45446b"-->
-          <!--                       alt=""-->
-          <!--                       class="like-pushed-img">-->
-          <!--&lt;!&ndash;                  <input type="submit"&ndash;&gt;-->
-          <!--&lt;!&ndash;                         value=""&ndash;&gt;-->
-          <!--&lt;!&ndash;                         data-wait=""&ndash;&gt;-->
-          <!--&lt;!&ndash;                         id="submitLike"&ndash;&gt;-->
-          <!--&lt;!&ndash;                         data-w-id="b0eb9413-2651-06d8-585e-effe1371eacb"&ndash;&gt;-->
-          <!--&lt;!&ndash;                         class="like-dislike-submit like w-button">&ndash;&gt;-->
-          <!--                  <button type="submit"></button>-->
-          <!--                </div>-->
-          <!--&lt;!&ndash;                </form>&ndash;&gt;-->
-          <!--              </div>-->
-          <!--            </div>-->
         </form>
       </div>
     </section>
@@ -204,6 +109,7 @@
       </div>
     </section>
   </div>
+  <script type="module" src="~/src/assets/scripts/index.js"></script>
   <!--  <script src="./Sphere Player_files/playerRules_Franky__with_login.js.Без названия"></script>-->
 </body>
 </html>

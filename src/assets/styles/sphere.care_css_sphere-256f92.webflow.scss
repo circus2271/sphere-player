@@ -14,8 +14,13 @@
   border-radius: 0;
 }
 
-input.w-button {
-  -webkit-appearance: button;
+//input.w-button {
+//  -webkit-appearance: button;
+//}
+
+
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 
@@ -32,7 +37,6 @@ body {
   flex-direction: column;
   justify-content: space-between;
   background-color: #ddd;
-  overflow: auto;
   overflow: hidden;
 }
 
@@ -222,7 +226,7 @@ body {
 
     &:first-of-type {
       margin-top: 40px;
-     }
+    }
   }
 
   .player__header {
