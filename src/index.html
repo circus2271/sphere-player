@@ -30,10 +30,17 @@
                 Введите, пожалуйста, ваш пароль, чтобы открыть страницу плеера
               </p>
             </header>
-            <form class="login-form" id="login-form">
-              <input type="text" class="login-form__input-field js-login-input" placeholder="Логин">
-              <input type="password" class="login-form__input-field js-password-input" placeholder="Пароль">
-
+            <form class="login-form" id="login-form" autocomplete="off">
+              <input type="text"
+                     name="sphere-login"
+                     class="login-form__input-field js-login-input"
+                     placeholder="Логин"
+                     autocomplete="new-password">
+              <input type="password"
+                     name="sphere-password"
+                     class="login-form__input-field js-password-input"
+                     placeholder="Пароль"
+                     autocomplete="new-password">
               <div class="login-form__inner-wrapper">
                 <button type="submit" class="button login-form__sign-in-button js-submit-button">
                   Зайти
@@ -47,67 +54,69 @@
         </div>
       </div>
     </div>
-
-
-    <div class="logo-wrapper">
-      <img src="~/src/assets/media/icons/sphere-logo.svg"
-           loading="lazy"
-           alt="sphere logo"
-           width="156"
-           height="31.79"
-           class="logo">
-    </div>
-    <section class="section player">
-      <header class="player__header">
-        <div class="place">Franky</div>
-        <div class="current-playlist">Beautified dream mix</div>
-      </header>
-      <div class="player__actions">
-        <div id="howler-play"
-             data-w-id="d52f03dd-91b4-02f7-d655-beec3ceab2ff"
-             class="play-button"
-             style="visibility: visible; opacity: 1; transition: visibility 0s ease 0s, opacity 0.25s ease-in 0s;">
-          <img src="~/src/assets/media/icons/play.svg"
+    <div class="main-content">
+      <div class="main-content__wrapper">
+        <div class="logo-wrapper">
+          <img src="~/src/assets/media/icons/sphere-logo.svg"
                loading="lazy"
-               height="28"
-               width="28"
-               data-w-id="d4cfa0aa-d13f-62c0-53f5-6d50b30b2715"
-               alt=""
-               class="play-icon">
-          <img src="~/src/assets/media/icons/pause.svg"
-               loading="lazy"
-               height="28"
-               width="28"
-               data-w-id="bb563e5e-cd42-1aff-c82c-f776759c6335"
-               alt=""
-               class="pause-icon">
+               alt="sphere logo"
+               width="156"
+               height="31.79"
+               class="logo">
         </div>
-        <form class="like-dislike-div">
-        </form>
+        <section class="section player">
+          <header class="player__header">
+            <div class="place">Franky</div>
+            <div class="current-playlist">Beautified dream mix</div>
+          </header>
+          <div class="player__actions">
+            <div id="howler-play"
+                 data-w-id="d52f03dd-91b4-02f7-d655-beec3ceab2ff"
+                 class="play-button"
+                 style="visibility: visible; opacity: 1; transition: visibility 0s ease 0s, opacity 0.25s ease-in 0s;">
+              <img src="~/src/assets/media/icons/play.svg"
+                   loading="lazy"
+                   height="28"
+                   width="28"
+                   data-w-id="d4cfa0aa-d13f-62c0-53f5-6d50b30b2715"
+                   alt=""
+                   class="play-icon">
+              <img src="~/src/assets/media/icons/pause.svg"
+                   loading="lazy"
+                   height="28"
+                   width="28"
+                   data-w-id="bb563e5e-cd42-1aff-c82c-f776759c6335"
+                   alt=""
+                   class="pause-icon">
+            </div>
+            <form class="like-dislike-div">
+            </form>
+          </div>
+        </section>
+        <section class="section description">
+          <div class="heading-micro">Что умеет наш плеер:</div>
+          <ul class="list">
+            <li class="list-item">Трэки автоматически смешиваются при запуске плеера.</li>
+            <li class="list-item">В подборке утренний и вечерний плейлисты. Они меняются сами, в зависимости от времени
+              дня.
+            </li>
+            <li>Можно отмечать лайком и дизлайком трэки. Так мы будем точнее обновлять ваши плейлисты.</li>
+          </ul>
+          <div>Для телефонов на Android версий 8 и 9 стоит использовать браузеры Opera или Mozilla Firefox.
+            <br>
+            Для iPhone
+            нужна ОС 13 и выше.
+            <br>
+            Скорость интернета должна быть выше 1 мб/c (проверить можно
+            <a href="https://fast.com/" target="_blank" class="link-3">здесь</a>
+            ).
+            <br>
+            Ниже
+            можно отправить нам фидбэк, плеер при отправке не выключится.
+          </div>
+        </section>
       </div>
-    </section>
-    <section class="section description">
-      <div class="heading-micro">Что умеет наш плеер:</div>
-      <ul class="list">
-        <li class="list-item">Трэки автоматически смешиваются при запуске плеера.</li>
-        <li class="list-item">В подборке утренний и вечерний плейлисты. Они меняются сами, в зависимости от времени
-          дня.
-        </li>
-        <li>Можно отмечать лайком и дизлайком трэки. Так мы будем точнее обновлять ваши плейлисты.</li>
-      </ul>
-      <div>Для телефонов на Android версий 8 и 9 стоит использовать браузеры Opera или Mozilla Firefox.
-        <br>
-        Для iPhone
-        нужна ОС 13 и выше.
-        <br>
-        Скорость интернета должна быть выше 1 мб/c (проверить можно
-        <a href="https://fast.com/" target="_blank" class="link-3">здесь</a>
-        ).
-        <br>
-        Ниже
-        можно отправить нам фидбэк, плеер при отправке не выключится.
-      </div>
-    </section>
+    </div>
   </div>
   <script type="module" src="~/src/assets/scripts/index.js"></script>
   <!--  <script src="./Sphere Player_files/playerRules_Franky__with_login.js.Без названия"></script>-->

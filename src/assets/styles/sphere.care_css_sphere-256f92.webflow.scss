@@ -41,12 +41,24 @@ body {
 }
 
 .page {
+  max-height: 100vh;
+  display: flex;
+}
+
+.main-content {
+  width: 100%;
+}
+
+.main-content__wrapper {
+  max-height: 100%;
   max-width: 1000px;
   padding: 50px 10px 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
+  overflow: auto;
+  align-self: stretch;
 }
 
 .logo {
@@ -212,7 +224,7 @@ body {
 }
 
 @media screen and (min-width: 479px) {
-  .page {
+  .main-content__wrapper {
     padding-left: 20px;
     padding-right: 20px;
   }
