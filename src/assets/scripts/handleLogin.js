@@ -1,6 +1,6 @@
 import { debounce } from './_helpers.js'
 
-const handleLogin = async () => {
+export const handleLogin = async (callback) => {
   const loginScreenAnimationDuration = 250
   const loginPopupAnimationDuration = loginScreenAnimationDuration
   const loadingPlaceholderAnimationDuration = loginScreenAnimationDuration
@@ -65,9 +65,9 @@ const handleLogin = async () => {
     
     if (loginResponse.ok) {
       const baseId = await loginResponse.text()
-      window.dispatchEvent(new CustomEvent('loggedInFromBrowserMemory'))
+      callback(baseId);
       
-      console.log(51)
+      window.dispatchEvent(new CustomEvent('loggedInFromBrowserMemory'))
       return
     }
   }
@@ -124,6 +124,7 @@ const handleLogin = async () => {
     const loginResponse = await logIn(username, password)
     if (loginResponse.ok) {
       const baseId = await loginResponse.text()
+      callback(baseId)
       
       localStorage.setItem('login', username)
       localStorage.setItem('password', password)
@@ -135,5 +136,3 @@ const handleLogin = async () => {
     }
   }
 }
-
-handleLogin()
