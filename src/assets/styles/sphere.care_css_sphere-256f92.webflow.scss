@@ -1,28 +1,6 @@
-.w-form {
-  margin: 0 0 15px;
-}
-
-.w-button {
-  display: inline-block;
-  padding: 9px 15px;
-  background-color: #3898EC;
-  color: white;
-  border: 0;
-  line-height: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 0;
-}
-
-//input.w-button {
-//  -webkit-appearance: button;
-//}
-
-
 *, *::before, *::after {
   box-sizing: border-box;
 }
-
 
 body {
   border-bottom: 1px none #4f4e4e;
@@ -42,14 +20,10 @@ body {
 
 .page {
   max-height: 100vh;
-  display: flex;
+  overflow: auto;
 }
 
 .main-content {
-  width: 100%;
-}
-
-.main-content__wrapper {
   max-height: 100%;
   max-width: 1000px;
   padding: 50px 10px 80px;
@@ -57,8 +31,6 @@ body {
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
-  overflow: auto;
-  align-self: stretch;
 }
 
 .logo {
@@ -224,7 +196,7 @@ body {
 }
 
 @media screen and (min-width: 479px) {
-  .main-content__wrapper {
+  .main-content {
     padding-left: 20px;
     padding-right: 20px;
   }

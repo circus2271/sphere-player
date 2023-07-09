@@ -30,7 +30,6 @@ export const handleLogin = async (callback) => {
     setTimeout(() => {
       // remove login screen from dom after animation ends
       loginScreen.parentNode.removeChild(loginScreen)
-      document.body.style.overflow = 'auto'
     }, loginScreenAnimationDuration)
   }
   
@@ -46,10 +45,14 @@ export const handleLogin = async (callback) => {
   const loginForm = document.querySelector('#login-form')
   
   // const requestUrl = window['serverlessFunctionUrl']
-  const requestUrl = 'http://localhost:8092/'
+  // const requestUrl = 'http://localhost:8095/'
+  const requestUrl = 'https://login-pxkzcjm4rq-lm.a.run.app/'
   const logIn = async (username, password) => {
     return fetch(requestUrl, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         login: username,
         password: password
