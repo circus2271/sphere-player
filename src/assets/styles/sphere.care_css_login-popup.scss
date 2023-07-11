@@ -41,16 +41,13 @@
       max-width: 420px;
     }
 
-    &::before {
+    .blurry-background {
       content: '';
       position: absolute;
       top: 0;
       left: 12px;
-      background-image: url('~/src/assets/media/images/blurry-background_(login-popup).svg');
       width: 358px;
       height: 278px;
-      background-repeat: no-repeat;
-      background-size: 100% 100%;
       z-index: 1;
       transform: scale(1.4);
 
@@ -64,6 +61,12 @@
         margin-top: -77px;
         margin-left: -60px;
         transform: scale(1.3);
+      }
+
+      svg {
+        display: block;
+        width: 100%;
+        height: 100%;
       }
     }
   }

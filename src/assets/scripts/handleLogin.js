@@ -1,10 +1,72 @@
 import { debounce } from './_helpers.js'
+import { loginApiEndpoint } from './_apiEndpoints.js'
+
+const loginScreenAnimationDuration = 250
+const loginPopupAnimationDuration = loginScreenAnimationDuration
+const loadingPlaceholderAnimationDuration = loginScreenAnimationDuration
+
+const loginScreen = document.querySelector('#login-screen')
+const loginForm = document.querySelector('#login-form')
+
+const removeFullpagePopup = () => {
+  // animate popup dissapearing
+  loginScreen.style.transitionDuration = `${loginScreenAnimationDuration}ms`
+  loginScreen.style.transitionTimingFunction = 'ease-out'
+  loginScreen.style.visibility = 'hidden'
+  loginScreen.style.opacity = 0
+  
+  setTimeout(() => {
+    // remove login screen from dom after animation ends
+    loginScreen.parentNode.removeChild(loginScreen)
+  }, loginScreenAnimationDuration)
+}
+
+const showLoginPopup = () => {
+  const loginPopup = document.querySelector('#login-popup')
+  loginPopup.style.transitionDuration = `${loginPopupAnimationDuration}ms`
+  loginPopup.style.transitionTimingFunction = 'ease-in'
+  loginPopup.style.visibility = 'visible'
+  loginPopup.style.opacity = 1
+}
+
+const logIn = async (username, password) => {
+  // const requestUrl = 'http://localhost:8095/'
+  const requestUrl = loginApiEndpoint
+  
+  return fetch(requestUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      login: username,
+      password: password
+    })
+  })
+}
+
+// login form error message handling
+const loginFormErrorMessage = loginForm.querySelector('#error-message')
+const loginFormErrorMessageAnimationTransitionDurationMs = 250
+const timeErrorMessageIsVisibleMs = 5000
+
+const showErrorMessage = () => {
+  loginFormErrorMessage.style.transitionDuration = `${loginFormErrorMessageAnimationTransitionDurationMs}ms`
+  loginFormErrorMessage.style.visibility = 'visible'
+  loginFormErrorMessage.style.opacity = '1'
+  
+  setLoginFormErrorMessageHidingTimer()
+}
+
+const setLoginFormErrorMessageHidingTimer = debounce(() => {
+  // hide login form error message after some delay
+  loginFormErrorMessage.style.transitionDuration = `${loginFormErrorMessageAnimationTransitionDurationMs}ms`
+  loginFormErrorMessage.style.visibility = 'hidden'
+  loginFormErrorMessage.style.opacity = '0'
+}, timeErrorMessageIsVisibleMs)
+
 
 export const handleLogin = async (callback) => {
-  const loginScreenAnimationDuration = 250
-  const loginPopupAnimationDuration = loginScreenAnimationDuration
-  const loadingPlaceholderAnimationDuration = loginScreenAnimationDuration
-  
   Promise.all([
     new Promise(resolve => {
       window.addEventListener('requiredDelayTimeIsUp', _ => resolve(), { once: true })
@@ -20,45 +82,6 @@ export const handleLogin = async (callback) => {
     window.dispatchEvent(new CustomEvent('requiredDelayTimeIsUp'))
   }, requiredLoadingMinDelayMilliseconds)
   
-  const removeFullpagePopup = () => {
-    // animate popup dissapearing
-    loginScreen.style.transitionDuration = `${loginScreenAnimationDuration}ms`
-    loginScreen.style.transitionTimingFunction = 'ease-out'
-    loginScreen.style.visibility = 'hidden'
-    loginScreen.style.opacity = 0
-    
-    setTimeout(() => {
-      // remove login screen from dom after animation ends
-      loginScreen.parentNode.removeChild(loginScreen)
-    }, loginScreenAnimationDuration)
-  }
-  
-  const showLoginPopup = () => {
-    const loginPopup = document.querySelector('#login-popup')
-    loginPopup.style.transitionDuration = `${loginPopupAnimationDuration}ms`
-    loginPopup.style.transitionTimingFunction = 'ease-in'
-    loginPopup.style.visibility = 'visible'
-    loginPopup.style.opacity = 1
-  }
-  
-  const loginScreen = document.querySelector('#login-screen')
-  const loginForm = document.querySelector('#login-form')
-  
-  // const requestUrl = window['serverlessFunctionUrl']
-  // const requestUrl = 'http://localhost:8095/'
-  const requestUrl = 'https://login-pxkzcjm4rq-lm.a.run.app/'
-  const logIn = async (username, password) => {
-    return fetch(requestUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        login: username,
-        password: password
-      })
-    })
-  }
   
   const username = localStorage.getItem('login')
   const password = localStorage.getItem('password')
@@ -82,33 +105,13 @@ export const handleLogin = async (callback) => {
     loadingPlaceholder.style.visibility = 'hidden'
     loadingPlaceholder.style.opacity = 0
     loadingPlaceholder.style.transitionDuration = `${loadingPlaceholderAnimationDuration}ms`
-  
+    
     // loading text dissapears -> show login popup
     const delay = 250 // add delay, so popup will animate not immediately, but after some amount of milliseconds
     setTimeout(() => showLoginPopup(), loadingPlaceholderAnimationDuration + delay)
   })()
   
-  // login form error message handling
-  const loginFormErrorMessage = loginForm.querySelector('#error-message')
-  const loginFormErrorMessageAnimationTransitionDurationMs = 250
-  const timeErrorMessageIsVisibleMs = 5000
   
-  const showErrorMessage = () => {
-    loginFormErrorMessage.style.transitionDuration = `${loginFormErrorMessageAnimationTransitionDurationMs}ms`
-    loginFormErrorMessage.style.visibility = 'visible'
-    loginFormErrorMessage.style.opacity = '1'
-    
-    setLoginFormErrorMessageHidingTimer()
-  }
-  
-  const setLoginFormErrorMessageHidingTimer = debounce(() => {
-    // hide login form error message after some delay
-    loginFormErrorMessage.style.transitionDuration = `${loginFormErrorMessageAnimationTransitionDurationMs}ms`
-    loginFormErrorMessage.style.visibility = 'hidden'
-    loginFormErrorMessage.style.opacity = '0'
-  }, timeErrorMessageIsVisibleMs)
-  
-  // const loginForm = document.querySelector('.js-login-form');
   const usernameInput = loginForm.querySelector('.js-login-input');
   const passwordInput = loginForm.querySelector('.js-password-input')
   
