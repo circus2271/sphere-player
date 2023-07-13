@@ -18,6 +18,19 @@ body {
   overflow: hidden;
 }
 
+button {
+  // reset some styles
+  background-color: transparent;
+  border-width: 0;
+  padding: 0;
+
+  cursor: pointer;
+}
+
+svg {
+  display: block;
+}
+
 .page {
   max-height: 100vh;
   overflow: auto;
@@ -31,27 +44,45 @@ body {
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
+
+  @include medium() {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
 }
 
-.logo {
-  width: 108px;
-  opacity: 0.86;
+.logo-wrapper {
+  width: 161px;
+  height: 51px;
+  color: #0F0F0E;
+
+  opacity: .75;
+  //color: hsl(208 44% 33% / 1);
 }
 
 .section {
   width: 100%;
   max-width: 630px;
-  padding: 20px 11px;
+  padding: 10px 5px;
   align-self: center;
   border-radius: 20px;
   background-color: #eaeaea;
   box-shadow: inset 2px 2px 4px 0 hsla(0, 0%, 100%, 0.4), 3px 3px 4px 0 rgba(0, 0, 0, 0.1);
 
-  &:first-of-type {
-    margin-top: 30px;
+  @include medium() {
+    padding: 17px 15px;
   }
 
-  &:nth-of-type(2) {
+  &.player {
+    margin-top: 30px;
+
+    @include medium() {
+      margin-top: 22px;
+    }
+  }
+
+  &.description {
+    display: none;
     margin-top: 25px;
     color: #747474;
     font-size: 19px;
@@ -61,167 +92,214 @@ body {
 }
 
 .player__header {
-  margin-bottom: 20px;
-  padding: 13px 14px;
   border-radius: 16px;
   background-color: #404a53;
   box-shadow: inset -4px -4px 10px 0 #575c72, inset 6px 6px 10px 1px #333647;
-  line-height: 20px;
+  padding: 16px 14px;
+  margin-bottom: 18px;
+
+  @include medium() {
+    padding: 13px 24px;
+    margin-bottom: 16px;
+  }
 
   .place {
     padding-bottom: 7px;
-    color: #929292;
-    font-size: 17px;
+    color: #F3F3F3;
+    font-size: 20px;
     line-height: 20px;
-    font-weight: 300;
+    font-weight: 400;
+
+    @include medium() {
+      font-size: 17px;
+    }
   }
 
   .current-playlist {
-    color: #bdbdbd;
-    font-size: 27px;
-    font-weight: 300;
+    color: #EAEAEA;
+    font-size: 30px;
+    font-weight: 500;
+
+    @include medium() {
+      font-size: 27px;
+    }
   }
 }
 
 .player__actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  //display: flex;
+  //justify-content: space-between;
+  //align-items: center;
+  padding: 0 5px 21px;
 
-  .play-button {
+  //.play-button {
+  //  display: flex;
+  //  width: 68px;
+  //  height: 68px;
+  //  margin-left: 10px;
+  //  justify-content: center;
+  //  align-items: center;
+  //  border-radius: 50px;
+  //  box-shadow: inset 2px 2px 8px 0 #fff, inset -3px -3px 4px 0 #cecece, 3px 3px 10px 0 hsla(0, 0%, 79.6%, 0.65), -4px -4px 5px 1px #fdfdfd, 2px -2px 8px 0 hsla(0, 0%, 84.3%, 0.3), -2px 2px 9px 0 hsla(0, 0%, 91.8%, 0.3);
+  //  transition: box-shadow 400ms cubic-bezier(.25, .46, .45, .94);
+  //  cursor: pointer;
+  //
+  //  @include medium() {
+  //    margin-left: 18px;
+  //  }
+  //}
+  //  &:active {
+  //    box-shadow: inset 3px 3px 8px 0 hsla(0, 0%, 69.8%, 0.66), inset -2px -2px 6px 0 #fefefe, 3px 3px 10px 0 hsla(0, 0%, 79.6%, 0.65), -3px -3px 7px 0 hsla(0, 0%, 99.2%, 0.97), 2px -2px 8px 0 hsla(0, 0%, 84.3%, 0.3), -2px 2px 9px 0 hsla(0, 0%, 91.8%, 0.3);
+  //  }
+  //
+  //  .play-icon {
+  //    display: block;
+  //    margin-left: 4px;
+  //  }
+  //
+  //  .pause-icon {
+  //    display: none;
+  //    margin-left: -2px;
+  //  }
+  //}
+}
+
+
+.first-line-actions {
+  display: flex;
+  width: 100%;
+  margin-bottom: 22px;
+
+  @include medium() {
+    margin-bottom: 13px;
+  }
+
+  .flex-spacer {
+    flex-grow: 1;
+  }
+
+  .song-rate-form {
     display: flex;
-    width: 68px;
-    height: 68px;
-    margin-left: 10px;
-    justify-content: center;
     align-items: center;
-    border-radius: 50px;
-    box-shadow: inset 2px 2px 8px 0 #fff, inset -3px -3px 4px 0 #cecece, 3px 3px 10px 0 hsla(0, 0%, 79.6%, 0.65), -4px -4px 5px 1px #fdfdfd, 2px -2px 8px 0 hsla(0, 0%, 84.3%, 0.3), -2px 2px 9px 0 hsla(0, 0%, 91.8%, 0.3);
-    transition: box-shadow 400ms cubic-bezier(.25, .46, .45, .94);
-    cursor: pointer;
-
-    &:active {
-      box-shadow: inset 3px 3px 8px 0 hsla(0, 0%, 69.8%, 0.66), inset -2px -2px 6px 0 #fefefe, 3px 3px 10px 0 hsla(0, 0%, 79.6%, 0.65), -3px -3px 7px 0 hsla(0, 0%, 99.2%, 0.97), 2px -2px 8px 0 hsla(0, 0%, 84.3%, 0.3), -2px 2px 9px 0 hsla(0, 0%, 91.8%, 0.3);
-    }
-
-    .play-icon {
-      display: block;
-      margin-left: 4px;
-    }
-
-    .pause-icon {
-      display: none;
-      margin-left: -2px;
-    }
-  }
-}
-
-
-.like-dislike-div {
-  display: flex;
-
-  .like-dislike-form-block {
-    width: 100%;
-    margin-right: 10px;
-    margin-bottom: 0px;
-    align-self: center;
   }
 
-  .div-forl-like-dislike {
-    position: relative;
-
-    .dislike-pushed-img {
-      position: absolute;
-      left: 7%;
-      top: 6%;
-      right: 0%;
-      bottom: 0%;
-      display: none;
-      width: 41px;
-    }
-
-    .like-pushed-img {
-      position: absolute;
-      display: none;
-    }
-  }
-
-  .like-dislike-submit {
-    width: 44px;
-    height: 38px;
-    background-color: transparent;
-    background-image: url('~/src/assets/media/icons/like.svg');
-    background-position: 50% 50%;
-    background-size: contain;
-    background-repeat: no-repeat;
-
-    &:hover {
-      filter: contrast(200%);
-    }
-  }
-}
-
-.like-dislike-submit.dislike {
-  width: 48px;
-  height: 38px;
-  background-image: url('~/src/assets/media/icons/dislike.svg');
-  background-position: 50% 50%;
-}
-
-.like-dislike-submit.dislike:hover {
-  filter: contrast(200%);
-}
-
-.like-dislike-submit.like {
-  width: 43px;
-}
-
-.section.description {
-  .heading-micro {
-    margin-bottom: 11px;
-    color: #7a7a7a;
-    font-size: 19px;
-    font-weight: 400;
-  }
-
-  .list {
-    margin-bottom: 15px;
-    padding-left: 23px;
-    list-style-type: disc;
-
-    &-item {
-      margin-bottom: 7px;
-    }
-  }
-}
-
-@media screen and (min-width: 479px) {
-  .main-content {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-
-  .logo {
-    width: 156px;
-  }
-
-  .section {
-    padding: 17px;
-
+  button {
     &:first-of-type {
-      margin-top: 40px;
+      padding-right: 4px;
+    }
+
+    &:last-of-type {
+      padding-left: 4px;
     }
   }
+}
 
-  .player__header {
-    padding: 18px 21px;
-  }
 
-  .play-button {
-    margin-left: 18px;
-  }
+.playlists {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
 
-  .list {
-    padding-left: 30px;
+  .playlist {
+    border-radius: 100px;
+    border: 2px solid #DDD;
+    background: #EDEDED;
+    color: #252525;
+    text-align: center;
+    //font-family: GT Pressura Trial;
+    font-size: 22px;
+    font-weight: 500;
+    padding: 13px 22px 15px;
+
+    &--selected {
+      background: #E0E0E0;
+
+      span {
+        opacity: 0.4000000059604645;
+      }
+    }
   }
 }
+
+
+//.like-dislike-div {
+//  display: flex;
+//
+//  .like-dislike-form-block {
+//    width: 100%;
+//    margin-right: 10px;
+//    margin-bottom: 0px;
+//    align-self: center;
+//  }
+//
+//  .div-forl-like-dislike {
+//    position: relative;
+//
+//    .dislike-pushed-img {
+//      position: absolute;
+//      left: 7%;
+//      top: 6%;
+//      right: 0%;
+//      bottom: 0%;
+//      display: none;
+//      width: 41px;
+//    }
+//
+//    .like-pushed-img {
+//      position: absolute;
+//      display: none;
+//    }
+//  }
+//
+//  .like-dislike-submit {
+//    width: 44px;
+//    height: 38px;
+//    background-color: transparent;
+//    background-image: url('~/src/assets/media/icons/like.svg');
+//    background-position: 50% 50%;
+//    background-size: contain;
+//    background-repeat: no-repeat;
+//
+//    &:hover {
+//      filter: contrast(200%);
+//    }
+//  }
+//}
+//
+//.like-dislike-submit.dislike {
+//  width: 48px;
+//  height: 38px;
+//  background-image: url('~/src/assets/media/icons/dislike.svg');
+//  background-position: 50% 50%;
+//}
+//
+//.like-dislike-submit.dislike:hover {
+//  filter: contrast(200%);
+//}
+//
+//.like-dislike-submit.like {
+//  width: 43px;
+//}
+//
+//.section.description {
+//  .heading-micro {
+//    margin-bottom: 11px;
+//    color: #7a7a7a;
+//    font-size: 19px;
+//    font-weight: 400;
+//  }
+//
+//  .list {
+//    margin-bottom: 15px;
+//    padding-left: 23px;
+//    list-style-type: disc;
+//
+//    @include medium() {
+//      padding-left: 30px;
+//    }
+//
+//    &-item {
+//      margin-bottom: 7px;
+//    }
+//  }
+//}

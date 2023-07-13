@@ -5,7 +5,7 @@ const getBaseId = async () => {
   const baseId = await new Promise(resolve => {
     handleLogin(resolve)
   })
-  
+
   return baseId
 }
 
@@ -16,10 +16,10 @@ const getBaseId = async () => {
   const urlToFetchRecords = `${getRecordsApiEndpoint}?${searchParams}`
   const response = await fetch(urlToFetchRecords)
   const records = await response.json()
-  
+
   console.log(records)
   records.forEach(record => {
     const playlistName = record.fields['Name']
-    alert(playlistName)
+    // alert(playlistName)
   })
 })()

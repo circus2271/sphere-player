@@ -13,7 +13,7 @@
   z-index: 2;
   color: #333;
   padding: 0 19px;
-  /*visibility: hidden; */
+  //visibility: hidden;
 
   .overlay {
     position: absolute;
@@ -22,7 +22,6 @@
     right: 0;
     bottom: 0;
     z-index: 1;
-    /*background-color: rgba(10, 10, 10, 1);*/
     background-color: #424242;
   }
 

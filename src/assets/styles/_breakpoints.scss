@@ -1,17 +1,4 @@
-$extra-small-end: 426px;
-$medium-start: 768px;
-
-@mixin extra-small() {
-  @media screen and (max-width: $extra-small-end) {
-    @content;
-  }
-}
-
-@mixin small() {
-  @media screen and (max-width: $medium-start - 1px) {
-    @content;
-  }
-}
+$medium-start: 479px;
 
 @mixin medium() {
   @media screen and (min-width: $medium-start) {
