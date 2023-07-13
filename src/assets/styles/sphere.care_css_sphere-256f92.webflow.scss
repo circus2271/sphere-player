@@ -82,7 +82,7 @@ svg {
   }
 
   &.description {
-    display: none;
+    //display: none;
     margin-top: 25px;
     color: #747474;
     font-size: 19px;
@@ -199,6 +199,7 @@ svg {
   display: flex;
   flex-direction: column;
   gap: 9px;
+  //padding: 0 6px;
 
   .playlist {
     border-radius: 100px;

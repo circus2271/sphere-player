@@ -113,8 +113,8 @@
       </div>
       <section class="section player">
         <header class="player__header">
-          <div class="place">Franky</div>
-          <div class="current-playlist">Beautified dream mix</div>
+          <div class="place" id="place-name">Franky (default)</div>
+          <div class="current-playlist" id="current-playlist">loading...</div>
         </header>
         <div class="player__actions">
           <div class="first-line-actions">
@@ -172,19 +172,18 @@
               </button>
             </form>
           </div>
-          <div class="playlists">
-            <button class="playlist playlist--selected">
-              <!--              🎶 Indie and pop club-->
-              <span>
-                              Indie and pop club
-              </span>
-            </button>
-            <button class="playlist">
-              <span>
-              Dance hall
-              </span>
-              <!--              🎶 Dance hall-->
-            </button>
+          <div class="playlists" id="playlists">
+            <template id="playlist-template">
+              <!--              <button class="playlist playlist&#45;&#45;selected">-->
+              <!--              </button>-->
+              <button class="playlist">
+                <span>
+                  Dance hall
+                </span>
+                <!--              🎶 Dance hall-->
+              </button>
+            </template>
+            loading...
           </div>
         </div>
       </section>
