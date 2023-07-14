@@ -5,42 +5,47 @@ const getBaseId = async () => {
   const baseId = await new Promise(resolve => {
     handleLogin(resolve)
   })
-
+  
   return baseId
 }
 
 (async () => {
   const baseId = await getBaseId()
-  const queryParams = { baseId, tableId: 'Info'}
+  const queryParams = { baseId, tableId: 'Info' }
   const searchParams = new URLSearchParams(queryParams)
   const urlToFetchRecords = `${getRecordsApiEndpoint}?${searchParams}`
   const response = await fetch(urlToFetchRecords)
   const records = await response.json()
-
+  
   console.log(records)
-
-  const playlistTemplate = document.querySelector('#playlist-template')
+  
   const playlists = document.querySelector('#playlists')
-
-  records.forEach(record => {
+  
+  playlists.textContent = ''
+  records.forEach((record, i) => {
     const playlistName = record.fields['Name']
+    const playlistDescription = record.fields['Notes']
+    const selected = i === 0
+    
+    if (selected) {
+      document.querySelector('#current-playlist').innerHTML = playlistName
+    }
+    
+    const html = `
+      <button class="playlist ${selected ? 'playlist--selected' : ''}">
+        <span class="playlist__name">
+          ${playlistName}
+        </span>
+        <span class="playlist__description">
+          ${playlistDescription}
+        </span>
+      </button>
+    `
 
-    playlists.textContent = ''
-    records.forEach((record, i) => {
-      const playlistName = record.fields['Name']
-      const clone = playlistTemplate.content.cloneNode(true)
-    
-      clone.querySelector('.playlist span').textContent = playlistName
-    
-      if (i === 0) {
-        clone.querySelector('.playlist').classList.add('playlist--selected')
-        document.querySelector('#current-playlist').textContent = playlistName
-      }
-    
-      playlists.appendChild(clone)
-    })
+    playlists.innerHTML += html
   })
 })()
+
 // const records = [
 //   {
 //     "id": "recD9LVoSJl9K48Q7",
@@ -61,9 +66,3 @@ const getBaseId = async () => {
 //     }
 //   }
 // ]
-
-
-// console.log(playlistTemplate.content.cloneNode(true))
-// console.log(playlistTemplate.content.cloneNode(true))
-// document.querySelector('.place').appendChild(playlistTemplate.content)
-// document.querySelector('.current-playlist').appendChild(playlistTemplate.content)

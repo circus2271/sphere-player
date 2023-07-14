@@ -2,11 +2,204 @@
 @import 'fonts';
 @import 'breakpoints';
 @import 'sphere.care_css_login-popup';
-@import 'sphere.care_css_sphere-256f92.webflow.scss';
-//body {
-//
-//  h1 {
-//    color: green;
-//    font-size: 4rem;
-//  }
-//}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  border-bottom: 1px none #4f4e4e;
+  background-image: url('~/src/assets/media/images/bg-lines-003-light.png'), url('~/src/assets/media/images/777-55-4-monochrome-min.png');
+  background-position: 50% 50%, 0px 0px;
+  background-size: cover, auto;
+  background-repeat: repeat, repeat;
+  font-family: Favoritpro, sans-serif;
+  color: #0e0e0e;
+  font-size: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #ddd;
+  overflow: hidden;
+}
+
+button {
+  // reset some styles
+  background-color: transparent;
+  border-width: 0;
+  padding: 0;
+
+  cursor: pointer;
+}
+
+svg {
+  display: block;
+}
+
+.page {
+  max-height: 100vh;
+  overflow: auto;
+}
+
+.main-content {
+  max-height: 100%;
+  max-width: 1000px;
+  padding: 50px 10px 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+
+  @include medium() {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+.logo-wrapper {
+  width: 161px;
+  height: 51px;
+  color: #0F0F0E;
+
+  opacity: .75;
+  //color: hsl(208 44% 33% / 1);
+}
+
+.section {
+  width: 100%;
+  max-width: 630px;
+  padding: 10px 5px;
+  align-self: center;
+  border-radius: 20px;
+  background-color: #eaeaea;
+  box-shadow: inset 2px 2px 4px 0 hsla(0, 0%, 100%, 0.4), 3px 3px 4px 0 rgba(0, 0, 0, 0.1);
+
+  @include medium() {
+    padding: 17px 15px;
+  }
+
+  &.player {
+    margin-top: 30px;
+
+    @include medium() {
+      margin-top: 22px;
+    }
+  }
+
+  &.description {
+    //display: none;
+    margin-top: 25px;
+    color: #747474;
+    font-size: 19px;
+    line-height: 21px;
+    font-weight: 300;
+  }
+}
+
+.player__header {
+  border-radius: 16px;
+  background-color: #404a53;
+  box-shadow: inset -4px -4px 10px 0 #575c72, inset 6px 6px 10px 1px #333647;
+  padding: 16px 14px;
+  margin-bottom: 18px;
+
+  @include medium() {
+    padding: 13px 24px;
+    margin-bottom: 16px;
+  }
+
+  .place {
+    padding-bottom: 7px;
+    color: #F3F3F3;
+    font-size: 20px;
+    line-height: 20px;
+    font-weight: 400;
+
+    @include medium() {
+      font-size: 17px;
+    }
+  }
+
+  .current-playlist {
+    color: #EAEAEA;
+    font-size: 30px;
+    font-weight: 500;
+
+    @include medium() {
+      font-size: 27px;
+    }
+  }
+}
+
+.player__actions {
+  padding: 0 5px 21px;
+}
+
+
+.first-line-actions {
+  display: flex;
+  width: 100%;
+  margin-bottom: 22px;
+
+  @include medium() {
+    margin-bottom: 13px;
+  }
+
+  .flex-spacer {
+    flex-grow: 1;
+  }
+
+  .song-rate-form {
+    display: flex;
+    align-items: center;
+  }
+
+  button {
+    &:first-of-type {
+      padding-right: 4px;
+    }
+
+    &:last-of-type {
+      padding-left: 4px;
+    }
+  }
+}
+
+
+.playlists {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  //padding: 0 6px;
+
+  .playlist {
+    border-radius: 30px;
+    border: 2px solid #DDD;
+    background: #EDEDED;
+    //font-family: GT Pressura Trial;
+    font-size: 22px;
+    font-weight: 500;
+    padding: 16px 22px;
+    color: #000;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+
+    &--selected {
+      background: #E0E0E0;
+    }
+
+    &__name {
+      margin-bottom: 15px;
+
+      &::before {
+        content: '🎶'
+      }
+    }
+
+    &__description {
+
+    }
+  }
+}
+
