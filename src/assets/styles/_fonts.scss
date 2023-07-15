@@ -23,24 +23,32 @@
 }
 
 @font-face {
-    font-family: 'GT Pressura Trial';
-    src: url('~/src/assets/fonts/GT-Pressura-LCGV-Standard-Light.otf') format('otf');
+    font-family: 'GT Pressura LCGV';
+    src: url('~/src/assets/fonts/GT-Pressura-LCGV-Extended-Light.otf') format('otf');
+    font-weight: 200;
+    font-style: normal;
+    font-display: auto;
+}
+
+@font-face {
+    font-family: 'GT Pressura LCGV';
+    src: url('~/src/assets/fonts/GT-Pressura-LCGV-Extended-Text.otf') format('otf');
     font-weight: 300;
     font-style: normal;
     font-display: auto;
 }
 
 @font-face {
-    font-family: 'GT Pressura Trial';
-    src: url('~/src/assets/fonts/GT-Pressura-LCGV-Standard-Regular.otf') format('otf');
+    font-family: 'GT Pressura LCGV';
+    src: url('~/src/assets/fonts/GT-Pressura-LCGV-Extended-Regular.otf') format('otf');
     font-weight: 400;
     font-style: normal;
     font-display: auto;
 }
 
 @font-face {
-    font-family: 'GT Pressura Trial';
-    src: url('~/src/assets/fonts/GT-Pressura-LCGV-Standard-Medium.otf') format('otf');
+    font-family: 'GT Pressura LCGV';
+    src: url('~/src/assets/fonts/GT-Pressura-LCGV-Extended-Medium.otf') format('otf');
     font-weight: 500;
     font-style: normal;
     font-display: auto;
