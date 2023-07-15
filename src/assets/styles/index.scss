@@ -13,7 +13,6 @@ body {
   background-position: 50% 50%, 0px 0px;
   background-size: cover, auto;
   background-repeat: repeat, repeat;
-  font-family: Favoritpro, sans-serif;
   color: #0e0e0e;
   font-size: 20px;
   display: flex;
@@ -36,9 +35,15 @@ svg {
   display: block;
 }
 
+ul {
+  margin: 0;
+  padding: 0;
+}
+
 .page {
   max-height: 100vh;
   overflow: auto;
+  font-family: 'GT Pressura Trial', sans-serif;
 }
 
 .main-content {
@@ -68,7 +73,7 @@ svg {
 .section {
   width: 100%;
   max-width: 630px;
-  padding: 10px 5px;
+  padding: 10px 5px 29px;
   align-self: center;
   border-radius: 20px;
   background-color: #eaeaea;
@@ -77,22 +82,14 @@ svg {
   @include medium() {
     padding: 17px 15px;
   }
+}
 
-  &.player {
-    margin-top: 30px;
 
-    @include medium() {
-      margin-top: 22px;
-    }
-  }
+.player {
+  margin-top: 30px;
 
-  &.description {
-    //display: none;
-    margin-top: 25px;
-    color: #747474;
-    font-size: 19px;
-    line-height: 21px;
-    font-weight: 300;
+  @include medium() {
+    margin-top: 22px;
   }
 }
 
@@ -132,9 +129,8 @@ svg {
 }
 
 .player__actions {
-  padding: 0 5px 21px;
+  padding: 0 5px;
 }
-
 
 .first-line-actions {
   display: flex;
@@ -165,28 +161,36 @@ svg {
   }
 }
 
-
 .playlists {
   display: flex;
   flex-direction: column;
   gap: 9px;
-  //padding: 0 6px;
+
+  &__list-title {
+    font-size: 20px;
+    line-height: 1;
+    font-weight: 400;
+    margin: 0 0 18px;
+    color: #000;
+    padding-left: 3px;
+  }
 
   .playlist {
     border-radius: 30px;
     border: 2px solid #DDD;
     background: #EDEDED;
-    //font-family: GT Pressura Trial;
     font-size: 22px;
     font-weight: 500;
-    padding: 16px 22px;
+    padding: 40px 22px 40px;
+    //padding: 16px 22px 22px;
     color: #000;
     display: flex;
     flex-direction: column;
     text-align: left;
+    user-select: text;
 
-    &:hover {
-      border: 2px solid #000000;
+    &--placeholder {
+      padding: 20px 22px 30px;
     }
 
     &--selected {
@@ -194,16 +198,47 @@ svg {
     }
 
     &__name {
-      margin-bottom: 15px;
-
-      &::before {
-        content: '🎶'
-      }
+      font-size: 20px;
+      margin-bottom: 16px;
+      width: 100%;
     }
 
     &__description {
-
+      font-size: 18px;
     }
   }
 }
 
+.description {
+  margin-top: 25px;
+  color: #000;
+  font-size: 20px;
+  font-weight: 300;
+  padding: 21px 24px 28px;
+  padding: 33px 24px 37px;
+
+  &__list-title {
+    font-size: 20px;
+    color: #000;
+    font-weight: 500;
+    margin: 0 0 12px;
+  }
+
+  ul {
+    padding-left: 32px;
+    margin-bottom: 19px;
+    font-weight: 300;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+
+    li {
+      margin-bottom: 5px;
+
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
