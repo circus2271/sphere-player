@@ -188,6 +188,7 @@ ul {
     flex-direction: column;
     text-align: left;
     user-select: text;
+    cursor: pointer;
 
     &:first-of-type:not(.playlist--placeholder) {
       background: #E0E0E0;
