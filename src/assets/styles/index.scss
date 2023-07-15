@@ -190,7 +190,8 @@ ul {
     user-select: text;
     cursor: pointer;
 
-    &:first-of-type:not(.playlist--placeholder) {
+    //&:first-of-type:not(.playlist--placeholder) {
+    &--selected {
       background: #E0E0E0;
     }
 

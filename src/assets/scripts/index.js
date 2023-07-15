@@ -54,7 +54,7 @@ const getBaseId = async () => {
     }
 
     const html = `
-      <div class="playlist" data-playlist-name="${playlistName}">
+      <div class="playlist ${selected ? 'playlist--selected' : ''}" data-playlist-name="${playlistName}">
         <span class="playlist__name">
           <span>🎶</span> ${playlistName}
         </span>
@@ -73,7 +73,9 @@ const getBaseId = async () => {
       const playlistEl = event.target.closest('.playlist');
       const playlistName = playlistEl.dataset.playlistName
 
-      playlists.prepend(playlistEl)
+      document.querySelector('.playlist--selected').classList.remove('playlist--selected')
+      playlistEl.classList.add('playlist--selected')
+      // playlists.prepend(playlistEl)
       document.querySelector('#current-playlist').innerHTML = playlistName
     }
   })
