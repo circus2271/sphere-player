@@ -29,7 +29,7 @@ const getBaseId = async () => {
 //       "Notes": "test playlist description"
 //     }
 //   }
-// ]
+// ];
 
 (async () => {
   const baseId = await getBaseId()
@@ -54,7 +54,7 @@ const getBaseId = async () => {
     }
 
     const html = `
-      <div class="playlist ${selected ? 'playlist--selected' : ''}">
+      <div class="playlist" data-playlist-name="${playlistName}">
         <span class="playlist__name">
           <span>🎶</span> ${playlistName}
         </span>
@@ -65,6 +65,17 @@ const getBaseId = async () => {
     `
 
     playlists.innerHTML += html
+  })
+  
+  playlists.addEventListener('click', event => {
+    
+    if (event.target.closest('.playlist')) {
+      const playlistEl = event.target.closest('.playlist');
+      const playlistName = playlistEl.dataset.playlistName
+
+      playlists.prepend(playlistEl)
+      document.querySelector('#current-playlist').innerHTML = playlistName
+    }
   })
 })()
 

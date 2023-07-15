@@ -189,15 +189,16 @@ ul {
     text-align: left;
     user-select: text;
 
+    &:first-of-type:not(.playlist--placeholder) {
+      background: #E0E0E0;
+    }
+
     &--placeholder {
       padding: 20px 22px 30px;
     }
 
-    &--selected {
-      background: #E0E0E0;
-    }
-
     &__name {
+      display: flex;
       font-size: 20px;
       margin-bottom: 16px;
       width: 100%;
