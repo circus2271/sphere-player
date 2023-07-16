@@ -19,7 +19,6 @@ body {
   flex-direction: column;
   justify-content: space-between;
   background-color: #ddd;
-  //overflow: hidden;
 }
 
 button {
@@ -42,6 +41,8 @@ ul {
 
 .page {
   max-height: 100vh;
+  // fix mobile 100vh bug with content overflowing
+  max-height: -webkit-fill-available;
   overflow: auto;
   font-family: 'GT Pressura LCGV', sans-serif;
 }

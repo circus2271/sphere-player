@@ -9,7 +9,6 @@ const getBaseId = async () => {
   return baseId
 }
 
-
 // const records = [
 //   {
 //     "id": "recD9LVoSJl9K48Q7",
@@ -75,7 +74,7 @@ const getBaseId = async () => {
 
       document.querySelector('.playlist--selected').classList.remove('playlist--selected')
       playlistEl.classList.add('playlist--selected')
-      // playlists.prepend(playlistEl)
+
       document.querySelector('#current-playlist').innerHTML = playlistName
     }
   })
