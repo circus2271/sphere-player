@@ -84,7 +84,6 @@ ul {
   }
 }
 
-
 .player {
   margin-top: 30px;
 
@@ -181,7 +180,6 @@ ul {
     background: #EDEDED;
     font-size: 22px;
     font-weight: 500;
-    //padding: 40px 22px 40px;
     padding: 18px 18px 18px;
     color: #000;
     display: flex;
@@ -190,7 +188,6 @@ ul {
     user-select: text;
     cursor: pointer;
 
-    //&:first-of-type:not(.playlist--placeholder) {
     &--selected {
       background: #E0E0E0;
     }
@@ -223,7 +220,6 @@ ul {
   color: #000;
   font-size: 20px;
   font-weight: 300;
-  padding: 21px 24px 28px;
   padding: 33px 24px 37px;
 
   &__list-title {
