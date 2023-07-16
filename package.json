@@ -6,7 +6,7 @@
     "url": "git+ssh://git@github.com/circus2271/sphere-player.git"
   },
   "scripts": {
-    "dev": "rimraf ./dist && parcel watch src/index.html --no-hmr & live-server --port=8000 ./dist/ --entry-file=index.html",
+    "dev": "rimraf ./dist && parcel watch src/index.html --no-hmr & live-server --port=8000 ./dist/",
     "build": "rimraf ./dist && parcel build src/index.html"
   },
   "browserslist": "> 0.5%, last 2 versions, not dead, iOS 13",
