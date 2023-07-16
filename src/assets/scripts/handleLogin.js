@@ -90,7 +90,9 @@ export const handleLogin = async (callback) => {
     const loginResponse = await logIn(username, password)
     
     if (loginResponse.ok) {
-      const baseId = await loginResponse.text()
+      const response = await loginResponse.json();
+      const { baseId, placeName } = response;
+      document.querySelector('#place-name').innerHTML = placeName;
       callback(baseId);
       
       window.dispatchEvent(new CustomEvent('loggedInFromBrowserMemory'))
@@ -129,7 +131,9 @@ export const handleLogin = async (callback) => {
     
     const loginResponse = await logIn(username, password)
     if (loginResponse.ok) {
-      const baseId = await loginResponse.text()
+      const response = await loginResponse.json();
+      const { baseId, placeName } = response;
+      document.querySelector('#place-name').innerHTML = placeName;
       callback(baseId)
       
       localStorage.setItem('login', username)
