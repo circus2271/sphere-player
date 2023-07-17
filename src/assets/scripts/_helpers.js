@@ -6,14 +6,9 @@ export function debounce(func, timeout) {
     timer = setTimeout(() => { func.apply(this, args) }, timeout)
   }
 }
-
-// // https://www.freecodecamp.org/news/javascript-debounce-example/
-// export const debounce = (func, timeout) => {
-//   let timer
-//   return (...args) => {
-//     clearTimeout(timer)
-//     timer = setTimeout(() => { func.apply(this, args) }, timeout)
-//   }
+//
+// export const getPlaylists = () => {
+//
 // }
 
 export let likeDislikeState = {
