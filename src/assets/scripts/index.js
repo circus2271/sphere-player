@@ -10,34 +10,34 @@ const getBaseId = async () => {
   return baseId
 }
 
-const records = [
-  {
-    "id": "tbl886QoG6g0tC9tV",
-    "createdTime": "2023-04-27T10:22:27.000Z",
-    "fields": {
-      "Name": "Indie playlist",
-      "Status": "Active",
-      "Notes": "Главный плейлист. Инди настроечка, лайтовый, ласковый, без бороды и шашлывков. йо\nРасписание: — здесь должно быть описано, как играет плейлист в течении недели —"
-    }
-  },
-  {
-    "id": "tblyqMDwKvBNSJPOY",
-    "createdTime": "2023-06-20T18:04:28.000Z",
-    "fields": {
-      "Name": "test playlist #2",
-      "Status": "Active",
-      "Notes": "test playlist description"
-    }
-  },
-];
+// const records = [
+//   {
+//     "id": "tbl886QoG6g0tC9tV",
+//     "createdTime": "2023-04-27T10:22:27.000Z",
+//     "fields": {
+//       "Name": "Indie playlist",
+//       "Status": "Active",
+//       "Notes": "Главный плейлист. Инди настроечка, лайтовый, ласковый, без бороды и шашлывков. йо\nРасписание: — здесь должно быть описано, как играет плейлист в течении недели —"
+//     }
+//   },
+//   {
+//     "id": "tblyqMDwKvBNSJPOY",
+//     "createdTime": "2023-06-20T18:04:28.000Z",
+//     "fields": {
+//       "Name": "test playlist #2",
+//       "Status": "Active",
+//       "Notes": "test playlist description"
+//     }
+//   },
+// ];
 
 (async () => {
   const baseId = await getBaseId()
-  // const queryParams = { baseId, tableId: 'Info' }
-  // const searchParams = new URLSearchParams(queryParams)
-  // const urlToFetchRecords = `${getRecordsApiEndpoint}?${searchParams}`
-  // const response = await fetch(urlToFetchRecords)
-  // const records = await response.json()
+  const queryParams = { baseId, tableId: 'Info' }
+  const searchParams = new URLSearchParams(queryParams)
+  const urlToFetchRecords = `${getRecordsApiEndpoint}?${searchParams}`
+  const response = await fetch(urlToFetchRecords)
+  const records = await response.json()
 
   // console.log(records)
 
