@@ -6,7 +6,7 @@ const getBaseId = async () => {
   const baseId = await new Promise(resolve => {
     handleLogin(resolve)
   })
-
+  
   return baseId
 }
 
@@ -38,22 +38,55 @@ const getBaseId = async () => {
   const urlToFetchRecords = `${getRecordsApiEndpoint}?${searchParams}`
   const response = await fetch(urlToFetchRecords)
   const records = await response.json()
-
-  // console.log(records)
-
+  
+  console.log(records)
+  
+  
+  // fetch playlists from airtable
+  const fetchPlaylists = async (records) => {
+    const promises = records.map(record => {
+      const playlistName = record.fields['Name']
+      const playlistDescription = record.fields['Notes']
+      
+      return new Promise(async (resolve, reject) => {
+        const queryParams = { baseId, tableId: playlistName }
+        const searchParams = new URLSearchParams(queryParams)
+        const urlToFetchRecords = `${getRecordsApiEndpoint}?${searchParams}`
+        
+        try {
+          const response = await fetch(urlToFetchRecords)
+          const playlist = await response.json()
+          
+          resolve({ playlistName, playlist, playlistDescription })
+        } catch (error) {
+          console.warn(`"${playlistName}" not found`)
+          console.log(error)
+          reject('error')
+        }
+      })
+    })
+    
+    const playlistsData = await Promise.allSettled(promises)
+    const fulfilledPlaylists = playlistsData.filter(playlist => playlist.status === 'fulfilled')
+    const existingPlaylists = fulfilledPlaylists.map(playlist => playlist.value)
+    
+    return existingPlaylists
+  }
+  
   const playlists = document.querySelector('#playlists')
-
-  playlists.innerHTML = ''
-  records.forEach((record, i) => {
-    const playlistName = record.fields['Name']
-    const playlistDescription = record.fields['Notes']
-    const selected = i === 0
-
-    if (selected) {
-      document.querySelector('#current-playlist').innerHTML = playlistName
-    }
-
-    const html = `
+  const existingPlaylists = await fetchPlaylists(records)
+  
+  const renderPlaylistsMarkup = () => {
+    playlists.innerHTML = ''
+    existingPlaylists.forEach((playlist, i) => {
+      const { playlistName, playlistDescription } = playlist
+      const selected = i === 0
+      
+      if (selected) {
+        document.querySelector('#current-playlist').innerHTML = playlistName
+      }
+      
+      const html = `
       <div class="playlist ${selected ? 'playlist--selected' : ''}" data-playlist-name="${playlistName}">
         <span class="playlist__name">
           <span class="note-sign">🎶</span> ${playlistName}
@@ -63,41 +96,26 @@ const getBaseId = async () => {
         </span>
       </div>
     `
-
-    playlists.innerHTML += html
-  })
+      
+      playlists.innerHTML += html
+    })
+  }
+  
+  renderPlaylistsMarkup();
   
   playlists.addEventListener('click', event => {
     
     if (event.target.closest('.playlist')) {
       const playlistEl = event.target.closest('.playlist');
       const playlistName = playlistEl.dataset.playlistName
-
+      
       document.querySelector('.playlist--selected').classList.remove('playlist--selected')
       playlistEl.classList.add('playlist--selected')
-
+      
       document.querySelector('#current-playlist').innerHTML = playlistName
     }
   })
   
-  
-  // fetch playlists from airtable
-  const promises = records.map(record => {
-    const playlistName = record.fields['Name']
-
-    return new Promise(async resolve => {
-      const queryParams = { baseId, tableId: playlistName }
-      const searchParams = new URLSearchParams(queryParams)
-      const urlToFetchRecords = `${getRecordsApiEndpoint}?${searchParams}`
-      const response = await fetch(urlToFetchRecords)
-      const playlist = await response.json()
-      
-      resolve({playlistId, playlistName, playlist})
-    })
-  })
-  
-  const playlistsData = await Promise.all(promises)
-  
-  handlePlayer(playlistsData)
+  handlePlayer(existingPlaylists)
 })()
 
