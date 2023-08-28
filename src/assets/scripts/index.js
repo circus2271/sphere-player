@@ -67,8 +67,8 @@ const getBaseId = async () => {
     })
     
     const playlistsData = await Promise.allSettled(promises)
-    const fulfilledPlaylists = playlistsData.filter(playlist => playlist.status === 'fulfilled')
-    const existingPlaylists = fulfilledPlaylists.map(playlist => playlist.value)
+    const fulfilled = playlistsData.filter(playlist => playlist.status === 'fulfilled')
+    const existingPlaylists = fulfilled.map(playlist => playlist.value)
     
     return existingPlaylists
   }
@@ -87,15 +87,15 @@ const getBaseId = async () => {
       }
       
       const html = `
-      <div class="playlist ${selected ? 'playlist--selected' : ''}" data-playlist-name="${playlistName}">
-        <span class="playlist__name">
-          <span class="note-sign">🎶</span> ${playlistName}
-        </span>
-        <span class="playlist__description">
-          ${playlistDescription}
-        </span>
-      </div>
-    `
+        <div class="playlist ${selected ? 'playlist--selected' : ''}" data-playlist-name="${playlistName}">
+          <span class="playlist__name">
+            <span class="note-sign">🎶</span> ${playlistName}
+          </span>
+          <span class="playlist__description">
+            ${playlistDescription}
+          </span>
+        </div>
+      `
       
       playlists.innerHTML += html
     })
