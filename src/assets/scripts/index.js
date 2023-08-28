@@ -83,11 +83,10 @@ const getBaseId = async () => {
   
   // fetch playlists from airtable
   const promises = records.map(record => {
-    const playlistId = record.id
     const playlistName = record.fields['Name']
 
     return new Promise(async resolve => {
-      const queryParams = { baseId, tableId: playlistId }
+      const queryParams = { baseId, tableId: playlistName }
       const searchParams = new URLSearchParams(queryParams)
       const urlToFetchRecords = `${getRecordsApiEndpoint}?${searchParams}`
       const response = await fetch(urlToFetchRecords)
