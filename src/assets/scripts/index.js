@@ -45,6 +45,7 @@ const getBaseId = async () => {
   // fetch playlists from airtable
   const fetchPlaylists = async (records) => {
     const promises = records.map(record => {
+      const playlistId = record.id
       const playlistName = record.fields['Name']
       const playlistDescription = record.fields['Notes']
       
@@ -57,7 +58,7 @@ const getBaseId = async () => {
           const response = await fetch(urlToFetchRecords)
           const playlist = await response.json()
           
-          resolve({ playlistName, playlist, playlistDescription })
+          resolve({ playlistName, playlistId, playlist, playlistDescription })
         } catch (error) {
           console.warn(`"${playlistName}" not found`)
           console.log(error)
