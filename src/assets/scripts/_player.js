@@ -1,18 +1,25 @@
 import howler from 'howler'
 
-var currentPlaylist, currentDayPlaylist;
+let currentPlaylist, currentDayPlaylist;
 
 const firstLineActionsDiv = document.querySelector('.first-line-actions');
-firstLineActionsDiv.style.opacity = '0.2';
+firstLineActionsDiv.style.opacity = '0.15';
 
 const audioPlayer = document.getElementById('audioPlayer');
 const playButton = document.getElementById('play-button');
+//const pauseButton = document.getElementById('pause-button');
+
 playButton.addEventListener('click', togglePlayPause);
 const fadeInOutDuration = 800; // 2000ms = 2 seconds
 
 let currentInterval = null;
 let currentTrackIndex = 0;
+let nextTrackindex = 1;
 let playlist = null;
+currentIntervalData = null;
+
+let nextBlobURL = null;
+let currentBlobURL = null;
 
 let currentIntervalIndex = -1;
 
@@ -104,7 +111,6 @@ function getCurrentInterval(data) {
 	    // Adjust for times wrapping midnight, e.g., "23-2"
 	    if (start > end) {
 	      if (currentHour >= start || currentHour < end) {
-	      	currentIntervalIndex
 	        return { urls: interval.signedURLs, index: i };
 	      }
 	    } else {
@@ -124,17 +130,7 @@ function loadTrack(index) {
 	// Then it loads new track to blob.
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
-  const currentIntervalData = getCurrentInterval(currentDayPlaylist);
-  if (currentIntervalIndex !== currentIntervalData.index) {
-    currentIntervalIndex = currentIntervalData.index;
-    playlist = currentIntervalData.urls;
-    currentTrackIndex = 0; // Start from the first track in the new interval
-  } else if (index >= playlist.length) {
-    // If we're beyond the end of the current playlist, loop back to the start
-    currentTrackIndex = 0;
-  }
-
-	return fetch(playlist[currentTrackIndex])
+	return fetch(playlist[index])
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -149,8 +145,11 @@ function loadTrack(index) {
             console.warn('Fetch was successful but blob is empty.');
         }
     })
-    .catch(e => console.error(e));
-
+    .catch(e => {
+    	// HERE wiil be good idea to try to load track once (but need to track how many tries)
+    	// or load +1. anyway its good idea to place setTimer
+    	console.error(e);
+    });
 }
 
 function togglePlayPause() {
@@ -192,22 +191,129 @@ function fadeAudioInPause() {
     }, fadeInOutDuration / 20);  // 20 intervals during the fade duration
 }
 
-function playerInitialisation (currentDayPlaylist) {
+function playerInitialisation () {
 
+  
+  currentDayPlaylist = getCurrentDaySongsInPlaylist(currentPlaylist);
+  currentInterval = getCurrentInterval(currentDayPlaylist);
+  currentIntervalData = getCurrentInterval(currentDayPlaylist)
+  currentIntervalIndex = currentIntervalData.index;
+  playlist = currentIntervalData.urls;
+
+  //console.log('firstPlaylist is', firstPlaylist) 
+  console.log('currentDayPlaylist is ', currentDayPlaylist)
+  console.log('currentInterval is ', currentInterval)
+
+  loadTrack(currentTrackIndex).then(blobURL => {
+  		currentBlobURL = blobURL;
+	    audioPlayer.src = currentBlobURL;
+	    firstLineActionsDiv.style.opacity = '1';
+	    console.log("first blob should be ready");
+	    console.log("(checking in loadTarck function calling inside poayerInitialisation) playlist lenght is — " + playlist.length);
+
+	    return loadTrack(nextTrackindex);
+
+		}).then(blobURL => {
+        		nextBlobURL = blobURL;
+    	}).catch(error => {
+        console.error("Error setting the source for the audio player:", error);
+  });
+
+	/*	
+  loadTrack(currentTrackIndex).then(blobURL => {
+  		currentBlobURL = blobURL;
+	    audioPlayer.src = currentBlobURL;
+	    firstLineActionsDiv.style.opacity = '1';
+	    // If you want to start playing immediately after setting the source:
+	    // audioPlayer.play();
+		}).catch(error => {
+		    console.error("Error setting the source for the audio player:", error);
+   });
+	*/
+   audioPlayer.addEventListener("ended", (event) => {
+        // If there is a next track
+        if (nextBlobURL) {
+        // Revoke the blob URL of the track that just finished playing
+           if (currentBlobURL) {
+               URL.revokeObjectURL(currentBlobURL);
+            }
+
+            currentBlobURL = nextBlobURL;
+            nextBlobURL = null;
+            audioPlayer.src = currentBlobURL;
+            audioPlayer.play();
+            currentTrackIndex = nextTrackindex;
+            nextTrackindex++;
+            console.log("(checking in audioPlayer on end event) playlist lenght is — " + playlist.length);
+            console.log("(checking in audioPlayer on end event) currentTrackIndex (after ++ above) — " + currentTrackIndex);
+
+            currentIntervalData = getCurrentInterval(currentDayPlaylist);
+			if (currentIntervalIndex !== currentIntervalData.index) {
+			    currentIntervalIndex = currentIntervalData.index;
+			    playlist = currentIntervalData.urls;
+			    nextTrackindex = 0; // Start from the first track in the new interval
+			} else if (nextTrackindex >= playlist.length) {
+			    // If we're beyond the end of the current playlist, loop back to the start
+			    nextTrackindex = 0;
+			}
+            
+            loadTrack(nextTrackindex).then(blobURL => {
+                nextBlobURL = blobURL;
+            	});
+            
+        }
+    }); 
+ 	
 
 }
 
+function changePlaylist (index) {
 
-//console.log(howler)
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	// Use this function when onClick event occurs, when user changes the playlist
+	// by pushing on playlist plashka.
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
+	currentBlobURL = null;
+	nextBlobURL = null;
+
+	currentIntervalIndex = -1
+
+	currentTrackIndex = 0;
+	nextTrackindex = 1;
+
+	//currentPlaylist = playlists[index];
+
+	playerInitialisation();
+
+}
+
+/*
+let simulatedHour = new Date().getHours(); // start with the real current hour
+console.log("simulatedHour is " + simulatedHour)
+
+Date.prototype.getHours = function() {
+    return simulatedHour;
+}
+
+function updateHour() {
+    simulatedHour = (simulatedHour + 1) % 24;
+    console.log("simulatedHour is " + simulatedHour);
+}
+
+setInterval(updateHour, 40 * 1000);
+*/
+
 export const handlePlayer = (playlists) => {
   console.log('hello from player')
+  console.log('playlists are', playlists);
 
-  const firstPlaylist = playlists[0];
-  currentPlaylist = firstPlaylist;
-  currentDayPlaylist = getCurrentDaySongsInPlaylist(currentPlaylist);
-  currentInterval = getCurrentInterval(currentDayPlaylist);
+  //const firstPlaylist = playlists[0];
+  //currentPlaylist = firstPlaylist;
+  //currentDayPlaylist = getCurrentDaySongsInPlaylist(currentPlaylist);
+  //currentInterval = getCurrentInterval(currentDayPlaylist);
 
-  loadTrack(currentTrackIndex).then(blobURL => {
+  /*loadTrack(currentTrackIndex).then(blobURL => {
     audioPlayer.src = blobURL;
     firstLineActionsDiv.style.opacity = '1';
     // If you want to start playing immediately after setting the source:
@@ -215,11 +321,16 @@ export const handlePlayer = (playlists) => {
 	}).catch(error => {
 	    console.error("Error setting the source for the audio player:", error);
    });
+   */
+  currentPlaylist = playlists[0];
+  console.log('currentPlaylist is', currentPlaylist);
+  playerInitialisation();
+  //console.log('playlists are' + playlists);
 
   console.log('all the playlists of a place are', playlists)
-  console.log('firstPlaylist is', firstPlaylist)
-  console.log('currentDayPlaylist is ', currentDayPlaylist)
-  console.log('currentInterval is ', currentInterval)
+  //console.log('firstPlaylist is', firstPlaylist)
+  //console.log('currentDayPlaylist is ', currentDayPlaylist)
+  //console.log('currentInterval is ', currentInterval)
 }
 
 
