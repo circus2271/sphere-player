@@ -117,6 +117,6 @@ const getBaseId = async () => {
     }
   })
   
-  handlePlayer(existingPlaylists)
+  handlePlayer(existingPlaylists, baseId)
 })()
 

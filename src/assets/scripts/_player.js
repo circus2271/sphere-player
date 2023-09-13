@@ -312,9 +312,10 @@ function updateHour() {
 setInterval(updateHour, 40 * 1000);
 */
 
-export const handlePlayer = (playlists) => {
+export const handlePlayer = (playlists, baseId) => {
   console.log('hello from player')
   console.log('playlists are', playlists);
+  console.log('baseId:', baseId)
 
   //const firstPlaylist = playlists[0];
   //currentPlaylist = firstPlaylist;
