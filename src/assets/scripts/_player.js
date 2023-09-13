@@ -7,10 +7,13 @@ firstLineActionsDiv.style.opacity = '0.15';
 
 const audioPlayer = document.getElementById('audioPlayer');
 const playButton = document.getElementById('play-button');
-//const pauseButton = document.getElementById('pause-button');
+// const pauseButton = document.getElementById('pause-button');
+// const skipButton = document.getElementById('skip-button');
 
 playButton.addEventListener('click', togglePlayPause);
 const fadeInOutDuration = 800; // 2000ms = 2 seconds
+// set css custom variable for css animations
+playButton.style.setProperty('--animation-duration', fadeInOutDuration + 'ms')
 
 let currentInterval = null;
 let currentTrackIndex = 0;
@@ -73,7 +76,7 @@ function getCurrentDaySongsInPlaylist(playlistObj) {
         return startA - startB;
     });
 
-    // We get here array of objects which look like this, they are sorted from early to late: 
+    // We get here array of objects which look like this, they are sorted from early to late:
     // { time: "8-12", signedURLs: ["1.mp3", "2.mp3", "3.mp3"] },
   	// { time: "12-16", signedURLs: ["4.mp3", "5.mp3", "6.mp3"] },
   	// { time: "16-20", signedURLs: ["7.mp3", "8.mp3", "9.mp3"] }
@@ -125,7 +128,7 @@ function getCurrentInterval(data) {
 function loadTrack(index) {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	// This function calls function which sets correct interval. It changes index to 0 if interval changes, 
+	// This function calls function which sets correct interval. It changes index to 0 if interval changes,
 	// or we should start from the begining.
 	// Then it loads new track to blob.
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -160,6 +163,11 @@ function togglePlayPause() {
         playButton.classList.remove('playing');
         fadeAudioOutPause();
     }
+
+    playButton.setAttribute('disabled', '')
+    setTimeout(() =>{
+        playButton.removeAttribute('disabled')
+    }, fadeInOutDuration)
 }
 
 function fadeAudioOutPause() {
@@ -200,7 +208,7 @@ function playerInitialisation () {
   currentIntervalIndex = currentIntervalData.index;
   playlist = currentIntervalData.urls;
 
-  //console.log('firstPlaylist is', firstPlaylist) 
+  //console.log('firstPlaylist is', firstPlaylist)
   console.log('currentDayPlaylist is ', currentDayPlaylist)
   console.log('currentInterval is ', currentInterval)
 
@@ -219,7 +227,7 @@ function playerInitialisation () {
         console.error("Error setting the source for the audio player:", error);
   });
 
-	/*	
+	/*
   loadTrack(currentTrackIndex).then(blobURL => {
   		currentBlobURL = blobURL;
 	    audioPlayer.src = currentBlobURL;
@@ -262,7 +270,7 @@ function playerInitialisation () {
             	});
             
         }
-    }); 
+    });
  	
 
 }
@@ -315,7 +323,7 @@ export const handlePlayer = (playlists) => {
 
   /*loadTrack(currentTrackIndex).then(blobURL => {
     audioPlayer.src = blobURL;
-    firstLineActionsDiv.style.opacity = '1';
+    // firstLineActionsDiv.style.opacity = '1';
     // If you want to start playing immediately after setting the source:
     // audioPlayer.play();
 	}).catch(error => {

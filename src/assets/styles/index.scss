@@ -167,6 +167,34 @@ ul {
   }
 }
 
+.play-button {
+  --animation-duration: none; // set via js
+
+  position: relative;
+
+  &[disabled] {
+    //opacity: .15;
+    opacity: .45;
+  }
+
+  &.playing .pause-icon {
+    visibility: visible;
+    //transition-delay: unset;
+  }
+
+  .pause-icon {
+    position: absolute;
+    top: 0;
+    visibility: hidden;
+    transition-delay: var(--animation-duration); // 800ms
+    transition-property: visibility;
+  }
+
+  svg {
+    fill: #eaeaea;
+  }
+}
+
 .playlists {
   display: flex;
   flex-direction: column;
