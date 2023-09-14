@@ -1,11 +1,16 @@
+import { updateRecordApiEndpoint } from './_apiEndpoints'
+
 // https://www.freecodecamp.org/news/javascript-debounce-example/
 export function debounce(func, timeout) {
   let timer
   return (...args) => {
     clearTimeout(timer)
-    timer = setTimeout(() => { func.apply(this, args) }, timeout)
+    timer = setTimeout(() => {
+      func.apply(this, args)
+    }, timeout)
   }
 }
+
 //
 // export const getPlaylists = () => {
 //
@@ -191,3 +196,47 @@ export function addLikeDislikeClickHandlers() {
 //     $("input[name=songname]").val("?error?");
 //   }
 // }
+
+
+export const sendLikeDislike = async data => {
+  
+  try {
+    
+    const response = await fetch(updateRecordApiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    })
+    
+    return response.json()
+    
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// usage example
+(async () => {
+  const dataExample = {
+    baseId: 'example base id',
+    // tableId may contain actual id or just a playlistname
+    // → tableId: 'tblhkaJOe'
+    // → tableId: 'Second test playlist'
+    tableId: 'example playlist name',
+    recordId: 'example id',
+    newStatus: 'Like' // or 'Dislike'
+  }
+  
+  const data = {
+    baseId: 'fake_app62dBMmVKP6',
+    tableId: 'fake_tblhkaJxaWy2M',
+    recordId: 'fake_recJNCFEtgQ0ESpyg',
+    newStatus: 'Like'
+  }
+  
+  const json = await sendLikeDislike(data)
+  console.log('j', json)
+})()
+

@@ -1,4 +1,5 @@
 import howler from 'howler'
+import { sendLikeDislike } from './_helpers.js'
 
 let currentPlaylist, currentDayPlaylist;
 
@@ -342,7 +343,12 @@ export const handlePlayer = (playlists, baseId) => {
   //console.log('currentInterval is ', currentInterval)
 }
 
-
-
-
+const likeButton = document.getElementById('like-button')
+likeButton.onclick = async () => {
+  await sendLikeDislike()
+}
+const dislikeButton = document.getElementById('dislike-button')
+dislikeButton.onclick = async () => {
+  await sendLikeDislike()
+}
 
