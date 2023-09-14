@@ -9,6 +9,9 @@ const audioPlayer = document.getElementById('audioPlayer');
 const playButton = document.getElementById('play-button');
 // const pauseButton = document.getElementById('pause-button');
 // const skipButton = document.getElementById('skip-button');
+const skipButton = document.getElementById('skip-button');
+skipButton.addEventListener('click', playAndLoadNextTrack);
+
 
 playButton.addEventListener('click', togglePlayPause);
 const fadeInOutDuration = 800; // 2000ms = 2 seconds
@@ -199,6 +202,7 @@ function fadeAudioInPause() {
     }, fadeInOutDuration / 20);  // 20 intervals during the fade duration
 }
 
+
 function playerInitialisation () {
 
   
@@ -207,6 +211,7 @@ function playerInitialisation () {
   currentIntervalData = getCurrentInterval(currentDayPlaylist)
   currentIntervalIndex = currentIntervalData.index;
   playlist = currentIntervalData.urls;
+  console.log(playlist[currentTrackIndex]);
 
   //console.log('firstPlaylist is', firstPlaylist)
   console.log('currentDayPlaylist is ', currentDayPlaylist)
@@ -238,7 +243,10 @@ function playerInitialisation () {
 		    console.error("Error setting the source for the audio player:", error);
    });
 	*/
-   audioPlayer.addEventListener("ended", (event) => {
+   audioPlayer.addEventListener("ended", playAndLoadNextTrack);
+}
+
+function playAndLoadNextTrack () {
         // If there is a next track
         if (nextBlobURL) {
         // Revoke the blob URL of the track that just finished playing
@@ -251,28 +259,27 @@ function playerInitialisation () {
             audioPlayer.src = currentBlobURL;
             audioPlayer.play();
             currentTrackIndex = nextTrackindex;
+            console.log(playlist[currentTrackIndex]);
             nextTrackindex++;
             console.log("(checking in audioPlayer on end event) playlist lenght is — " + playlist.length);
             console.log("(checking in audioPlayer on end event) currentTrackIndex (after ++ above) — " + currentTrackIndex);
 
             currentIntervalData = getCurrentInterval(currentDayPlaylist);
-			if (currentIntervalIndex !== currentIntervalData.index) {
-			    currentIntervalIndex = currentIntervalData.index;
-			    playlist = currentIntervalData.urls;
-			    nextTrackindex = 0; // Start from the first track in the new interval
-			} else if (nextTrackindex >= playlist.length) {
-			    // If we're beyond the end of the current playlist, loop back to the start
-			    nextTrackindex = 0;
-			}
+
+            if (currentIntervalIndex !== currentIntervalData.index) {
+                currentIntervalIndex = currentIntervalData.index;
+                playlist = currentIntervalData.urls;
+                nextTrackindex = 0; // Start from the first track in the new interval
+            } else if (nextTrackindex >= playlist.length) {
+                // If we're beyond the end of the current playlist, loop back to the start
+                nextTrackindex = 0;
+            }
             
             loadTrack(nextTrackindex).then(blobURL => {
                 nextBlobURL = blobURL;
-            	});
+              });
             
         }
-    });
- 	
-
 }
 
 function changePlaylist (index) {
