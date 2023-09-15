@@ -1,4 +1,4 @@
-import { updateRecordApiEndpoint } from './_apiEndpoints'
+import { updateRecordApiEndpoint, updateSongStatsApiEndpoint } from './_apiEndpoints'
 
 // https://www.freecodecamp.org/news/javascript-debounce-example/
 export function debounce(func, timeout) {
@@ -11,10 +11,6 @@ export function debounce(func, timeout) {
   }
 }
 
-//
-// export const getPlaylists = () => {
-//
-// }
 
 export let likeDislikeState = {
   shouldLike: false,
@@ -198,6 +194,13 @@ export function addLikeDislikeClickHandlers() {
 // }
 
 
+// data = {
+//   baseId: 'example baseId',
+//   tableId: 'example tableId', // can be either actual id (e.g. 'tbls88896G6g') or just regular table name (.e.g. 'My awesome table')
+//   recordId: 'example recordId',
+//   tableId: 'exampla tableId',
+//   newStatus: 'Like' // can be either 'Like' or 'Dislike'
+// }
 export const sendLikeDislike = async data => {
   
   try {
@@ -217,26 +220,54 @@ export const sendLikeDislike = async data => {
   }
 }
 
+
+// data = {
+//   baseId
+//   : 'example baseId',
+//   tableId: 'example tableId', // can be either actual id (e.g. 'tbls88896G6g') or just regular table name (.e.g. 'My awesome table')
+//   recordId: 'example recordId',
+//   tableId: 'exampla tableId',
+//   skipped: true // optional paramater (if set, may be true or false)
+// }
+export const updateSongStats = async data => {
+  
+  try {
+    
+    const response = await fetch(updateSongStatsApiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    })
+    
+    return response.text()
+    
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// sendLikeDislike & updateSongStats
 // usage example
-(async () => {
-  const dataExample = {
-    baseId: 'example base id',
-    // tableId may contain actual id or just a playlistname
-    // → tableId: 'tblhkaJOe'
-    // → tableId: 'Second test playlist'
-    tableId: 'example playlist name',
-    recordId: 'example id',
-    newStatus: 'Like' // or 'Dislike'
-  }
-  
-  const data = {
-    baseId: 'fake_app62dBMmVKP6',
-    tableId: 'fake_tblhkaJxaWy2M',
-    recordId: 'fake_recJNCFEtgQ0ESpyg',
-    newStatus: 'Like'
-  }
-  
-  const json = await sendLikeDislike(data)
-  console.log('j', json)
-})()
+// (async () => {
+//   const dataExample = {
+//     baseId: 'example base id',
+//     // tableId may contain actual id or just a playlistname
+//     // → tableId: 'tblhkaJOe'
+//     // → tableId: 'Second test playlist'
+//     tableId: 'example playlist name',
+//     recordId: 'example id',
+//     newStatus: 'Like' // or 'Dislike'
+//   }
+//
+//   const data = {
+//     baseId: 'fake_app62dBMf9YymV',
+//     tableId: 'Second test playlist',
+//     recordId: 'recJNCFEtgQ0ESpyg',
+//   }
+//
+//   const response = await updateSongStats(data)
+//   console.log('j', response)
+// })()
 

@@ -6,7 +6,8 @@
   <meta content="Sphere Player" property="og:title">
   <meta content="Sphere Player" property="twitter:title">
   <meta content="width=device-width, initial-scale=1" name="viewport">
-  <link href="~/src/assets/media/icons/favicon.png" rel="shortcut icon" type="image/x-icon">
+  <link href="~/src/assets/media/icons/favicon.ico" rel="shortcut icon" type="image/x-icon">
+  <link href="~/src/assets/media/icons/favicon.png" rel="icon" type="image/png">
   <link href="~/src/assets/media/icons/webclip.png" rel="apple-touch-icon">
   <link rel="stylesheet" href="~/src/assets/styles/index.scss">
 </head>
@@ -118,9 +119,8 @@
         </header>
         <div class="player__actions">
           <div class="first-line-actions">
-                <audio id="audioPlayer" preload="none">
-                      Your browser does not support the audio element.
-                </audio>
+            <audio id="audioPlayer" preload="none">
+            </audio>
             <button class="play-button" id="play-button">
               <svg width="84" height="84" id="play-icon" class="play-icon" viewBox="0 0 84 84" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g>
@@ -133,10 +133,10 @@
                 </g>
               </svg>
               <svg width="84" height="80" id="pause-icon" class="pause-icon" viewBox="0 0 84 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M41.9998 76.7396C63.5912 76.7396 81.0944 60.2907 81.0944 39.9999C81.0944 19.7092 63.5912 3.26025 41.9998 3.26025C20.4085 3.26025 2.90527 19.7092 2.90527 39.9999C2.90527 60.2907 20.4085 76.7396 41.9998 76.7396Z" stroke="#DDDDDD" stroke-width="2" stroke-miterlimit="10"/>
-                    <path d="M33 25V55" stroke="#F28F4D" stroke-width="8" stroke-miterlimit="10" stroke-linecap="round"/>
-                    <path d="M50 25V55" stroke="#F28F4D" stroke-width="8" stroke-miterlimit="10" stroke-linecap="round"/>
-                    </svg>
+                <path d="M41.9998 76.7396C63.5912 76.7396 81.0944 60.2907 81.0944 39.9999C81.0944 19.7092 63.5912 3.26025 41.9998 3.26025C20.4085 3.26025 2.90527 19.7092 2.90527 39.9999C2.90527 60.2907 20.4085 76.7396 41.9998 76.7396Z" stroke="#DDDDDD" stroke-width="2" stroke-miterlimit="10"/>
+                <path d="M33 25V55" stroke="#F28F4D" stroke-width="8" stroke-miterlimit="10" stroke-linecap="round"/>
+                <path d="M50 25V55" stroke="#F28F4D" stroke-width="8" stroke-miterlimit="10" stroke-linecap="round"/>
+              </svg>
             </button>
             <button class="skip-button" id="skip-button">
               <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -218,7 +218,6 @@
             Restart your device, since its memory could be overloaded by other apps and general using
           </li>
         </ul>
-
       </section>
     </div>
   </div>

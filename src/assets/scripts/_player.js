@@ -1,5 +1,5 @@
 import howler from 'howler'
-import { sendLikeDislike } from './_helpers.js'
+import { sendLikeDislike, updateSongStats } from './_helpers.js'
 
 let currentPlaylist, currentDayPlaylist;
 let playlistsData, baseIdData;
@@ -24,7 +24,7 @@ let currentInterval = null;
 let currentTrackIndex = 0;
 let nextTrackindex = 1;
 let playlist = null;
-currentIntervalData = null;
+let currentIntervalData = null;
 
 let nextBlobURL = null;
 let currentBlobURL = null;
@@ -394,4 +394,3 @@ const dislikeButton = document.getElementById('dislike-button')
 dislikeButton.onclick = async () => {
   await sendLikeDislike()
 }
-

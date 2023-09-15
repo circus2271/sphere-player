@@ -87,14 +87,14 @@ const getBaseId = async () => {
       }
       
       const html = `
-        <div class="playlist ${selected ? 'playlist--selected' : ''}" data-playlist-name="${playlistName}">
+        <button class="playlist ${selected ? 'playlist--selected' : ''}" data-playlist-name="${playlistName}">
           <span class="playlist__name">
             <span class="note-sign">🎶</span> ${playlistName}
           </span>
           <span class="playlist__description">
             ${playlistDescription}
           </span>
-        </div>
+        </button>
       `
       
       playlists.innerHTML += html
