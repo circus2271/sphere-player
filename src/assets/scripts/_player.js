@@ -2,6 +2,7 @@ import howler from 'howler'
 import { sendLikeDislike } from './_helpers.js'
 
 let currentPlaylist, currentDayPlaylist;
+let playlistsData, baseIdData;
 
 const firstLineActionsDiv = document.querySelector('.first-line-actions');
 firstLineActionsDiv.style.opacity = '0.15';
@@ -249,6 +250,8 @@ function playerInitialisation () {
 
 function playAndLoadNextTrack () {
         // If there is a next track
+          updateState(playlist[currentTrackIndex]);
+          console.log("state is ", state)
         if (nextBlobURL) {
         // Revoke the blob URL of the track that just finished playing
            if (currentBlobURL) {
@@ -304,6 +307,32 @@ function changePlaylist (index) {
 
 }
 
+let state = {};
+
+function updateState(signedUrl) {
+    console.log('playlistsData is', playlistsData);
+
+    for (let playlistObj of playlistsData) {  // iterate over each playlist object
+        for (let song of playlistObj.playlist) {  // iterate over each song in the current playlist
+            if (song.signedUrl === signedUrl) {
+                let id = song.id;
+                let playlistName = playlistObj.playlistName;
+
+                state = {
+                    baseId: baseIdData,
+                    tableId: playlistName,
+                    recordId: id
+                };
+                return;
+            }
+        }
+    }
+    console.log("No match found for the provided URL");
+}
+
+
+
+
 /*
 let simulatedHour = new Date().getHours(); // start with the real current hour
 console.log("simulatedHour is " + simulatedHour)
@@ -321,9 +350,14 @@ setInterval(updateHour, 40 * 1000);
 */
 
 export const handlePlayer = (playlists, baseId) => {
+  playlistsData = playlists;
+  baseIdData = baseId;
   console.log('hello from player')
   console.log('playlists are', playlists);
+  console.log('playlistsData is', playlistsData);
   console.log('baseId:', baseId)
+
+
 
   //const firstPlaylist = playlists[0];
   //currentPlaylist = firstPlaylist;
@@ -352,7 +386,9 @@ export const handlePlayer = (playlists, baseId) => {
 
 const likeButton = document.getElementById('like-button')
 likeButton.onclick = async () => {
-  await sendLikeDislike()
+  // Usage
+
+  //await sendLikeDislike()
 }
 const dislikeButton = document.getElementById('dislike-button')
 dislikeButton.onclick = async () => {
