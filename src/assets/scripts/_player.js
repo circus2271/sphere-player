@@ -1,5 +1,5 @@
 import howler from 'howler'
-import { sendLikeDislike, updateSongStats } from './_helpers.js'
+import { sendLikeDislike, updateSongStats, fetchPlaylist } from './_helpers.js'
 
 let currentPlaylist, currentDayPlaylist;
 let playlistsData, baseIdData;
@@ -349,16 +349,29 @@ function updateHour() {
 setInterval(updateHour, 40 * 1000);
 */
 
-export const handlePlayer = (playlists, baseId) => {
-  playlistsData = playlists;
+export const handlePlayer = async (playlistsInfo, baseId) => {
+  // playlistsData = playlists;
   baseIdData = baseId;
   console.log('hello from player')
-  console.log('playlists are', playlists);
+  // console.log('playlists are', playlists);
+  // console.log('playlists are', playlistNames);
   console.log('playlistsData is', playlistsData);
   console.log('baseId:', baseId)
+  
+  console.log('pip', playlistsInfo)
+  const activePlaylist = playlistsInfo[0]
+  const activePlaylistName = activePlaylist.playlistName
+  const activePlaylistTableId = activePlaylist.tableId
+  
+  
+  const activePlaylistTracks = await fetchPlaylist(baseId, activePlaylistTableId)
+  console.log('activePlaylistTracks', activePlaylistTracks)
 
-
-
+  // дальше возможны ошибки
+  return
+  
+  
+  
   //const firstPlaylist = playlists[0];
   //currentPlaylist = firstPlaylist;
   //currentDayPlaylist = getCurrentDaySongsInPlaylist(currentPlaylist);
@@ -373,7 +386,7 @@ export const handlePlayer = (playlists, baseId) => {
 	    console.error("Error setting the source for the audio player:", error);
    });
    */
-  currentPlaylist = playlists[0];
+  // currentPlaylist = playlistNames[0];
   console.log('currentPlaylist is', currentPlaylist);
   playerInitialisation();
   //console.log('playlists are' + playlists);

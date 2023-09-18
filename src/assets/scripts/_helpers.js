@@ -1,4 +1,4 @@
-import { updateRecordApiEndpoint, updateSongStatsApiEndpoint } from './_apiEndpoints'
+import { updateRecordApiEndpoint, updateSongStatsApiEndpoint, getRecordsApiEndpoint } from './_apiEndpoints'
 
 // https://www.freecodecamp.org/news/javascript-debounce-example/
 export function debounce(func, timeout) {
@@ -11,6 +11,24 @@ export function debounce(func, timeout) {
   }
 }
 
+
+// fetch playlists from airtable
+export const fetchPlaylist = async (baseId, tableId) => {
+  const queryParams = { baseId, tableId }
+  const searchParams = new URLSearchParams(queryParams)
+  const urlToFetchRecords = `${getRecordsApiEndpoint}?${searchParams}`
+  
+  try {
+    const response = await fetch(urlToFetchRecords)
+    const playlist = await response.json()
+    console.log('pl', playlist)
+    return playlist
+    
+  } catch (error) {
+    console.warn(`"${playlistName}" not found`)
+    console.log(error)
+  }
+}
 
 export let likeDislikeState = {
   shouldLike: false,

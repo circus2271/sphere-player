@@ -37,49 +37,18 @@ const getBaseId = async () => {
   const searchParams = new URLSearchParams(queryParams)
   const urlToFetchRecords = `${getRecordsApiEndpoint}?${searchParams}`
   const response = await fetch(urlToFetchRecords)
-  const records = await response.json()
+  const playlistsInfo = await response.json()
   
-  console.log(records)
-  
-  
-  // fetch playlists from airtable
-  const fetchPlaylists = async (records) => {
-    const promises = records.map(record => {
-      const playlistName = record.fields['Name']
-      const playlistDescription = record.fields['Notes']
-      
-      return new Promise(async (resolve, reject) => {
-        const queryParams = { baseId, tableId: playlistName }
-        const searchParams = new URLSearchParams(queryParams)
-        const urlToFetchRecords = `${getRecordsApiEndpoint}?${searchParams}`
-        
-        try {
-          const response = await fetch(urlToFetchRecords)
-          const playlist = await response.json()
-          
-          resolve({ playlistName, playlist, playlistDescription })
-        } catch (error) {
-          console.warn(`"${playlistName}" not found`)
-          console.log(error)
-          reject('error')
-        }
-      })
-    })
-    
-    const playlistsData = await Promise.allSettled(promises)
-    const fulfilled = playlistsData.filter(playlist => playlist.status === 'fulfilled')
-    const existingPlaylists = fulfilled.map(playlist => playlist.value)
-    
-    return existingPlaylists
-  }
+  console.log('playlistsInfo', playlistsInfo)
   
   const playlists = document.querySelector('#playlists')
-  const existingPlaylists = await fetchPlaylists(records)
   
   const renderPlaylistsMarkup = () => {
     playlists.innerHTML = ''
-    existingPlaylists.forEach((playlist, i) => {
-      const { playlistName, playlistDescription } = playlist
+    playlistsInfo.forEach((playlist, i) => {
+      const playlistName = playlist.fields['Name']
+      const playlistDescription = playlist.fields['Notes']
+      // const { playlistName, playlistDescription } = playlist
       const selected = i === 0
       
       if (selected) {
@@ -116,6 +85,17 @@ const getBaseId = async () => {
     }
   })
   
-  handlePlayer(existingPlaylists, baseId)
+  console.log('ap', playlistsInfo)
+  const availablePlaylists = playlistsInfo.map(playlist => {
+    const playlistName = playlist.fields['Name']
+    const tableId = playlist.tableId
+    
+    return {
+      playlistName,
+      tableId
+    }
+  })
+  
+  handlePlayer(availablePlaylists, baseId)
 })()
 
