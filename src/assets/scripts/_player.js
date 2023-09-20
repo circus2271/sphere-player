@@ -1,7 +1,7 @@
 import howler from 'howler'
 import { sendLikeDislike, updateSongStats, fetchPlaylist } from './_helpers.js'
 
-let currentPlaylist, currentDayPlaylist;
+let currentPlaylist, currentDayPlaylist, currentPlaylistTableId;
 let playlistsData, baseIdData;
 
 const firstLineActionsDiv = document.querySelector('.first-line-actions');
@@ -32,7 +32,7 @@ let currentBlobURL = null;
 let currentIntervalIndex = -1;
 
 
-function getCurrentDaySongsInPlaylist(playlistObj) {
+function getCurrentDaySongsInPlaylist(playlistArray) {
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// THIS function works (getting as an argument) the whole playlist with all the days intervals
@@ -45,7 +45,9 @@ function getCurrentDaySongsInPlaylist(playlistObj) {
 
     // Define an object to store intervals and their respective songs
     const songIntervals = {};
+    //console.log('playlistObj is ', playlistObj)
 
+    /*
     // Iterate through the playlist (which is under the key "playlist" in the playlistObj)
     playlistObj.playlist.forEach(song => {
         // Check if the song has an interval for the current day
@@ -59,6 +61,20 @@ function getCurrentDaySongsInPlaylist(playlistObj) {
             songIntervals[interval].push(song.signedUrl);
         }
     });
+    */
+    playlistArray.forEach(song => {
+        // Check if the song has an interval for the current day
+        const interval = song.fields[currentDay];
+        if (interval) {
+            // Check if we already have this interval in the songIntervals object
+            if (!songIntervals[interval]) {
+                songIntervals[interval] = [];
+            }
+            // Add the song's signedUrl to the interval array
+            songIntervals[interval].push(song.signedUrl);
+        }
+    });
+
 
     // Convert songIntervals object to the desired array format
     const result = [];
@@ -207,7 +223,7 @@ function fadeAudioInPause() {
 
 function playerInitialisation () {
 
-  
+  console.log('firstPlaylistTracks inside playerInitialisation', currentPlaylist)
   currentDayPlaylist = getCurrentDaySongsInPlaylist(currentPlaylist);
   currentInterval = getCurrentInterval(currentDayPlaylist);
   currentIntervalData = getCurrentInterval(currentDayPlaylist)
@@ -251,7 +267,7 @@ function playerInitialisation () {
 function playAndLoadNextTrack () {
         // If there is a next track
           updateState(playlist[currentTrackIndex]);
-          console.log("state is ", state)
+          console.log('playlist[currentTrackIndex] and signedURL is ' + playlist[currentTrackIndex])
         if (nextBlobURL) {
         // Revoke the blob URL of the track that just finished playing
            if (currentBlobURL) {
@@ -265,8 +281,8 @@ function playAndLoadNextTrack () {
             currentTrackIndex = nextTrackindex;
             console.log(playlist[currentTrackIndex]);
             nextTrackindex++;
-            console.log("(checking in audioPlayer on end event) playlist lenght is — " + playlist.length);
-            console.log("(checking in audioPlayer on end event) currentTrackIndex (after ++ above) — " + currentTrackIndex);
+            //console.log("(checking in audioPlayer on end event) playlist lenght is — " + playlist.length);
+            //console.log("(checking in audioPlayer on end event) currentTrackIndex (after ++ above) — " + currentTrackIndex);
 
             currentIntervalData = getCurrentInterval(currentDayPlaylist);
 
@@ -286,13 +302,15 @@ function playAndLoadNextTrack () {
         }
 }
 
-function changePlaylist (index) {
+function playlistButtonPush (chosenPlaylistTableId) {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	// Use this function when onClick event occurs, when user changes the playlist
 	// by pushing on playlist plashka.
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
+  currentplaylist = await fetchPlaylist(baseId, chosenPlaylistTableId);
+  playerInitialisation();
 	currentBlobURL = null;
 	nextBlobURL = null;
 
@@ -301,33 +319,27 @@ function changePlaylist (index) {
 	currentTrackIndex = 0;
 	nextTrackindex = 1;
 
-	//currentPlaylist = playlists[index];
-
 	playerInitialisation();
 
 }
 
 let state = {};
 
-function updateState(signedUrl) {
-    console.log('playlistsData is', playlistsData);
+function updateState (signedUrlstring) {
 
-    for (let playlistObj of playlistsData) {  // iterate over each playlist object
-        for (let song of playlistObj.playlist) {  // iterate over each song in the current playlist
-            if (song.signedUrl === signedUrl) {
-                let id = song.id;
-                let playlistName = playlistObj.playlistName;
+    for (const song of currentPlaylist) {
+        if (song.signedUrl === signedUrlstring) {
+            let id = song.id;
 
-                state = {
+            state = {
                     baseId: baseIdData,
-                    tableId: playlistName,
+                    tableId: currentPlaylistTableId,
                     recordId: id
-                };
-                return;
             }
+            console.log("state is ", state)
+            return;  // exit the function once the recordId is set
         }
     }
-    console.log("No match found for the provided URL");
 }
 
 
@@ -349,25 +361,31 @@ function updateHour() {
 setInterval(updateHour, 40 * 1000);
 */
 
+
+
+
+
 export const handlePlayer = async (playlistsInfo, baseId) => {
-  // playlistsData = playlists;
   baseIdData = baseId;
   console.log('hello from player')
   // console.log('playlists are', playlists);
   // console.log('playlists are', playlistNames);
-  console.log('playlistsData is', playlistsData);
-  console.log('baseId:', baseId)
+  //console.log('playlistsData is', playlistsData);
+  //console.log('baseId:', baseId)
   
   console.log('pip', playlistsInfo)
-  const activePlaylist = playlistsInfo[0]
-  const activePlaylistName = activePlaylist.playlistName
-  const activePlaylistTableId = activePlaylist.tableId
+  const firstAndActivePlaylist = playlistsInfo[0]
+
+  //const activePlaylistName = activePlaylist.playlistName
+  currentPlaylistTableId = firstAndActivePlaylist.tableId
   
-  
-  const activePlaylistTracks = await fetchPlaylist(baseId, activePlaylistTableId)
-  console.log('activePlaylistTracks', activePlaylistTracks)
+  //Запрашиваем первый плейлист
+  currentPlaylist = await fetchPlaylist(baseId, currentPlaylistTableId)
+  console.log('firstPlaylistTracks', currentPlaylist)
 
   // дальше возможны ошибки
+  playerInitialisation();
+
   return
   
   
@@ -387,11 +405,7 @@ export const handlePlayer = async (playlistsInfo, baseId) => {
    });
    */
   // currentPlaylist = playlistNames[0];
-  console.log('currentPlaylist is', currentPlaylist);
-  playerInitialisation();
   //console.log('playlists are' + playlists);
-
-  console.log('all the playlists of a place are', playlists)
   //console.log('firstPlaylist is', firstPlaylist)
   //console.log('currentDayPlaylist is ', currentDayPlaylist)
   //console.log('currentInterval is ', currentInterval)
