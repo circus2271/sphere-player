@@ -1,5 +1,5 @@
 import howler from 'howler'
-import { sendLikeDislike, updateSongStats, fetchPlaylist } from './_helpers.js'
+import { sendLikeDislike, updateSongStats, fetchPlaylist, getCurrentTableId } from './_helpers.js'
 
 let currentPlaylist, currentDayPlaylist;
 let playlistsData, baseIdData;
@@ -367,6 +367,31 @@ export const handlePlayer = async (playlistsInfo, baseId) => {
   const activePlaylistTracks = await fetchPlaylist(baseId, activePlaylistTableId)
   console.log('activePlaylistTracks', activePlaylistTracks)
 
+  
+  
+  const currentTableId = getCurrentTableId(playlistsInfo)
+  console.log('currentTableId:', currentTableId)
+  
+  const form = document.querySelector('#like-dislike-form')
+  form.addEventListener('submit', e => {
+    e.preventDefault()
+    
+    const submitter = e.submitter
+    const like = submitter.id === 'like-button'
+    const dislike = submitter.id === 'dislike-button'
+    
+    const currentPlaylistTableId = getCurrentTableId(playlistsInfo)
+    console.log('form submission, currentTableId:', currentPlaylistTableId)
+  
+    const data = {
+      currentPlaylistTableId,
+      like,
+      dislike
+    }
+  
+    console.log('form data', data)
+  })
+  
   // дальше возможны ошибки
   return
   
@@ -397,13 +422,13 @@ export const handlePlayer = async (playlistsInfo, baseId) => {
   //console.log('currentInterval is ', currentInterval)
 }
 
-const likeButton = document.getElementById('like-button')
-likeButton.onclick = async () => {
-  // Usage
-
-  //await sendLikeDislike()
-}
-const dislikeButton = document.getElementById('dislike-button')
-dislikeButton.onclick = async () => {
-  await sendLikeDislike()
-}
+// const likeButton = document.getElementById('like-button')
+// likeButton.onclick = async () => {
+//   // Usage
+//
+//   //await sendLikeDislike()
+// }
+// const dislikeButton = document.getElementById('dislike-button')
+// dislikeButton.onclick = async () => {
+//   await sendLikeDislike()
+// }

@@ -289,3 +289,12 @@ export const updateSongStats = async data => {
 //   console.log('j', response)
 // })()
 
+export const getCurrentTableId = (playlistsInfo) => {
+  const currentSelectedPlaylistButton = document.querySelector('.playlist--selected')
+  const currentPlaylistName = currentSelectedPlaylistButton.dataset.playlistName
+  const currentPlaylist = playlistsInfo.find(playlist => playlist.playlistName === currentPlaylistName)
+  const currentPlaylistTableId = currentPlaylist.tableId
+  
+  // debugger
+  return currentPlaylistTableId
+}
