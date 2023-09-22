@@ -142,6 +142,11 @@ ul {
   display: flex;
   width: 100%;
   margin-bottom: 22px;
+  opacity: .15;
+
+  body.first-track-loaded & {
+    opacity: 1;
+  }
 
   @include medium() {
     margin-bottom: 13px;

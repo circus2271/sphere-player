@@ -121,23 +121,34 @@ export function sendLikeDislikeToServer() {
 
 // function for shuffling array
 export function shuffle(array) {
-  var currentIndex = array.length, temporaryValue, randomIndex;
+  // THIS function only shuffles array
   
-  // While there remain elements to shuffle...
-  while (0 !== currentIndex) {
-    
-    // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex -= 1;
-    
-    // And swap it with the current element.
-    temporaryValue = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
-    array[randomIndex] = temporaryValue;
+  
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]]; // Swap elements
   }
-  
+  // Shuffles array which commes as an argument
   return array;
 }
+// export function shuffle(array) {
+//   var currentIndex = array.length, temporaryValue, randomIndex;
+//
+//   // While there remain elements to shuffle...
+//   while (0 !== currentIndex) {
+//
+//     // Pick a remaining element...
+//     randomIndex = Math.floor(Math.random() * currentIndex);
+//     currentIndex -= 1;
+//
+//     // And swap it with the current element.
+//     temporaryValue = array[currentIndex];
+//     array[currentIndex] = array[randomIndex];
+//     array[randomIndex] = temporaryValue;
+//   }
+//
+//   return array;
+// }
 
 export function animateHowlerPlayButton() {
   document.querySelector("#howler-play").style.transition = 'visibility, opacity 0.25s ease-in'
