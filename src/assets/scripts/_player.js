@@ -1,18 +1,15 @@
 import howler from 'howler'
 import { sendLikeDislike, updateSongStats, fetchPlaylist, getCurrentTableId, shuffle } from './_helpers.js'
 import { PlayerState } from './_playerState'
-
 let currentPlaylist, currentPlaylistTableId;
 let baseIdData;
 
 
-const audioPlayer = document.getElementById('audioPlayer');
 
 
 
 
 const playerState = new PlayerState()
-
 
 export const handlePlayer = async (playlistsInfo, baseId) => {
   baseIdData = baseId;
@@ -56,62 +53,6 @@ export const handlePlayer = async (playlistsInfo, baseId) => {
 }
 
 
-// player 'play' settings and event handlers
-const playButton = document.getElementById('play-button');
-const skipButton = document.getElementById('skip-button');
-
-skipButton.addEventListener('click', playerState.playAndLoadNextTrack());
-playButton.addEventListener('click', togglePlayPause);
-
-const fadeInOutDuration = 800; // 2000ms = 2 seconds
-// set css custom variable for css animations
-playButton.style.setProperty('--animation-duration', fadeInOutDuration + 'ms')
-
-// player 'play' controls
-function fadeAudioOutPause() {
-  let volume = 1.0;
-  
-  const fadeInterval = setInterval(function () {
-    volume -= 0.05;  // decrease by 0.05 until 0
-    if (volume <= 0.0) {
-      volume = 0.0;
-      audioPlayer.pause();
-      clearInterval(fadeInterval);
-    }
-    audioPlayer.volume = volume;
-  }, fadeInOutDuration / 20);  // 20 intervals during the fade duration
-}
-
-function fadeAudioInPause() {
-  let volume = 0.0;
-  audioPlayer.volume = volume;
-  audioPlayer.play();
-  
-  const fadeInterval = setInterval(function () {
-    volume += 0.05;  // increase by 0.05 until 1.0
-    if (volume >= 1.0) {
-      volume = 1.0;
-      clearInterval(fadeInterval);
-    }
-    audioPlayer.volume = volume;
-  }, fadeInOutDuration / 20);  // 20 intervals during the fade duration
-}
-
-// player audio controls
-function togglePlayPause() {
-  if (audioPlayer.paused || audioPlayer.ended) {
-    playButton.classList.add('playing');
-    fadeAudioInPause();
-  } else {
-    playButton.classList.remove('playing');
-    fadeAudioOutPause();
-  }
-  
-  playButton.setAttribute('disabled', '')
-  setTimeout(() => {
-    playButton.removeAttribute('disabled')
-  }, fadeInOutDuration)
-}
 
 // state
 
