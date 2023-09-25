@@ -302,7 +302,7 @@ function playAndLoadNextTrack () {
         }
 }
 
-function async playlistButtonPush (chosenPlaylistTableId) {
+async function playlistButtonPush (chosenPlaylistTableId) {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	// Use this function when onClick event occurs, when user changes the playlist
