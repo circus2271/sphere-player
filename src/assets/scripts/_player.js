@@ -7,7 +7,13 @@ let playlistsData, baseIdData;
 const firstLineActionsDiv = document.querySelector('.first-line-actions');
 firstLineActionsDiv.style.opacity = '0.15';
 
-const audioPlayer = document.getElementById('audioPlayer');
+//const audioPlayer = document.getElementById('audioPlayer');
+const audioPlayer = document.createElement('audio');
+document.body.appendChild(audioPlayer);
+const sourceElemnt = document.createElement('source');
+audioPlayer.appendChild(sourceElemnt);
+
+
 const playButton = document.getElementById('play-button');
 // const pauseButton = document.getElementById('pause-button');
 // const skipButton = document.getElementById('skip-button');
@@ -166,9 +172,10 @@ function loadTrack(index) {
         return response.blob();
     })
     .then(blob => {
-        if (blob.size > 0) {
+      const audioBlob = new Blob([blob], { type: 'audio/mpeg' });
+        if (audioBlob.size > 0) {
             console.log('Successfully fetched and have content in blob.');
-            return URL.createObjectURL(blob);
+            return URL.createObjectURL(audioBlob);
         } else {
             console.warn('Fetch was successful but blob is empty.');
         }
@@ -243,6 +250,8 @@ function playerInitialisation () {
 
   loadTrack(currentTrackIndex).then(blobURL => {
   		currentBlobURL = blobURL;
+      //sourceElemnt.src = currentBlobURL;
+      //sourceElemnt.type = 'audio/mp3';
 	    audioPlayer.src = currentBlobURL;
 	    firstLineActionsDiv.style.opacity = '1';
 	    console.log("first blob should be ready");
