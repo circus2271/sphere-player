@@ -14,6 +14,10 @@ const playButton = document.getElementById('play-button');
 const skipButton = document.getElementById('skip-button');
 skipButton.addEventListener('click', playAndLoadNextTrack);
 
+audioPlayer.addEventListener('error', (e) => {
+    console.error('Audio playback error:', e);
+});
+
 
 playButton.addEventListener('click', togglePlayPause);
 const fadeInOutDuration = 800; // 2000ms = 2 seconds
@@ -180,9 +184,11 @@ function togglePlayPause() {
     if (audioPlayer.paused || audioPlayer.ended) {
         playButton.classList.add('playing');
         fadeAudioInPause();
+        console.log("we are inside of toggle PlayPause function, this is true (audioPlayer.paused || audioPlayer.ended) ")
     } else {
         playButton.classList.remove('playing');
         fadeAudioOutPause();
+        console.log("we are inside of toggle PlayPause function, this is NOT true (audioPlayer.paused || audioPlayer.ended) ")
     }
 
     playButton.setAttribute('disabled', '')
