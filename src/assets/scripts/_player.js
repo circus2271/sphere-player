@@ -302,7 +302,7 @@ function playAndLoadNextTrack () {
         }
 }
 
-function playlistButtonPush (chosenPlaylistTableId) {
+function async playlistButtonPush (chosenPlaylistTableId) {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	// Use this function when onClick event occurs, when user changes the playlist
@@ -383,7 +383,6 @@ export const handlePlayer = async (playlistsInfo, baseId) => {
   currentPlaylist = await fetchPlaylist(baseId, currentPlaylistTableId)
   console.log('firstPlaylistTracks', currentPlaylist)
 
-  
   
   const currentTableId = getCurrentTableId(playlistsInfo)
   console.log('currentTableId:', currentTableId)
