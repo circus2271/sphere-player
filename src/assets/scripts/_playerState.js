@@ -1,3 +1,5 @@
+import { shuffle } from './_helpers';
+
 export class PlayerState {
   currentTrackIndex = 0;
   nextTrackIndex = 1;
@@ -16,31 +18,35 @@ export class PlayerState {
     
   }
   
-  initializePlayer(currentPlaylist) {
+  async initializePlayer(currentPlaylist) {
     this.initializePlayerHTMLControls()
     
     console.log('firstPlaylistTracks inside playerInitialisation', currentPlaylist)
-    this.currentDayPlaylist = getCurrentDaySongsInPlaylist(currentPlaylist);
+    this.currentDayPlaylist = this.getCurrentDaySongsInPlaylist(currentPlaylist);
     
-    const currentInterval = getCurrentInterval(this.currentDayPlaylist)
+    const currentInterval = this.getCurrentInterval(this.currentDayPlaylist)
     
     
-    this.currentIntervalData = getCurrentIntervalRelatedData(currentInterval)
+    this.currentIntervalData = this.getCurrentIntervalRelatedData(currentInterval)
     this.currentIntervalIndex = this.currentIntervalData.index;
     this.playlist = this.currentIntervalData.urls;
     console.log(this.playlist[this.currentTrackIndex]);
     //console.log('firstPlaylist is', firstPlaylist)
     console.log('currentDayPlaylist is ', this.currentDayPlaylist)
-    
-    this.loadTrack(this).then(blobURL => {
+    const playlist = this.playlist
+    const nextTrackIndex = this.nextTrackIndex
+    const currentTrackIndex = this.currentTrackIndex
+    await this.loadTrack(playlist, currentTrackIndex).then(blobURL => {
       this.currentBlobURL = blobURL;
       audioPlayer.src = this.currentBlobURL;
       document.body.classList.add('first-track-loaded')
+      console.log('first-t')
       console.log("first blob should be ready");
       console.log("(checking in loadTarck function calling inside poayerInitialisation) playlist lenght is — " + playlist.length);
-      debugger
-      
-      return this.loadTrack(this);
+      console.log('first-t')
+      // const playlist = this.playlist
+      // const nextTrackIndex = this.nextTrackIndex
+      return this.loadTrack(playlist, nextTrackIndex);
       
     }).then(blobURL => {
       this.nextBlobURL = blobURL;
@@ -48,11 +54,14 @@ export class PlayerState {
       console.error("Error setting the source for the audio player:", error);
     });
     
-    audioPlayer.addEventListener("ended", playAndLoadNextTrack);
+    audioPlayer.addEventListener("ended", (event) => {
+      console.log('audioPlayer ended')
+      this.playAndLoadNextTrack()
+    });
     
   }
   
-  loadTrack({ playlist, index }) {
+  loadTrack(playlist, index) {
     // This function calls function which sets correct interval. It changes index to 0 if interval changes,
     // or we should start from the beginning.
     // Then it loads new track to blob.
@@ -81,6 +90,7 @@ export class PlayerState {
   
   
   playAndLoadNextTrack() {
+    // debugger
     // If there is a next track
     // updateState(playlist[currentTrackIndex]);
     console.log('playlist[currentTrackIndex] and signedURL is ' + this.playlist[this.currentTrackIndex])
@@ -100,7 +110,7 @@ export class PlayerState {
       //console.log("(checking in audioPlayer on end event) playlist lenght is — " + playlist.length);
       //console.log("(checking in audioPlayer on end event) currentTrackIndex (after ++ above) — " + currentTrackIndex);
       
-      this.currentIntervalData = getCurrentInterval(this.currentDayPlaylist);
+      this.currentIntervalData = this.getCurrentInterval(this.currentDayPlaylist);
       
       if (this.currentIntervalIndex !== this.currentIntervalData.index) {
         this.currentIntervalIndex = this.currentIntervalData.index;
@@ -111,7 +121,7 @@ export class PlayerState {
         this.nextTrackIndex = 0;
       }
       
-      this.loadTrack(this).then(blobURL => {
+      this.loadTrack(this.playlist, this.nextTrackIndex).then(blobURL => {
         this.nextBlobURL = blobURL;
       });
       
@@ -134,6 +144,11 @@ export class PlayerState {
         return currentHour >= start && currentHour < end
       }
     })
+
+    if (currentInterval) {
+      const index = data.findIndex(interval => interval.time === currentInterval.time)
+      currentInterval.index = index
+    }
     
     return currentInterval
     
@@ -141,7 +156,10 @@ export class PlayerState {
   
   getCurrentIntervalRelatedData(currentInterval) {
     if (currentInterval) {
-      return { urls: interval.signedURLs, index: i };
+      return {
+        urls: currentInterval.signedURLs,
+        index: currentInterval.index
+      };
     }
     
     return { urls: [], index: -1 }; // Default return if no matching interval is found
@@ -211,7 +229,7 @@ export class PlayerState {
     const playButton = document.getElementById('play-button');
     const skipButton = document.getElementById('skip-button');
   
-    skipButton.addEventListener('click', this.playAndLoadNextTrack());
+    skipButton.addEventListener('click', () => this.playAndLoadNextTrack());
     playButton.addEventListener('click', togglePlayPause);
   
     const fadeInOutDuration = 800; // 2000ms = 2 seconds

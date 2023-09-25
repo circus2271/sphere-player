@@ -17,7 +17,7 @@ export const handlePlayer = async (playlistsInfo, baseId) => {
   
   console.log('pip', playlistsInfo)
   // const firstAndActivePlaylist = playlistsInfo[0]
-  const firstAndActivePlaylist = playlistsInfo[2]
+  const firstAndActivePlaylist = playlistsInfo[0]
   
   //const activePlaylistName = activePlaylist.playlistName
   currentPlaylistTableId = firstAndActivePlaylist.tableId
@@ -25,7 +25,7 @@ export const handlePlayer = async (playlistsInfo, baseId) => {
   //Запрашиваем первый плейлист
   currentPlaylist = await fetchPlaylist(baseId, currentPlaylistTableId)
   console.log('firstPlaylistTracks', currentPlaylist)
-  playerState.initializePlayer(currentPlaylist);
+  await playerState.initializePlayer(currentPlaylist);
   
   // const currentTableId = getCurrentTableId(playlistsInfo)
   // console.log('currentTableId:', currentTableId)
