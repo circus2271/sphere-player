@@ -5,10 +5,6 @@ let currentPlaylist, currentPlaylistTableId;
 let baseIdData;
 
 
-
-
-
-
 const playerState = new PlayerState()
 
 export const handlePlayer = async (playlistsInfo, baseId) => {
@@ -27,28 +23,14 @@ export const handlePlayer = async (playlistsInfo, baseId) => {
   console.log('firstPlaylistTracks', currentPlaylist)
   await playerState.initializePlayer(currentPlaylist);
   
+  
+  // await playerState.playAndLoadNextTrack()
+  // await playerState.playAndLoadNextTrack()
+  // await playerState.playAndLoadNextTrack()
+  //   alert(playerState.currentTrackIndex)
   // const currentTableId = getCurrentTableId(playlistsInfo)
   // console.log('currentTableId:', currentTableId)
   
-  const form = document.querySelector('#like-dislike-form')
-  form.addEventListener('submit', e => {
-    e.preventDefault()
-    
-    const submitter = e.submitter
-    const like = submitter.id === 'like-button'
-    const dislike = submitter.id === 'dislike-button'
-    
-    const currentPlaylistTableId = getCurrentTableId(playlistsInfo)
-    console.log('form submission, currentTableId:', currentPlaylistTableId)
-    
-    const data = {
-      currentPlaylistTableId,
-      like,
-      dislike
-    }
-    
-    console.log('form data', data)
-  })
   
 }
 

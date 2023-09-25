@@ -36,6 +36,7 @@ export class PlayerState {
     const playlist = this.playlist
     const nextTrackIndex = this.nextTrackIndex
     const currentTrackIndex = this.currentTrackIndex
+    
     await this.loadTrack(playlist, currentTrackIndex).then(blobURL => {
       this.currentBlobURL = blobURL;
       audioPlayer.src = this.currentBlobURL;
@@ -65,6 +66,7 @@ export class PlayerState {
     // This function calls function which sets correct interval. It changes index to 0 if interval changes,
     // or we should start from the beginning.
     // Then it loads new track to blob.
+  
     console.log('ppp', playlist[index])
     return fetch(playlist[index])
       .then(response => {
@@ -89,7 +91,7 @@ export class PlayerState {
   }
   
   
-  playAndLoadNextTrack() {
+  async playAndLoadNextTrack() {
     // debugger
     // If there is a next track
     // updateState(playlist[currentTrackIndex]);
@@ -121,7 +123,7 @@ export class PlayerState {
         this.nextTrackIndex = 0;
       }
       
-      this.loadTrack(this.playlist, this.nextTrackIndex).then(blobURL => {
+      await this.loadTrack(this.playlist, this.nextTrackIndex).then(blobURL => {
         this.nextBlobURL = blobURL;
       });
       
@@ -281,6 +283,27 @@ export class PlayerState {
         playButton.removeAttribute('disabled')
       }, fadeInOutDuration)
     }
+  
+  
+    const form = document.querySelector('#like-dislike-form')
+    form.addEventListener('submit', e => {
+      e.preventDefault()
+    
+      const submitter = e.submitter
+      const like = submitter.id === 'like-button'
+      const dislike = submitter.id === 'dislike-button'
+    
+      const currentPlaylistTableId = getCurrentTableId(playlistsInfo)
+      console.log('form submission, currentTableId:', currentPlaylistTableId)
+    
+      const data = {
+        currentPlaylistTableId,
+        like,
+        dislike
+      }
+    
+      console.log('form data', data)
+    })
   }
   
 }
