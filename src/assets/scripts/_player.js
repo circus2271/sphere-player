@@ -163,7 +163,7 @@ function loadTrack(index) {
 	// or we should start from the begining.
 	// Then it loads new track to blob.
 	////////////////////////////////////////////////////////////////////////////////////////////////
-
+//commenting
 	return fetch(playlist[index])
     .then(response => {
         if (!response.ok) {
@@ -250,9 +250,14 @@ function playerInitialisation () {
 
   loadTrack(currentTrackIndex).then(blobURL => {
   		currentBlobURL = blobURL;
-      //sourceElemnt.src = currentBlobURL;
-      //sourceElemnt.type = 'audio/mp3';
-	    audioPlayer.src = currentBlobURL;
+
+      //new code below
+      sourceElemnt.src = currentBlobURL;
+      sourceElemnt.type = 'audio/mp3';
+	    //audioPlayer.src = currentBlobURL;
+      audioPlayer.load();
+      //new code above
+
 	    firstLineActionsDiv.style.opacity = '1';
 	    console.log("first blob should be ready");
 	    console.log("(checking in loadTarck function calling inside poayerInitialisation) playlist lenght is — " + playlist.length);
@@ -291,7 +296,14 @@ function playAndLoadNextTrack () {
 
             currentBlobURL = nextBlobURL;
             nextBlobURL = null;
-            audioPlayer.src = currentBlobURL;
+
+            //new code below
+            sourceElemnt.src = currentBlobURL;
+            sourceElemnt.type = 'audio/mp3';
+            audioPlayer.load();
+            //audioPlayer.src = currentBlobURL;
+            //new code above
+            
             audioPlayer.play();
             currentTrackIndex = nextTrackindex;
             console.log(playlist[currentTrackIndex]);
