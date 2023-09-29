@@ -1,6 +1,6 @@
 import { handleLogin } from './_handleLogin'
 import { getRecordsApiEndpoint } from './_apiEndpoints'
-import { handlePlayer } from './_player'
+import { Player } from './_player'
 
 const getBaseId = async () => {
   const baseId = await new Promise(resolve => {
@@ -72,18 +72,6 @@ const getBaseId = async () => {
   
   renderPlaylistsMarkup();
   
-  playlists.addEventListener('click', event => {
-    
-    if (event.target.closest('.playlist')) {
-      const playlistEl = event.target.closest('.playlist');
-      const playlistName = playlistEl.dataset.playlistName
-      
-      document.querySelector('.playlist--selected').classList.remove('playlist--selected')
-      playlistEl.classList.add('playlist--selected')
-      
-      document.querySelector('#current-playlist').innerHTML = playlistName
-    }
-  })
   
   console.log('ap', playlistsInfo)
   const availablePlaylists = playlistsInfo.map(playlist => {
@@ -96,6 +84,9 @@ const getBaseId = async () => {
     }
   })
   
-  handlePlayer(availablePlaylists, baseId)
+  
+  // handlePlayer(availablePlaylists, baseId)
+  const player = new Player()
+  await player.initializePlayer(availablePlaylists, baseId);
 })()
 
