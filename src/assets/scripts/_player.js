@@ -94,31 +94,11 @@ export class Player {
       const track = this.tracks[this.currentTrackIndex]
       // debugger
       
-      if (likeDislikeStatus.scheduled) {
-        const newStatus = likeDislikeStatus.newStatus
-        
-        const data = {
-          baseId: this.baseId,
-          tableId: this.currentPlaylistTableId,
-          recordId: track.id,
-          newStatus
-        }
-        
-        await sendLikeDislike(data)
-        resetLikeDislikeSchedule()
-        
-        setTimeout(async () => {
-          const stats = data
-          stats.skipped = skipped
-          stats.playlistName = this.currentPlaylistTableName
-          
-          await sendSongStats(data)
-          // reset skipped to initial value
-          skipped = false
-          
-          // wait 3 seconds for hopefully pass airtable 5-requeste-at-once limit
-        }, 3000)
-      }
+      // let's hope this won't block next track from loading
+      setTimeout(async () => {
+        await sendDataOnSongEnd()
+      }, 500)
+      
       
       console.log('audioPlayer ended')
       await this.playAndLoadNextTrack()
@@ -191,6 +171,34 @@ export class Player {
         this.nextBlobURL = blobURL;
       });
       
+    }
+  }
+  
+  async sendDataOnSongEnd() {
+    if (likeDislikeStatus.scheduled) {
+      const newStatus = likeDislikeStatus.newStatus
+    
+      const data = {
+        baseId: this.baseId,
+        tableId: this.currentPlaylistTableId,
+        recordId: track.id,
+        newStatus
+      }
+    
+      await sendLikeDislike(data)
+      resetLikeDislikeSchedule()
+    
+      setTimeout(async () => {
+        const stats = data
+        stats.skipped = skipped
+        stats.playlistName = this.currentPlaylistTableName
+      
+        await sendSongStats(data)
+        // reset skipped to initial value
+        skipped = false
+      
+        // wait 3 seconds for hopefully pass airtable 5-requeste-at-once limit
+      }, 3000)
     }
   }
   
@@ -383,7 +391,7 @@ export class Player {
       
       
       if (like) {
-        scheduleLikeDislike(newStatus = 'afdLike')
+        scheduleLikeDislike(newStatus = 'Like')
       }
       
       if (dislike) {
