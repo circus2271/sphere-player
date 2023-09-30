@@ -96,7 +96,7 @@ export class Player {
       
       // let's hope this won't block next track from loading
       setTimeout(async () => {
-        await this.sendDataOnSongEnd()
+        await this.sendDataOnSongEnd(track)
       }, 500)
       
       
@@ -174,7 +174,7 @@ export class Player {
     }
   }
   
-  async sendDataOnSongEnd() {
+  async sendDataOnSongEnd(track) {
     if (likeDislikeStatus.scheduled) {
       const newStatus = likeDislikeStatus.newStatus
     
