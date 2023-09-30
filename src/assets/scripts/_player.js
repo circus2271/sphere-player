@@ -96,7 +96,7 @@ export class Player {
       
       // let's hope this won't block next track from loading
       setTimeout(async () => {
-        await sendDataOnSongEnd()
+        await this.sendDataOnSongEnd()
       }, 500)
       
       
@@ -310,9 +310,9 @@ export class Player {
       
       // здесь должна происходить перемотка трэка в конец,
       // чтобы потом автоматически сработала функция в onend у плеера,
-      // там и отправляем всю статостику и данные
+      // там и отправляем всю статистику и данные
       // после отправки данных, возвращаем флаг в значение false (это уже в самом onend обработчике)
-      skipButton.dispatchEvent(new Event('ended'))
+      this.audioPlayer.dispatchEvent(new Event('ended'))
     })
     playButton.addEventListener('click', togglePlayPause);
     
