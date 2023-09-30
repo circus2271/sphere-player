@@ -1,21 +1,43 @@
-import { shuffle, getCurrentTableId, sendLikeDislike, updateSongStats } from './_helpers';
+import { shuffle, getCurrentTableId, sendLikeDislike, updateSongStats, fetchPlaylist } from './_helpers';
+
+
+let likeDislikeStatus = {
+  scheduled: false,
+  newStatus: null
+}
+
+const scheduleLikeDislike = (newStatus) => {
+  // make sure first letter is capitalized
+  const firstLetter = newStatus[0].toUpperCase()
+  const status = firstLetter + newStatus.toLowerCase().slice(1)
+  
+  likeDislikeStatus = {
+    scheduled: true,
+    newStatus: status
+  }
+}
+
+const resetLikeDislikeSchedule = () => {
+  likeDislikeStatus = {
+    scheduled: false,
+    newStatus: null
+  }
+}
+
+let skipped = false
 
 export class Player {
   currentTrackIndex = 0;
   nextTrackIndex = 1;
-  playlist = null;
+  tracks = null;
   currentIntervalData = null;
   nextBlobURL = null;
   currentBlobURL = null;
   currentIntervalIndex = -1;
   currentDayPlaylist = null;
-  currentPlaylistTableId = null
-  
-  shouldSendStatus = false
-  like = false
-  dislike = false
-  
+  currentPlaylistTableId = null;
   audioPlayer = document.getElementById('audioPlayer');
+  baseId = null;
   
   constructor() {
     if (!this.audioPlayer) {
@@ -24,48 +46,42 @@ export class Player {
     
   }
   
-  async getTracks(currentPlaylistTableId) {
-    const currentPlaylist = await fetchPlaylist(baseId, currentPlaylistTableId)
-    this.currentDayPlaylist = this.getCurrentDaySongsInPlaylist(currentPlaylist);
-    const currentInterval = this.getCurrentInterval(this.currentDayPlaylist)
-    this.currentIntervalData = this.getCurrentIntervalRelatedData(currentInterval)
-    this.currentIntervalIndex = this.currentIntervalData.index;
-    const tracks =  this.currentIntervalData.urls;
-  
-    return tracks
-  }
-  
   async initializePlayer(availablePlaylists, baseId) {
+    this.baseId = baseId
   
     // Запрашиваем первый плейлист
     const firstAndActivePlaylist = availablePlaylists[0]
     this.currentPlaylistTableId = firstAndActivePlaylist.tableId
-    
-    this.playlist = await this.getTracks(this.currentPlaylistTableId)
+    this.currentPlaylistTableName = firstAndActivePlaylist.playlistName
+    const currentPlaylist = await fetchPlaylist(baseId, this.currentPlaylistTableId)
+    this.currentDayPlaylist = this.getCurrentDaySongsInPlaylist(currentPlaylist);
+    const currentInterval = this.getCurrentInterval(this.currentDayPlaylist)
+    this.currentIntervalData = this.getCurrentIntervalRelatedData(currentInterval)
+    this.currentIntervalIndex = this.currentIntervalData.index;
+    this.tracks = this.currentIntervalData.urls;
 
     // первый плейлист получен, показываем кнопки play и skip
     this.initializePlayerHTMLControls()
   
-    
-    console.log(this.playlist[this.currentTrackIndex]);
+    console.log(this.tracks[this.currentTrackIndex]);
     //console.log('firstPlaylist is', firstPlaylist)
     console.log('currentDayPlaylist is ', this.currentDayPlaylist)
-    const playlist = this.playlist
+    const tracks = this.tracks
     const nextTrackIndex = this.nextTrackIndex
     const currentTrackIndex = this.currentTrackIndex
     
-    await this.loadTrack(playlist, currentTrackIndex).then(blobURL => {
+    await this.loadTrack(tracks, currentTrackIndex).then(blobURL => {
       this.currentBlobURL = blobURL;
       
       this.audioPlayer.src = this.currentBlobURL;
       document.body.classList.add('first-track-loaded')
       console.log('first-t')
       console.log('first blob should be ready');
-      console.log('(checking in loadTarck function calling inside poayerInitialisation) playlist lenght is — ' + playlist.length);
+      console.log('(checking in loadTarck function calling inside poayerInitialisation) tracks lenght is — ' + tracks.length);
       console.log('first-t')
-      // const playlist = this.playlist
+      // const tracks = this.tracks
       // const nextTrackIndex = this.nextTrackIndex
-      return this.loadTrack(playlist, nextTrackIndex);
+      return this.loadTrack(tracks, nextTrackIndex);
       
     }).then(blobURL => {
       this.nextBlobURL = blobURL;
@@ -75,24 +91,33 @@ export class Player {
     
     this.audioPlayer.addEventListener('ended', async (event) => {
       // alert('ended')
-      const track = this.playlist[this.currentTrackIndex]
+      const track = this.tracks[this.currentTrackIndex]
       // debugger
-      if (this.shouldSendStatus) {
-        const status = this.like || this.dislike
+      
+      if (likeDislikeStatus.scheduled) {
+        const newStatus = likeDislikeStatus.newStatus
         
-        // baseId: 'example baseId',
-//
-//   tableId: 'example tableId', // can be either actual id (e.g. 'tbls88896G6g') or just regular table name (.e.g. 'My awesome table')
-//   recordId: 'example recordId',
-//   tableId: 'exampla tableId',
-//   newStatus: 'Like' // can be either 'Like' or 'Dislike'
-// }
         const data = {
-          newStatus: status
+          baseId: this.baseId,
+          tableId: this.currentPlaylistTableId,
+          recordId: track.id,
+          newStatus
         }
-        await sendLikeDislike()
         
+        await sendLikeDislike(data)
+        resetLikeDislikeSchedule()
         
+        setTimeout(async () => {
+          const stats = data
+          stats.skipped = skipped
+          stats.playlistName = this.currentPlaylistTableName
+          
+          await sendSongStats(data)
+          // reset skipped to initial value
+          skipped = false
+          
+          // wait 3 seconds for hopefully pass airtable 5-requeste-at-once limit
+        }, 3000)
       }
       
       console.log('audioPlayer ended')
@@ -101,13 +126,13 @@ export class Player {
     
   }
   
-  loadTrack(playlist, index) {
+  loadTrack(tracks, index) {
     // This function calls function which sets correct interval. It changes index to 0 if interval changes,
     // or we should start from the beginning.
     // Then it loads new track to blob.
     
-    console.log('ppp', playlist[index])
-    return fetch(playlist[index])
+    console.log('ppp', tracks[index])
+    return fetch(tracks[index])
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -133,8 +158,8 @@ export class Player {
   async playAndLoadNextTrack() {
     // debugger
     // If there is a next track
-    // updateState(playlist[currentTrackIndex]);
-    console.log('playlist[currentTrackIndex] and signedURL is ' + this.playlist[this.currentTrackIndex])
+    // updateState(tracks[currentTrackIndex]);
+    console.log('tracks[currentTrackIndex] and signedURL is ' + this.tracks[this.currentTrackIndex])
     if (this.nextBlobURL) {
       // Revoke the blob URL of the track that just finished playing
       if (this.currentBlobURL) {
@@ -146,23 +171,23 @@ export class Player {
       this.nextBlobURL = null;
       this.audioPlayer.src = this.currentBlobURL;
       this.audioPlayer.play();
-      // console.log(playlist[currentTrackIndex]);
+      // console.log(tracks[currentTrackIndex]);
       this.nextTrackIndex++;
-      //console.log("(checking in audioPlayer on end event) playlist lenght is — " + playlist.length);
+      //console.log("(checking in audioPlayer on end event) tracks lenght is — " + tracks.length);
       //console.log("(checking in audioPlayer on end event) currentTrackIndex (after ++ above) — " + currentTrackIndex);
       
       this.currentIntervalData = this.getCurrentInterval(this.currentDayPlaylist);
       
       if (this.currentIntervalIndex !== this.currentIntervalData.index) {
         this.currentIntervalIndex = this.currentIntervalData.index;
-        this.playlist = this.currentIntervalData.urls;
+        this.tracks = this.currentIntervalData.urls;
         this.nextTrackIndex = 0; // Start from the first track in the new interval
-      } else if (this.nextTrackIndex >= this.playlist.length) {
-        // If we're beyond the end of the current playlist, loop back to the start
+      } else if (this.nextTrackIndex >= this.tracks.length) {
+        // If we're beyond the end of the current tracks, loop back to the start
         this.nextTrackIndex = 0;
       }
       
-      await this.loadTrack(this.playlist, this.nextTrackIndex).then(blobURL => {
+      await this.loadTrack(this.tracks, this.nextTrackIndex).then(blobURL => {
         this.nextBlobURL = blobURL;
       });
       
@@ -269,8 +294,18 @@ export class Player {
     // player 'play' settings and event handlers
     const playButton = document.getElementById('play-button');
     const skipButton = document.getElementById('skip-button');
-    
-    skipButton.addEventListener('click', () => this.playAndLoadNextTrack());
+  
+    // skipButton.addEventListener('click', () => this.playAndLoadNextTrack());
+    skipButton.addEventListener('click', () => {
+      // ставим флаг skipped в значение true
+      skipped = true
+      
+      // здесь должна происходить перемотка трэка в конец,
+      // чтобы потом автоматически сработала функция в onend у плеера,
+      // там и отправляем всю статостику и данные
+      // после отправки данных, возвращаем флаг в значение false (это уже в самом onend обработчике)
+      skipButton.dispatchEvent(new Event('ended'))
+    })
     playButton.addEventListener('click', togglePlayPause);
     
     const fadeInOutDuration = 800; // 2000ms = 2 seconds
@@ -346,16 +381,14 @@ export class Player {
       const like = submitter.id === 'like-button'
       const dislike = submitter.id === 'dislike-button'
       
-      const currentPlaylistTableId = getCurrentTableId(playlistsInfo)
-      console.log('form submission, currentTableId:', currentPlaylistTableId)
       
-      const data = {
-        currentPlaylistTableId,
-        like,
-        dislike
+      if (like) {
+        scheduleLikeDislike(newStatus = 'afdLike')
       }
       
-      console.log('form data', data)
+      if (dislike) {
+        scheduleLikeDislike(newStatus = 'Dislike')
+      }
     })
   }
   
