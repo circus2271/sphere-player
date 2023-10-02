@@ -297,15 +297,15 @@ export class Player {
         button.removeAttribute('disabled')
       }, fadeInOutDuration)
     }
-    
+  
+    const disableButton = (button) => button.setAttribute('disabled', '')
+    const enableButton = (button) => button.removeAttribute('disabled')
+  
     const fadeOutPlayingState = () => {
       playButton.classList.remove('playing')
       fadeAudioToPause()
-      temporaryDisableButton(playButton)
+      disableButton(playButton)
     }
-    
-    const disableButton = (button) => button.setAttribute('disabled', '')
-    const enableButton = (button) => button.removeAttribute('disabled')
   
     // if playlist button is clicked
     // change playlist and load first two tracks of it
