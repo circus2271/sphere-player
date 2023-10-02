@@ -75,12 +75,35 @@ export class Player {
       // alert('ended')
       const track = this.tracks[this.currentTrackIndex]
       // debugger
-      
-      // let's hope this won't block next track from loading
+  
+  
+      const data = {
+        baseId: this.baseId,
+        tableId: this.currentPlaylistTableId,
+        recordId: track.id,
+      }
+  
+  
+      if (likeDislikeStatus.scheduled) {
+        // set new status...
+        const newStatus = likeDislikeStatus.newStatus
+        if (newStatus) data.newStatus = newStatus
+    
+        await sendLikeDislike(data)
+        resetLikeDislikeScheduledValues()
+      }
+  
+      const stats = data
+      stats.skipped = skipped
+      stats.playlistName = this.currentPlaylistTableName
+  
       setTimeout(async () => {
-        await this.sendDataOnSongEnd(track)
-      }, 500)
-      
+        await sendSongStats(stats)
+        // wait 3 seconds for hopefully pass airtable 5-requeste-at-once limit
+      }, 3000)
+  
+      // reset skipped to initial value
+      skipped = false
       
       console.log('audioPlayer ended')
       await this.playAndLoadNextTrack()
@@ -128,34 +151,36 @@ export class Player {
     });
   }
   
-  loadTrack(tracks, index) {
-    // This function calls function which sets correct interval. It changes index to 0 if interval changes,
-    // or we should start from the beginning.
-    // Then it loads new track to blob.
+  async sendDataOnSongEnd(track) {
     
-    console.log('ppp', tracks[index])
-    return fetch(tracks[index])
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.blob();
-      })
-      .then(blob => {
-        if (blob.size > 0) {
-          console.log('Successfully fetched and have content in blob.');
-          return URL.createObjectURL(blob);
-        } else {
-          console.warn('Fetch was successful but blob is empty.');
-        }
-      })
-      .catch(e => {
-        // here will be good idea to try to load track once (but need to track how many tries)
-        // or load +1. anyway its good idea to place setTimer
-        console.error(e);
-      });
+    const data = {
+      baseId: this.baseId,
+      tableId: this.currentPlaylistTableId,
+      recordId: track.id,
+    }
+    
+    
+    if (likeDislikeStatus.scheduled) {
+      // set new status...
+      const newStatus = likeDislikeStatus.newStatus
+      if (newStatus) data.newStatus = newStatus
+      
+      await sendLikeDislike(data)
+      resetLikeDislikeScheduledValues()
+    }
+    
+    setTimeout(async () => {
+      const stats = data
+      stats.skipped = skipped
+      stats.playlistName = this.currentPlaylistTableName
+      
+      await sendSongStats(stats)
+      // reset skipped to initial value
+      skipped = false
+      
+      // wait 3 seconds for hopefully pass airtable 5-requeste-at-once limit
+    }, 3000)
   }
-  
   
   async playAndLoadNextTrack() {
     // debugger
@@ -196,35 +221,173 @@ export class Player {
     }
   }
   
-  async sendDataOnSongEnd(track) {
+  initializePlayerHTMLControls() {
+    const audioPlayer = this.audioPlayer
     
-    const data = {
-      baseId: this.baseId,
-      tableId: this.currentPlaylistTableId,
-      recordId: track.id,
+    // player 'play' settings and event handlers
+    const playButton = document.getElementById('play-button');
+    const skipButton = document.getElementById('skip-button');
+    
+    // skipButton.addEventListener('click', () => this.playAndLoadNextTrack());
+    skipButton.addEventListener('click', () => {
+      // ставим флаг skipped в значение true
+      skipped = true
+      
+      // здесь должна происходить перемотка трэка в конец,
+      // чтобы потом автоматически сработала функция в onend у плеера,
+      // там и отправляем всю статистику и данные
+      // после отправки данных, возвращаем флаг в значение false (это уже в самом onend обработчике)
+      this.audioPlayer.dispatchEvent(new Event('ended'))
+    })
+    playButton.addEventListener('click', togglePlayPause);
+    
+    const fadeInOutDuration = 800; // 2000ms = 2 seconds
+    // set css custom variable for css animations
+    playButton.style.setProperty('--animation-duration', fadeInOutDuration + 'ms')
+    
+    // player 'play' controls
+    function fadeAudioOutPause() {
+      let volume = 1.0;
+      
+      const fadeInterval = setInterval(function () {
+        volume -= 0.05;  // decrease by 0.05 until 0
+        if (volume <= 0.0) {
+          volume = 0.0;
+          audioPlayer.pause();
+          clearInterval(fadeInterval);
+        }
+        audioPlayer.volume = volume;
+      }, fadeInOutDuration / 20);  // 20 intervals during the fade duration
+    }
+    
+    function fadeAudioInPause() {
+      let volume = 0.0;
+      audioPlayer.volume = volume;
+      audioPlayer.play();
+      
+      const fadeInterval = setInterval(function () {
+        volume += 0.05;  // increase by 0.05 until 1.0
+        if (volume >= 1.0) {
+          volume = 1.0;
+          clearInterval(fadeInterval);
+        }
+        audioPlayer.volume = volume;
+      }, fadeInOutDuration / 20);  // 20 intervals during the fade duration
+    }
+    
+    // player audio controls
+    function togglePlayPause() {
+      if (audioPlayer.paused || audioPlayer.ended) {
+        playButton.classList.add('playing');
+        fadeAudioInPause();
+      } else {
+        playButton.classList.remove('playing');
+        fadeAudioOutPause();
+      }
+      
+      temporaryDisableButton(playButton)
+    }
+    
+    const temporaryDisableButton = (button) => {
+      button.setAttribute('disabled', '')
+      setTimeout(() => {
+        button.removeAttribute('disabled')
+      }, fadeInOutDuration)
     }
     
     
-    if (likeDislikeStatus.scheduled) {
-      // set new status...
-      const newStatus = likeDislikeStatus.newStatus
-      if (newStatus) data.newStatus = newStatus
+    // if playlist button is clicked
+    // change playlist and load first two tracks of it
+    document.querySelector('#playlists').addEventListener('click', async (event) => {
       
-      await sendLikeDislike(data)
-      resetLikeDislikeScheduledValues()
-    }
+      if (event.target.closest('.playlist')) {
+        const playlistEl = event.target.closest('.playlist');
+        const playlistName = playlistEl.dataset.playlistName
+        
+        document.querySelector('.playlist--selected').classList.remove('playlist--selected')
+        playlistEl.classList.add('playlist--selected')
+        
+        const newPlaylistName = playlistEl.dataset.playlistName
+        const newPlaylist = this.availablePlaylists.find(playlist => playlist.playlistName === newPlaylistName)
+        
+        document.querySelector('#current-playlist').innerHTML = 'loading playlist...'
+        
+        // disable playlist button until the response is here
+        const disablePlaylistButton = () => playlistEl.setAttribute('disabled', '')
+        const enablePlaylistButton = () =>  playlistEl.removeAttribute('disabled')
+        
+        disablePlaylistButton()
+        await this.setPlaylistData({ newPlaylist })
+        
+        // new playlist is set
+        // make sure data is updated
+        const updatedPlaylistName = this.currentPlaylistTableName
+        document.querySelector('#current-playlist').innerHTML = updatedPlaylistName
+        console.log('new playlist:', this.tracks)
+        
+        try {
+          await this.initializeFirstTwoTracksOfAPlaylist()
+        } catch (error) {
+          console.error(`playlist error: can't load first two tracks of a new playlist`)
+        } finally {
+          enablePlaylistButton()
+        }
+        // debugger
+      }
+    })
     
-    setTimeout(async () => {
-      const stats = data
-      stats.skipped = skipped
-      stats.playlistName = this.currentPlaylistTableName
+    const form = document.querySelector('#like-dislike-form')
+    form.addEventListener('submit', e => {
+      e.preventDefault()
       
-      await sendSongStats(stats)
-      // reset skipped to initial value
-      skipped = false
+      const submitter = e.submitter
+      const like = submitter.id === 'like-button'
+      const dislike = submitter.id === 'dislike-button'
       
-      // wait 3 seconds for hopefully pass airtable 5-requeste-at-once limit
-    }, 3000)
+      
+      if (like) {
+        scheduleLikeDislike({ newStatus: 'Like' })
+      }
+      
+      if (dislike) {
+        scheduleLikeDislike({ newStatus: 'Dislike' })
+      }
+      
+      // alert(likeDislikeStatus.newStatus)
+    })
+    
+    
+    // finally, enable all buttons
+    const buttons = document.querySelectorAll('button')
+    buttons.forEach(button => button.removeAttribute('disabled'))
+  }
+  
+  loadTrack(tracks, index) {
+    // This function calls function which sets correct interval. It changes index to 0 if interval changes,
+    // or we should start from the beginning.
+    // Then it loads new track to blob.
+    
+    console.log('ppp', tracks[index])
+    return fetch(tracks[index])
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.blob();
+      })
+      .then(blob => {
+        if (blob.size > 0) {
+          console.log('Successfully fetched and have content in blob.');
+          return URL.createObjectURL(blob);
+        } else {
+          console.warn('Fetch was successful but blob is empty.');
+        }
+      })
+      .catch(e => {
+        // here will be good idea to try to load track once (but need to track how many tries)
+        // or load +1. anyway its good idea to place setTimer
+        console.error(e);
+      });
   }
   
   getCurrentInterval(data) {
@@ -319,147 +482,6 @@ export class Player {
     // { time: "12-16", signedURLs: ["4.mp3", "5.mp3", "6.mp3"] },
     // { time: "16-20", signedURLs: ["7.mp3", "8.mp3", "9.mp3"] }
     return result;
-  }
-  
-  initializePlayerHTMLControls() {
-    const audioPlayer = this.audioPlayer
-    
-    // player 'play' settings and event handlers
-    const playButton = document.getElementById('play-button');
-    const skipButton = document.getElementById('skip-button');
-    
-    // skipButton.addEventListener('click', () => this.playAndLoadNextTrack());
-    skipButton.addEventListener('click', () => {
-      // ставим флаг skipped в значение true
-      skipped = true
-      
-      // здесь должна происходить перемотка трэка в конец,
-      // чтобы потом автоматически сработала функция в onend у плеера,
-      // там и отправляем всю статистику и данные
-      // после отправки данных, возвращаем флаг в значение false (это уже в самом onend обработчике)
-      this.audioPlayer.dispatchEvent(new Event('ended'))
-    })
-    playButton.addEventListener('click', togglePlayPause);
-    
-    const fadeInOutDuration = 800; // 2000ms = 2 seconds
-    // set css custom variable for css animations
-    playButton.style.setProperty('--animation-duration', fadeInOutDuration + 'ms')
-    
-    // player 'play' controls
-    function fadeAudioOutPause() {
-      let volume = 1.0;
-      
-      const fadeInterval = setInterval(function () {
-        volume -= 0.05;  // decrease by 0.05 until 0
-        if (volume <= 0.0) {
-          volume = 0.0;
-          audioPlayer.pause();
-          clearInterval(fadeInterval);
-        }
-        audioPlayer.volume = volume;
-      }, fadeInOutDuration / 20);  // 20 intervals during the fade duration
-    }
-    
-    function fadeAudioInPause() {
-      let volume = 0.0;
-      audioPlayer.volume = volume;
-      audioPlayer.play();
-      
-      const fadeInterval = setInterval(function () {
-        volume += 0.05;  // increase by 0.05 until 1.0
-        if (volume >= 1.0) {
-          volume = 1.0;
-          clearInterval(fadeInterval);
-        }
-        audioPlayer.volume = volume;
-      }, fadeInOutDuration / 20);  // 20 intervals during the fade duration
-    }
-    
-    // player audio controls
-    function togglePlayPause() {
-      if (audioPlayer.paused || audioPlayer.ended) {
-        playButton.classList.add('playing');
-        fadeAudioInPause();
-      } else {
-        playButton.classList.remove('playing');
-        fadeAudioOutPause();
-      }
-      
-      temporaryDisableButton(playButton)
-    }
-    
-    const temporaryDisableButton = (button) => {
-      button.setAttribute('disabled', '')
-      setTimeout(() => {
-        button.removeAttribute('disabled')
-      }, fadeInOutDuration)
-    }
-    
-
-    // if playlist button is clicked
-    // change playlist and load first two tracks of it
-    document.querySelector('#playlists').addEventListener('click', async (event) => {
-      
-      if (event.target.closest('.playlist')) {
-        const playlistEl = event.target.closest('.playlist');
-        const playlistName = playlistEl.dataset.playlistName
-        
-        document.querySelector('.playlist--selected').classList.remove('playlist--selected')
-        playlistEl.classList.add('playlist--selected')
-
-        const newPlaylistName = playlistEl.dataset.playlistName
-        const newPlaylist = this.availablePlaylists.find(playlist => playlist.playlistName === newPlaylistName)
-  
-        document.querySelector('#current-playlist').innerHTML = 'loading playlist...'
-        
-        // disable playlist button until the response is here
-        const disablePlaylistButton = () => playlistEl.setAttribute('disabled', '')
-        const enablePlaylistButton = () =>  playlistEl.removeAttribute('disabled')
-  
-        disablePlaylistButton()
-        await this.setPlaylistData({ newPlaylist })
-        
-        // new playlist is set
-        // make sure data is updated
-        const updatedPlaylistName = this.currentPlaylistTableName
-        document.querySelector('#current-playlist').innerHTML = updatedPlaylistName
-        console.log('new playlist:', this.tracks)
-        
-        try {
-          await this.initializeFirstTwoTracksOfAPlaylist()
-        } catch (error) {
-          console.error(`playlist error: can't load first two tracks of a new playlist`)
-        } finally {
-          enablePlaylistButton()
-        }
-        // debugger
-      }
-    })
-    
-    const form = document.querySelector('#like-dislike-form')
-    form.addEventListener('submit', e => {
-      e.preventDefault()
-      
-      const submitter = e.submitter
-      const like = submitter.id === 'like-button'
-      const dislike = submitter.id === 'dislike-button'
-      
-      
-      if (like) {
-        scheduleLikeDislike({ newStatus: 'Like' })
-      }
-      
-      if (dislike) {
-        scheduleLikeDislike({ newStatus: 'Dislike' })
-      }
-      
-      // alert(likeDislikeStatus.newStatus)
-    })
-    
-    
-    // finally, enable all buttons
-    const buttons = document.querySelectorAll('button')
-    buttons.forEach(button => button.removeAttribute('disabled'))
   }
   
 }
