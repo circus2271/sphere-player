@@ -79,7 +79,7 @@ export const sendLikeDislike = async data => {
 //   tableId: 'exampla tableId',
 //   skipped: true // optional paramater (if set, may be true or false)
 // }
-export const updateSongStats = async data => {
+export const sendSongStats = async data => {
   
   try {
     

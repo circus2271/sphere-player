@@ -1,4 +1,4 @@
-import { shuffle, sendLikeDislike, updateSongStats, fetchPlaylist } from './_helpers';
+import { shuffle, sendLikeDislike, sendSongStats, fetchPlaylist } from './_helpers';
 
 
 let likeDislikeStatus = {
@@ -69,6 +69,10 @@ export class Player {
       // console.log('no tracks')
       // this.initializePlayerHTMLControls()
       console.error(`can't first two tracks`)
+    } finally {
+      // if error or success
+      this.initializePlayerHTMLControls()
+      document.body.classList.add('first-track-loaded')
     }
     
     this.audioPlayer.addEventListener('ended', async (event) => {
@@ -124,7 +128,10 @@ export class Player {
   }
   
   async initializeFirstTwoTracksOfAPlaylist() {
-  
+    // reset
+    this.currentTrackIndex = 0;
+    this.nextTrackIndex = 1;
+
     // обходим ошибки с потерей контекста
     const tracks = this.tracks
     const nextTrackIndex = this.nextTrackIndex
@@ -134,10 +141,6 @@ export class Player {
       this.currentBlobURL = blobURL;
     
       this.audioPlayer.src = this.currentBlobURL;
-    
-      // здесь первый трэк уже получен, поэтому можно сделать кнопки кликабельными
-      this.initializePlayerHTMLControls()
-      document.body.classList.add('first-track-loaded')
     
       console.log('first blob should be ready');
       return this.loadTrack(tracks, nextTrackIndex);
@@ -246,7 +249,22 @@ export class Player {
     playButton.style.setProperty('--animation-duration', fadeInOutDuration + 'ms')
     
     // player 'play' controls
-    function fadeAudioOutPause() {
+    function fadeAudioToPlaying() {
+      let volume = 0.0;
+      audioPlayer.volume = volume;
+      audioPlayer.play();
+    
+      const fadeInterval = setInterval(function () {
+        volume += 0.05;  // increase by 0.05 until 1.0
+        if (volume >= 1.0) {
+          volume = 1.0;
+          clearInterval(fadeInterval);
+        }
+        audioPlayer.volume = volume;
+      }, fadeInOutDuration / 20);  // 20 intervals during the fade duration
+    }
+    
+    function fadeAudioToPause() {
       let volume = 1.0;
       
       const fadeInterval = setInterval(function () {
@@ -260,29 +278,14 @@ export class Player {
       }, fadeInOutDuration / 20);  // 20 intervals during the fade duration
     }
     
-    function fadeAudioInPause() {
-      let volume = 0.0;
-      audioPlayer.volume = volume;
-      audioPlayer.play();
-      
-      const fadeInterval = setInterval(function () {
-        volume += 0.05;  // increase by 0.05 until 1.0
-        if (volume >= 1.0) {
-          volume = 1.0;
-          clearInterval(fadeInterval);
-        }
-        audioPlayer.volume = volume;
-      }, fadeInOutDuration / 20);  // 20 intervals during the fade duration
-    }
-    
     // player audio controls
     function togglePlayPause() {
       if (audioPlayer.paused || audioPlayer.ended) {
         playButton.classList.add('playing');
-        fadeAudioInPause();
+        fadeAudioToPlaying();
       } else {
         playButton.classList.remove('playing');
-        fadeAudioOutPause();
+        fadeAudioToPause();
       }
       
       temporaryDisableButton(playButton)
@@ -295,28 +298,37 @@ export class Player {
       }, fadeInOutDuration)
     }
     
+    const fadeOutPlayingState = () => {
+      playButton.classList.remove('playing')
+      fadeAudioToPause()
+      temporaryDisableButton(playButton)
+    }
     
+    const disableButton = (button) => button.setAttribute('disabled', '')
+    const enableButton = (button) => button.removeAttribute('disabled')
+  
     // if playlist button is clicked
     // change playlist and load first two tracks of it
     document.querySelector('#playlists').addEventListener('click', async (event) => {
       
       if (event.target.closest('.playlist')) {
-        const playlistEl = event.target.closest('.playlist');
-        const playlistName = playlistEl.dataset.playlistName
+        const playlistButton = event.target.closest('.playlist');
+        const playlistName = playlistButton.dataset.playlistName
         
         document.querySelector('.playlist--selected').classList.remove('playlist--selected')
-        playlistEl.classList.add('playlist--selected')
+        playlistButton.classList.add('playlist--selected')
         
-        const newPlaylistName = playlistEl.dataset.playlistName
+        const newPlaylistName = playlistButton.dataset.playlistName
         const newPlaylist = this.availablePlaylists.find(playlist => playlist.playlistName === newPlaylistName)
-        
+  
+        fadeOutPlayingState()
+        // disable play button until first two tracks of a new playlist are ready
+        disableButton(playlistButton)
+        disableButton(playButton)
+        disableButton(skipButton)
         document.querySelector('#current-playlist').innerHTML = 'loading playlist...'
         
-        // disable playlist button until the response is here
-        const disablePlaylistButton = () => playlistEl.setAttribute('disabled', '')
-        const enablePlaylistButton = () =>  playlistEl.removeAttribute('disabled')
         
-        disablePlaylistButton()
         await this.setPlaylistData({ newPlaylist })
         
         // new playlist is set
@@ -330,7 +342,9 @@ export class Player {
         } catch (error) {
           console.error(`playlist error: can't load first two tracks of a new playlist`)
         } finally {
-          enablePlaylistButton()
+          enableButton(playlistButton)
+          enableButton(playButton)
+          enableButton(skipButton)
         }
         // debugger
       }
