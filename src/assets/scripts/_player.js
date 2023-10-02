@@ -1,4 +1,4 @@
-import { shuffle, getCurrentTableId, sendLikeDislike, updateSongStats, fetchPlaylist } from './_helpers';
+import { shuffle, sendLikeDislike, updateSongStats, fetchPlaylist } from './_helpers';
 
 
 let likeDislikeStatus = {
