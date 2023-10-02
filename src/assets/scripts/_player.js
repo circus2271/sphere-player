@@ -63,7 +63,13 @@ export class Player {
     //console.log('firstPlaylist is', firstPlaylist)
     console.log('currentDayPlaylist is ', this.currentDayPlaylist)
   
-    await this.initializeFirstTwoTracksOfAPlaylist()
+    try {
+      await this.initializeFirstTwoTracksOfAPlaylist()
+    } catch (error) {
+      // console.log('no tracks')
+      // this.initializePlayerHTMLControls()
+      console.error(`can't first two tracks`)
+    }
     
     this.audioPlayer.addEventListener('ended', async (event) => {
       // alert('ended')
@@ -405,14 +411,27 @@ export class Player {
         const newPlaylist = this.availablePlaylists.find(playlist => playlist.playlistName === newPlaylistName)
   
         document.querySelector('#current-playlist').innerHTML = 'loading playlist...'
+        
+        // disable playlist button until the response is here
+        const disablePlaylistButton = () => playlistEl.setAttribute('disabled', '')
+        const enablePlaylistButton = () =>  playlistEl.removeAttribute('disabled')
+  
+        disablePlaylistButton()
         await this.setPlaylistData({ newPlaylist })
-
+        
         // new playlist is set
         // make sure data is updated
         const updatedPlaylistName = this.currentPlaylistTableName
         document.querySelector('#current-playlist').innerHTML = updatedPlaylistName
         console.log('new playlist:', this.tracks)
-        await this.initializeFirstTwoTracksOfAPlaylist()
+        
+        try {
+          await this.initializeFirstTwoTracksOfAPlaylist()
+        } catch (error) {
+          console.error(`playlist error: can't load first two tracks of a new playlist`)
+        } finally {
+          enablePlaylistButton()
+        }
         // debugger
       }
     })
