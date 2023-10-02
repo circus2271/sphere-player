@@ -56,7 +56,7 @@ const getBaseId = async () => {
       }
       
       const html = `
-        <button class="playlist ${selected ? 'playlist--selected' : ''}" data-playlist-name="${playlistName}">
+        <button disabled class="playlist ${selected ? 'playlist--selected' : ''}" data-playlist-name="${playlistName}">
           <span class="playlist__name">
             <span class="note-sign">🎶</span> ${playlistName}
           </span>

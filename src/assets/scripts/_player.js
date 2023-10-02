@@ -6,7 +6,8 @@ let likeDislikeStatus = {
   newStatus: null
 }
 
-const scheduleLikeDislike = (newStatus) => {
+// parce an object parameter and get its newStatus key
+const scheduleLikeDislike = ({ newStatus }) => {
   // make sure first letter is capitalized
   const firstLetter = newStatus[0].toUpperCase()
   const status = firstLetter + newStatus.toLowerCase().slice(1)
@@ -17,7 +18,7 @@ const scheduleLikeDislike = (newStatus) => {
   }
 }
 
-const resetLikeDislikeSchedule = () => {
+const resetLikeDislikeScheduledValues = () => {
   likeDislikeStatus = {
     scheduled: false,
     newStatus: null
@@ -36,8 +37,10 @@ export class Player {
   currentIntervalIndex = -1;
   currentDayPlaylist = null;
   currentPlaylistTableId = null;
+  currentPlaylistTableName = null;
   audioPlayer = document.getElementById('audioPlayer');
   baseId = null;
+  availablePlaylists = null;
   
   constructor() {
     if (!this.audioPlayer) {
@@ -47,47 +50,20 @@ export class Player {
   }
   
   async initializePlayer(availablePlaylists, baseId) {
+    this.availablePlaylists = availablePlaylists
     this.baseId = baseId
-  
+    
     // Запрашиваем первый плейлист
-    const firstAndActivePlaylist = availablePlaylists[0]
-    this.currentPlaylistTableId = firstAndActivePlaylist.tableId
-    this.currentPlaylistTableName = firstAndActivePlaylist.playlistName
-    const currentPlaylist = await fetchPlaylist(baseId, this.currentPlaylistTableId)
-    this.currentDayPlaylist = this.getCurrentDaySongsInPlaylist(currentPlaylist);
-    const currentInterval = this.getCurrentInterval(this.currentDayPlaylist)
-    this.currentIntervalData = this.getCurrentIntervalRelatedData(currentInterval)
-    this.currentIntervalIndex = this.currentIntervalData.index;
-    this.tracks = this.currentIntervalData.urls;
-
-    // первый плейлист получен, показываем кнопки play и skip
-    this.initializePlayerHTMLControls()
-  
+    const firstPlaylist = availablePlaylists[0]
+    // обновляем все данные о плейлисте
+    await this.setPlaylistData({ newPlaylist: firstPlaylist })
+    
+    
     console.log(this.tracks[this.currentTrackIndex]);
     //console.log('firstPlaylist is', firstPlaylist)
     console.log('currentDayPlaylist is ', this.currentDayPlaylist)
-    const tracks = this.tracks
-    const nextTrackIndex = this.nextTrackIndex
-    const currentTrackIndex = this.currentTrackIndex
-    
-    await this.loadTrack(tracks, currentTrackIndex).then(blobURL => {
-      this.currentBlobURL = blobURL;
-      
-      this.audioPlayer.src = this.currentBlobURL;
-      document.body.classList.add('first-track-loaded')
-      console.log('first-t')
-      console.log('first blob should be ready');
-      console.log('(checking in loadTarck function calling inside poayerInitialisation) tracks lenght is — ' + tracks.length);
-      console.log('first-t')
-      // const tracks = this.tracks
-      // const nextTrackIndex = this.nextTrackIndex
-      return this.loadTrack(tracks, nextTrackIndex);
-      
-    }).then(blobURL => {
-      this.nextBlobURL = blobURL;
-    }).catch(error => {
-      console.error('Error setting the source for the audio player:', error);
-    });
+  
+    await this.initializeFirstTwoTracksOfAPlaylist()
     
     this.audioPlayer.addEventListener('ended', async (event) => {
       // alert('ended')
@@ -104,6 +80,46 @@ export class Player {
       await this.playAndLoadNextTrack()
     });
     
+  }
+  
+  async setPlaylistData({ newPlaylist }) {
+    this.currentPlaylistTableId = newPlaylist.tableId
+    this.currentPlaylistTableName = newPlaylist.playlistName
+    const currentPlaylist = await fetchPlaylist(this.baseId, this.currentPlaylistTableId)
+    this.currentDayPlaylist = this.getCurrentDaySongsInPlaylist(currentPlaylist);
+    const currentInterval = this.getCurrentInterval(this.currentDayPlaylist)
+    this.currentIntervalData = this.getCurrentIntervalRelatedData(currentInterval)
+    this.currentIntervalIndex = this.currentIntervalData.index;
+    this.tracks = this.currentIntervalData.urls;
+    // debugger
+  }
+  
+  async initializeFirstTwoTracksOfAPlaylist() {
+  
+    // обходим ошибки с потерей контекста
+    const tracks = this.tracks
+    const nextTrackIndex = this.nextTrackIndex
+    const currentTrackIndex = this.currentTrackIndex
+  
+    await this.loadTrack(tracks, currentTrackIndex).then(blobURL => {
+      this.currentBlobURL = blobURL;
+    
+      this.audioPlayer.src = this.currentBlobURL;
+    
+      // здесь первый трэк уже получен, поэтому можно сделать кнопки кликабельными
+      this.initializePlayerHTMLControls()
+      document.body.classList.add('first-track-loaded')
+    
+      console.log('first blob should be ready');
+      return this.loadTrack(tracks, nextTrackIndex);
+    
+    }).then(blobURL => {
+      this.nextBlobURL = blobURL;
+      
+      console.log('first two tracks of a playlist are initialized')
+    }).catch(error => {
+      console.error('Error setting the source for the audio player:', error);
+    });
   }
   
   loadTrack(tracks, index) {
@@ -175,31 +191,34 @@ export class Player {
   }
   
   async sendDataOnSongEnd(track) {
-    if (likeDislikeStatus.scheduled) {
-      const newStatus = likeDislikeStatus.newStatus
     
-      const data = {
-        baseId: this.baseId,
-        tableId: this.currentPlaylistTableId,
-        recordId: track.id,
-        newStatus
-      }
-    
-      await sendLikeDislike(data)
-      resetLikeDislikeSchedule()
-    
-      setTimeout(async () => {
-        const stats = data
-        stats.skipped = skipped
-        stats.playlistName = this.currentPlaylistTableName
-      
-        await sendSongStats(data)
-        // reset skipped to initial value
-        skipped = false
-      
-        // wait 3 seconds for hopefully pass airtable 5-requeste-at-once limit
-      }, 3000)
+    const data = {
+      baseId: this.baseId,
+      tableId: this.currentPlaylistTableId,
+      recordId: track.id,
     }
+    
+    
+    if (likeDislikeStatus.scheduled) {
+      // set new status...
+      const newStatus = likeDislikeStatus.newStatus
+      if (newStatus) data.newStatus = newStatus
+      
+      await sendLikeDislike(data)
+      resetLikeDislikeScheduledValues()
+    }
+    
+    setTimeout(async () => {
+      const stats = data
+      stats.skipped = skipped
+      stats.playlistName = this.currentPlaylistTableName
+      
+      await sendSongStats(stats)
+      // reset skipped to initial value
+      skipped = false
+      
+      // wait 3 seconds for hopefully pass airtable 5-requeste-at-once limit
+    }, 3000)
   }
   
   getCurrentInterval(data) {
@@ -302,7 +321,7 @@ export class Player {
     // player 'play' settings and event handlers
     const playButton = document.getElementById('play-button');
     const skipButton = document.getElementById('skip-button');
-  
+    
     // skipButton.addEventListener('click', () => this.playAndLoadNextTrack());
     skipButton.addEventListener('click', () => {
       // ставим флаг skipped в значение true
@@ -360,15 +379,20 @@ export class Player {
         fadeAudioOutPause();
       }
       
-      playButton.setAttribute('disabled', '')
+      temporaryDisableButton(playButton)
+    }
+    
+    const temporaryDisableButton = (button) => {
+      button.setAttribute('disabled', '')
       setTimeout(() => {
-        playButton.removeAttribute('disabled')
+        button.removeAttribute('disabled')
       }, fadeInOutDuration)
     }
     
-    
-    // playlists.addEventListener('click', event => {
-    document.querySelector('#playlists').addEventListener('click', event => {
+
+    // if playlist button is clicked
+    // change playlist and load first two tracks of it
+    document.querySelector('#playlists').addEventListener('click', async (event) => {
       
       if (event.target.closest('.playlist')) {
         const playlistEl = event.target.closest('.playlist');
@@ -376,8 +400,20 @@ export class Player {
         
         document.querySelector('.playlist--selected').classList.remove('playlist--selected')
         playlistEl.classList.add('playlist--selected')
-        
-        document.querySelector('#current-playlist').innerHTML = playlistName
+
+        const newPlaylistName = playlistEl.dataset.playlistName
+        const newPlaylist = this.availablePlaylists.find(playlist => playlist.playlistName === newPlaylistName)
+  
+        document.querySelector('#current-playlist').innerHTML = 'loading playlist...'
+        await this.setPlaylistData({ newPlaylist })
+
+        // new playlist is set
+        // make sure data is updated
+        const updatedPlaylistName = this.currentPlaylistTableName
+        document.querySelector('#current-playlist').innerHTML = updatedPlaylistName
+        console.log('new playlist:', this.tracks)
+        await this.initializeFirstTwoTracksOfAPlaylist()
+        // debugger
       }
     })
     
@@ -391,13 +427,20 @@ export class Player {
       
       
       if (like) {
-        scheduleLikeDislike(newStatus = 'Like')
+        scheduleLikeDislike({ newStatus: 'Like' })
       }
       
       if (dislike) {
-        scheduleLikeDislike(newStatus = 'Dislike')
+        scheduleLikeDislike({ newStatus: 'Dislike' })
       }
+      
+      // alert(likeDislikeStatus.newStatus)
     })
+    
+    
+    // finally, enable all buttons
+    const buttons = document.querySelectorAll('button')
+    buttons.forEach(button => button.removeAttribute('disabled'))
   }
   
 }

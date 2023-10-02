@@ -118,10 +118,10 @@
           <div class="current-playlist" id="current-playlist">loading...</div>
         </header>
         <div class="player__actions">
-          <div class="first-line-actions">
+          <div class="first-line-actions js-first-line-actions">
             <audio id="audioPlayer" preload="none">
             </audio>
-            <button class="play-button" id="play-button">
+            <button disabled class="play-button" id="play-button">
               <svg width="84" height="84" id="play-icon" class="play-icon" viewBox="0 0 84 84" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g>
                   <path
@@ -138,7 +138,7 @@
                 <path d="M50 25V55" stroke="#F28F4D" stroke-width="8" stroke-miterlimit="10" stroke-linecap="round"/>
               </svg>
             </button>
-            <button class="skip-button" id="skip-button">
+            <button disabled class="skip-button" id="skip-button">
               <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                     d="M30.9999 57.5547C46.9364 57.5547 59.8554 45.218 59.8554 29.9999C59.8554 14.7819 46.9364 2.44519 30.9999 2.44519C15.0635 2.44519 2.14441 14.7819 2.14441 29.9999C2.14441 45.218 15.0635 57.5547 30.9999 57.5547Z"
@@ -151,7 +151,7 @@
             </button>
             <div class="flex-spacer"></div>
             <form class="like-dislike-form" id="like-dislike-form">
-              <button class="dislike-button" id="dislike-button">
+              <button disabled class="dislike-button" id="dislike-button">
                 <svg width="58" height="58" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <g>
                     <rect x="1" y="-1" width="56" height="56" rx="28" transform="matrix(1 0 0 -1 0 56)"
@@ -167,7 +167,7 @@
                   </g>
                 </svg>
               </button>
-              <button class="like-button" id="like-button">
+              <button disabled class="like-button" id="like-button">
                 <svg width="58" height="58" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <g>
                     <rect x="1" y="-1" width="56" height="56" rx="28" transform="matrix(1 0 0 -1 0 56)"
