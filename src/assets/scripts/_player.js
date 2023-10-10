@@ -39,7 +39,6 @@ export class Player {
   currentDayPlaylist = null;
   currentPlaylistTableId = null;
   currentPlaylistTableName = null;
-  topActionButtons = document.querySelectorAll('.first-line-actions button');
   allButtons = document.querySelectorAll('button');
   audioPlayer = document.getElementById('audioPlayer');
   baseId = null;
@@ -258,14 +257,14 @@ export class Player {
       }, fadeInOutDuration / 20);  // 20 intervals during the fade duration
     }
   
-    const enablePlayerControls = () => {
-      this.topActionButtons.forEach(button => {
+    const enableAllButtons = () => {
+      this.allButtons.forEach(button => {
         button.disabled = false
       })
     }
  
-    const disablePlayerControls = () => {
-      this.topActionButtons.forEach(button => {
+    const disableAllButtons = () => {
+      this.allButtons.forEach(button => {
         button.disabled = true
       })
     }
@@ -280,7 +279,7 @@ export class Player {
         fadeAudioToPause();
       }
     
-      temporaryDisablePlayerControls()
+      temporaryDisableAllButtons()
     }
 
     const temporaryDisableButton = (button) => {
@@ -290,8 +289,8 @@ export class Player {
       }, fadeInOutDuration)
     }
     
-    const temporaryDisablePlayerControls = () => {
-      this.topActionButtons.forEach(button => {
+    const temporaryDisableAllButtons = () => {
+      this.allButtons.forEach(button => {
         temporaryDisableButton(button)
       })
     }
@@ -321,9 +320,8 @@ export class Player {
         const newPlaylist = this.availablePlaylists.find(playlist => playlist.playlistName === newPlaylistName)
   
         fadeOutPlayingState()
-        // disable play button until first two tracks of a new playlist are ready
-        disablePlayerControls()
-        
+        // disable all buttons until first track is ready
+        disableAllButtons()
         
         await this.setPlaylistData({ newPlaylist })
         
@@ -332,9 +330,8 @@ export class Player {
         
         try {
           await this.initializeFirstTwoTracksOfAPlaylist({firstTrackLoaded: () => {
-            enablePlayerControls()
-            
-            }})
+            enableAllButtons()
+          }})
         } catch (error) {
           console.error(`playlist error: can't load first two tracks of a new playlist`)
         }
