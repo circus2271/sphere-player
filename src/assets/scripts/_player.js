@@ -35,9 +35,12 @@ export class Player {
   nextBlobURL = null;
   currentBlobURL = null;
   currentIntervalIndex = -1;
+  currentPlaylistInitialData = null
   currentDayPlaylist = null;
   currentPlaylistTableId = null;
   currentPlaylistTableName = null;
+  topActionButtons = document.querySelectorAll('.first-line-actions button');
+  allButtons = document.querySelectorAll('button');
   audioPlayer = document.getElementById('audioPlayer');
   baseId = null;
   availablePlaylists = null;
@@ -59,32 +62,30 @@ export class Player {
     await this.setPlaylistData({ newPlaylist: firstPlaylist })
     
     
-    console.log(this.tracks[this.currentTrackIndex]);
-    //console.log('firstPlaylist is', firstPlaylist)
-    console.log('currentDayPlaylist is ', this.currentDayPlaylist)
-  
     try {
-      await this.initializeFirstTwoTracksOfAPlaylist()
+      await this.initializeFirstTwoTracksOfAPlaylist({firstTrackLoaded: () => {
+          this.initializePlayerHTMLControls();
+          document.body.classList.add('first-track-loaded');
+      }})
     } catch (error) {
       // console.log('no tracks')
       // this.initializePlayerHTMLControls()
       console.error(`can't first two tracks`)
-    } finally {
-      // if error or success
-      this.initializePlayerHTMLControls()
-      document.body.classList.add('first-track-loaded')
     }
     
     this.audioPlayer.addEventListener('ended', async (event) => {
       // alert('ended')
-      const track = this.tracks[this.currentTrackIndex]
-      // debugger
+      const currentTrackUrl = this.tracks[this.currentTrackIndex]
+      console.log('currentDayPlaylist', this.currentDayPlaylist)
+      
+      const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.signedUrl === currentTrackUrl)
+      const currentTrackId = currentTrackInitialData.id
   
   
       const data = {
         baseId: this.baseId,
         tableId: this.currentPlaylistTableId,
-        recordId: track.id,
+        recordId: currentTrackId,
       }
   
   
@@ -116,18 +117,22 @@ export class Player {
   }
   
   async setPlaylistData({ newPlaylist }) {
+    // show user friendly message
+    document.querySelector('#current-playlist').innerHTML = 'loading playlist...'
+  
     this.currentPlaylistTableId = newPlaylist.tableId
     this.currentPlaylistTableName = newPlaylist.playlistName
-    const currentPlaylist = await fetchPlaylist(this.baseId, this.currentPlaylistTableId)
-    this.currentDayPlaylist = this.getCurrentDaySongsInPlaylist(currentPlaylist);
+    this.currentPlaylistInitialData = await fetchPlaylist(this.baseId, this.currentPlaylistTableId)
+    this.currentDayPlaylist = this.getCurrentDaySongsInPlaylist(this.currentPlaylistInitialData);
     const currentInterval = this.getCurrentInterval(this.currentDayPlaylist)
     this.currentIntervalData = this.getCurrentIntervalRelatedData(currentInterval)
     this.currentIntervalIndex = this.currentIntervalData.index;
     this.tracks = this.currentIntervalData.urls;
-    // debugger
   }
   
-  async initializeFirstTwoTracksOfAPlaylist() {
+  async initializeFirstTwoTracksOfAPlaylist({ firstTrackLoaded }) {
+    document.querySelector('#current-playlist').innerHTML = 'loading first track...'
+    
     // reset
     this.currentTrackIndex = 0;
     this.nextTrackIndex = 1;
@@ -142,6 +147,12 @@ export class Player {
     
       this.audioPlayer.src = this.currentBlobURL;
     
+      firstTrackLoaded()
+      
+      // show the name of a playlist to an user
+      document.querySelector('#current-playlist').innerHTML = this.currentPlaylistTableName
+  
+  
       console.log('first blob should be ready');
       return this.loadTrack(tracks, nextTrackIndex);
     
@@ -153,38 +164,7 @@ export class Player {
       console.error('Error setting the source for the audio player:', error);
     });
   }
-  
-  async sendDataOnSongEnd(track) {
-    
-    const data = {
-      baseId: this.baseId,
-      tableId: this.currentPlaylistTableId,
-      recordId: track.id,
-    }
-    
-    
-    if (likeDislikeStatus.scheduled) {
-      // set new status...
-      const newStatus = likeDislikeStatus.newStatus
-      if (newStatus) data.newStatus = newStatus
-      
-      await sendLikeDislike(data)
-      resetLikeDislikeScheduledValues()
-    }
-    
-    setTimeout(async () => {
-      const stats = data
-      stats.skipped = skipped
-      stats.playlistName = this.currentPlaylistTableName
-      
-      await sendSongStats(stats)
-      // reset skipped to initial value
-      skipped = false
-      
-      // wait 3 seconds for hopefully pass airtable 5-requeste-at-once limit
-    }, 3000)
-  }
-  
+
   async playAndLoadNextTrack() {
     // debugger
     // If there is a next track
@@ -277,6 +257,18 @@ export class Player {
         audioPlayer.volume = volume;
       }, fadeInOutDuration / 20);  // 20 intervals during the fade duration
     }
+  
+    const enablePlayerControls = () => {
+      this.topActionButtons.forEach(button => {
+        button.disabled = false
+      })
+    }
+ 
+    const disablePlayerControls = () => {
+      this.topActionButtons.forEach(button => {
+        button.disabled = true
+      })
+    }
     
     // player audio controls
     function togglePlayPause() {
@@ -287,30 +279,37 @@ export class Player {
         playButton.classList.remove('playing');
         fadeAudioToPause();
       }
-      
-      temporaryDisableButton(playButton)
-    }
     
+      temporaryDisablePlayerControls()
+    }
+
     const temporaryDisableButton = (button) => {
       button.setAttribute('disabled', '')
       setTimeout(() => {
         button.removeAttribute('disabled')
       }, fadeInOutDuration)
     }
+    
+    const temporaryDisablePlayerControls = () => {
+      this.topActionButtons.forEach(button => {
+        temporaryDisableButton(button)
+      })
+    }
   
-    const disableButton = (button) => button.setAttribute('disabled', '')
-    const enableButton = (button) => button.removeAttribute('disabled')
-  
+    // const disableButton = (button) => button.setAttribute('disabled', '')
+    // const enableButton = (button) => button.removeAttribute('disabled')
+    //
+    //
     const fadeOutPlayingState = () => {
       playButton.classList.remove('playing')
       fadeAudioToPause()
-      disableButton(playButton)
     }
   
     // if playlist button is clicked
     // change playlist and load first two tracks of it
     document.querySelector('#playlists').addEventListener('click', async (event) => {
       
+      // playlist button is clicked
       if (event.target.closest('.playlist')) {
         const playlistButton = event.target.closest('.playlist');
         const playlistName = playlistButton.dataset.playlistName
@@ -323,30 +322,22 @@ export class Player {
   
         fadeOutPlayingState()
         // disable play button until first two tracks of a new playlist are ready
-        disableButton(playlistButton)
-        disableButton(playButton)
-        disableButton(skipButton)
-        document.querySelector('#current-playlist').innerHTML = 'loading playlist...'
+        disablePlayerControls()
         
         
         await this.setPlaylistData({ newPlaylist })
         
         // new playlist is set
         // make sure data is updated
-        const updatedPlaylistName = this.currentPlaylistTableName
-        document.querySelector('#current-playlist').innerHTML = updatedPlaylistName
-        console.log('new playlist:', this.tracks)
         
         try {
-          await this.initializeFirstTwoTracksOfAPlaylist()
+          await this.initializeFirstTwoTracksOfAPlaylist({firstTrackLoaded: () => {
+            enablePlayerControls()
+            
+            }})
         } catch (error) {
           console.error(`playlist error: can't load first two tracks of a new playlist`)
-        } finally {
-          enableButton(playlistButton)
-          enableButton(playButton)
-          enableButton(skipButton)
         }
-        // debugger
       }
     })
     
@@ -432,6 +423,7 @@ export class Player {
   
   getCurrentIntervalRelatedData(currentInterval) {
     if (currentInterval) {
+      console.log('currentII', currentInterval)
       return {
         urls: currentInterval.signedURLs,
         index: currentInterval.index

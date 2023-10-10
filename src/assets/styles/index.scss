@@ -162,6 +162,11 @@ ul {
   }
 
   button {
+    &[disabled] {
+      //opacity: .15;
+      opacity: .45;
+    }
+
     &:first-of-type {
       padding-right: 4px;
     }
@@ -177,10 +182,10 @@ ul {
 
   position: relative;
 
-  &[disabled] {
-    //opacity: .15;
-    opacity: .45;
-  }
+  //&[disabled] {
+  //  //opacity: .15;
+  //  opacity: .45;
+  //}
 
   &.playing .pause-icon {
     visibility: visible;
