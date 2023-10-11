@@ -6,11 +6,17 @@ let likeDislikeStatus = {
   newStatus: null
 }
 
+const likeButton = document.querySelector('#like-button')
+const dislikeButton = document.querySelector('#dislike-button')
+
 // parce an object parameter and get its newStatus key
 const scheduleLikeDislike = ({ newStatus }) => {
   // make sure first letter is capitalized
   const firstLetter = newStatus[0].toUpperCase()
   const status = firstLetter + newStatus.toLowerCase().slice(1)
+  
+  if (status === 'Like') likeButton.classList.add('active')
+  if (status === 'Dislike') dislikeButton.classList.add('active')
   
   likeDislikeStatus = {
     scheduled: true,
@@ -19,6 +25,10 @@ const scheduleLikeDislike = ({ newStatus }) => {
 }
 
 const resetLikeDislikeScheduledValues = () => {
+  // clean up
+  likeButton.classList.remove('active')
+  dislikeButton.classList.remove('active')
+  
   likeDislikeStatus = {
     scheduled: false,
     newStatus: null
@@ -357,43 +367,32 @@ export class Player {
       const like = submitter.id === 'like-button'
       const dislike = submitter.id === 'dislike-button'
 
-      const likeButton = document.querySelector('#like-button')
-      const dislikeButton = document.querySelector('#dislike-button')
-
-      
-      
       if (like) {
         if (likeDislikeStatus.scheduled && likeDislikeStatus.newStatus === 'Like') {
-          likeButton.classList.remove('active')
           resetLikeDislikeScheduledValues()
           
           return
         }
   
         if (likeDislikeStatus.scheduled && likeDislikeStatus.newStatus === 'Dislike') {
-          dislikeButton.classList.remove('active')
           resetLikeDislikeScheduledValues()
         }
         
-        likeButton.classList.add('active')
-        scheduleLikeDislike({ newStatus: 'Like'})
+        scheduleLikeDislike({ newStatus: 'Like' })
       }
   
       if (dislike) {
         if (likeDislikeStatus.scheduled && likeDislikeStatus.newStatus === 'Dislike') {
-          dislikeButton.classList.remove('active')
           resetLikeDislikeScheduledValues()
       
           return
         }
     
         if (likeDislikeStatus.scheduled && likeDislikeStatus.newStatus === 'Like') {
-          likeButton.classList.remove('active')
           resetLikeDislikeScheduledValues()
         }
     
-        dislikeButton.classList.add('active')
-        scheduleLikeDislike({ newStatus: 'Dislike'})
+        scheduleLikeDislike({ newStatus: 'Dislike' })
       }
     })
     
