@@ -87,12 +87,19 @@ export class Player {
         recordId: currentTrackId,
       }
   
-  
+
+      let trackWasDeleted;
       if (likeDislikeStatus.scheduled) {
         // set new status...
         const newStatus = likeDislikeStatus.newStatus
         if (newStatus) data.newStatus = newStatus
     
+        if (newStatus === 'Dislike') {
+          // delete track from current playlist locally
+          this.tracks = this.tracks.filter(track => track !== currentTrackUrl)
+          trackWasDeleted = true
+        }
+        
         await sendLikeDislike(data)
         resetLikeDislikeScheduledValues()
       }
@@ -110,7 +117,7 @@ export class Player {
       skipped = false
       
       console.log('audioPlayer ended')
-      await this.playAndLoadNextTrack()
+      await this.playAndLoadNextTrack({trackWasDeleted})
     });
     
   }
@@ -164,7 +171,7 @@ export class Player {
     });
   }
 
-  async playAndLoadNextTrack() {
+  async playAndLoadNextTrack({ trackWasDeleted }) {
     // debugger
     // If there is a next track
     // updateState(tracks[currentTrackIndex]);
@@ -176,12 +183,16 @@ export class Player {
       }
       
       this.currentBlobURL = this.nextBlobURL;
-      this.currentTrackIndex = this.nextTrackIndex;
       this.nextBlobURL = null;
       this.audioPlayer.src = this.currentBlobURL;
       this.audioPlayer.play();
       // console.log(tracks[currentTrackIndex]);
-      this.nextTrackIndex++;
+      if (!trackWasDeleted) {
+        // update indexes only if previous track wasnt' deleted
+        // if track was deleted indexes remain the same
+        this.currentTrackIndex = this.nextTrackIndex;
+        this.nextTrackIndex++;
+      }
       //console.log("(checking in audioPlayer on end event) tracks lenght is — " + tracks.length);
       //console.log("(checking in audioPlayer on end event) currentTrackIndex (after ++ above) — " + currentTrackIndex);
       
