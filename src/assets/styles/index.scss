@@ -177,6 +177,26 @@ ul {
   }
 }
 
+@mixin active($active-color) {
+  &.active {
+    svg {
+      fill: $active-color;
+    }
+
+    .circle-border {
+      stroke: $active-color;
+    }
+  }
+}
+
+.like-button {
+  @include active(#FFD3D3);
+}
+
+.dislike-button {
+  @include active(#D4DFFD);
+}
+
 .play-button {
   --animation-duration: none; // set via js
 

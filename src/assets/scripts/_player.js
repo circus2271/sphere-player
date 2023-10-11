@@ -345,23 +345,50 @@ export class Player {
       const submitter = e.submitter
       const like = submitter.id === 'like-button'
       const dislike = submitter.id === 'dislike-button'
+
+      const likeButton = document.querySelector('#like-button')
+      const dislikeButton = document.querySelector('#dislike-button')
+
       
       
       if (like) {
-        scheduleLikeDislike({ newStatus: 'Like' })
+        if (likeDislikeStatus.scheduled && likeDislikeStatus.newStatus === 'Like') {
+          likeButton.classList.remove('active')
+          resetLikeDislikeScheduledValues()
+          
+          return
+        }
+  
+        if (likeDislikeStatus.scheduled && likeDislikeStatus.newStatus === 'Dislike') {
+          dislikeButton.classList.remove('active')
+          resetLikeDislikeScheduledValues()
+        }
+        
+        likeButton.classList.add('active')
+        scheduleLikeDislike({ newStatus: 'Like'})
       }
-      
+  
       if (dislike) {
-        scheduleLikeDislike({ newStatus: 'Dislike' })
-      }
+        if (likeDislikeStatus.scheduled && likeDislikeStatus.newStatus === 'Dislike') {
+          dislikeButton.classList.remove('active')
+          resetLikeDislikeScheduledValues()
       
-      // alert(likeDislikeStatus.newStatus)
+          return
+        }
+    
+        if (likeDislikeStatus.scheduled && likeDislikeStatus.newStatus === 'Like') {
+          likeButton.classList.remove('active')
+          resetLikeDislikeScheduledValues()
+        }
+    
+        dislikeButton.classList.add('active')
+        scheduleLikeDislike({ newStatus: 'Dislike'})
+      }
     })
     
     
     // finally, enable all buttons
-    const buttons = document.querySelectorAll('button')
-    buttons.forEach(button => button.removeAttribute('disabled'))
+    enableAllButtons()
   }
   
   loadTrack(tracks, index) {
