@@ -37,6 +37,8 @@ const resetLikeDislikeScheduledValues = () => {
 
 let skipped = false
 
+let playlistShouldChange = false
+
 export class Player {
   currentTrackIndex = 0;
   nextTrackIndex = 1;
@@ -83,7 +85,12 @@ export class Player {
     }
     
     this.audioPlayer.addEventListener('ended', async (event) => {
-      // alert('ended')
+      // if playlist is changing, don't load next song of current playlist
+      const playlistChange = playlistShouldChange
+      // reset this global value
+      playlistShouldChange = false
+      
+      
       const currentTrackUrl = this.tracks[this.currentTrackIndex]
       console.log('currentDayPlaylist', this.currentDayPlaylist)
       
@@ -91,26 +98,28 @@ export class Player {
       const currentTrackId = currentTrackInitialData.id
   
   
+      // this object will be sent to server
       const data = {
         baseId: this.baseId,
         tableId: this.currentPlaylistTableId,
         recordId: currentTrackId,
       }
   
-
       let trackWasDeleted;
       if (likeDislikeStatus.scheduled) {
-        // set new status...
         const newStatus = likeDislikeStatus.newStatus
-        if (newStatus) data.newStatus = newStatus
+        // set 'Like' or 'Dislike' that will be sent to server
+        data.newStatus = newStatus
     
         if (newStatus === 'Dislike') {
           // delete track from current playlist locally
           this.tracks = this.tracks.filter(track => track !== currentTrackUrl)
           trackWasDeleted = true
         }
-        
-        await sendLikeDislike(data)
+
+        setTimeout(() => {
+          sendLikeDislike(data)
+        }, 1200) // wait too overcome the 5 request per second limit
         resetLikeDislikeScheduledValues()
       }
   
@@ -118,8 +127,8 @@ export class Player {
       stats.skipped = skipped
       stats.playlistName = this.currentPlaylistTableName
   
-      setTimeout(async () => {
-        await sendSongStats(stats)
+      setTimeout(() => {
+        sendSongStats(stats)
         // wait 3 seconds for hopefully pass airtable 5-requeste-at-once limit
       }, 3000)
   
@@ -127,7 +136,10 @@ export class Player {
       skipped = false
       
       console.log('audioPlayer ended')
-      await this.playAndLoadNextTrack({trackWasDeleted})
+      // if track is ended due to playlist change, don't load next track
+      if (!playlistChange) {
+        await this.playAndLoadNextTrack({trackWasDeleted})
+      }
     });
     
   }
@@ -343,6 +355,12 @@ export class Player {
         fadeOutPlayingState()
         // disable all buttons until first track is ready
         disableAllButtons()
+  
+        // end current track, so statistics and 'like'/'dislike' could be sent
+        skipped = true
+        playlistShouldChange = true
+        this.audioPlayer.dispatchEvent(new Event('ended'))
+        
         
         await this.setPlaylistData({ newPlaylist })
         
