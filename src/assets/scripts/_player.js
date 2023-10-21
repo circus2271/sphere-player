@@ -126,6 +126,7 @@ export class Player {
       const stats = data
       stats.skipped = skipped
       stats.playlistName = this.currentPlaylistTableName
+      stats.timestamp = new Date().toLocaleString("ru-RU")
   
       setTimeout(() => {
         sendSongStats(stats)
