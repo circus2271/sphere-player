@@ -18,6 +18,7 @@
     "rimraf": "^5.0.1"
   },
   "dependencies": {
+    "fetch-retry": "^5.0.6",
     "howler": "^2.2.3"
   }
 }

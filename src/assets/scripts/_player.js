@@ -1,5 +1,7 @@
+import fetchRetry from 'fetch-retry'
 import { shuffle, sendLikeDislike, sendSongStats, fetchPlaylist } from './_helpers';
 
+const fetchWithRetry = fetchRetry(fetch);
 
 let likeDislikeStatus = {
   scheduled: false,
@@ -171,7 +173,7 @@ export class Player {
     const nextTrackIndex = this.nextTrackIndex
     const currentTrackIndex = this.currentTrackIndex
   
-    await this.loadTrack(tracks, currentTrackIndex).then(blobURL => {
+    await this.loadTrack({tracks, currentTrackIndex, firstTrack: true}).then(blobURL => {
       this.currentBlobURL = blobURL;
     
       this.audioPlayer.src = this.currentBlobURL;
@@ -183,7 +185,7 @@ export class Player {
   
   
       console.log('first blob should be ready');
-      return this.loadTrack(tracks, nextTrackIndex);
+      return this.loadTrack({tracks, nextTrackIndex});
     
     }).then(blobURL => {
       this.nextBlobURL = blobURL;
@@ -230,7 +232,7 @@ export class Player {
         this.nextTrackIndex = 0;
       }
       
-      await this.loadTrack(this.tracks, this.nextTrackIndex).then(blobURL => {
+      await this.loadTrack({tracks: this.tracks, trackIndex: this.nextTrackIndex}).then(blobURL => {
         this.nextBlobURL = blobURL;
       });
       
@@ -420,13 +422,16 @@ export class Player {
     enableAllButtons()
   }
   
-  loadTrack(tracks, index) {
+  loadTrack({tracks, trackIndex, firstTrack = false}) {
     // This function calls function which sets correct interval. It changes index to 0 if interval changes,
     // or we should start from the beginning.
     // Then it loads new track to blob.
     
-    console.log('ppp', tracks[index])
-    return fetch(tracks[index])
+    console.log('ppp', tracks[trackIndex])
+    return fetchWithRetry(tracks[trackIndex], {
+        retries: !firstTrack && 5,
+        retryDelay: !firstTrack && 1000
+      })
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
