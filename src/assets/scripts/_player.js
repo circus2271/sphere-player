@@ -52,8 +52,7 @@ export class Player {
   currentPlaylistTableId = null;
   currentPlaylistTableName = null;
   allButtons = document.querySelectorAll('button');
-  //audioPlayer = document.getElementById('audioPlayer');
-  audioPlayer = new Audio();
+  audioPlayer = document.getElementById('audioPlayer');
   baseId = null;
   availablePlaylists = null;
   
