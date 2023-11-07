@@ -429,8 +429,14 @@ export class Player {
     
     console.log('ppp', tracks[trackIndex])
     return fetchWithRetry(tracks[trackIndex], {
-        retries: !firstTrack && 5,
-        retryDelay: !firstTrack && 1000
+      retries: !firstTrack && 5,
+      retryDelay: !firstTrack && 1000,
+      retryOn: function(attempt, error, response) {
+        // retry on any network error, or 4xx or 5xx status codes
+        if (error !== null || response.status >= 400) {
+          console.log(`retrying, attempt number ${attempt + 1}`);
+          return true;
+        }
       })
       .then(response => {
         if (!response.ok) {
