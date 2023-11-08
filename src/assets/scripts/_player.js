@@ -175,7 +175,7 @@ export class Player {
     const nextTrackIndex = this.nextTrackIndex
     const currentTrackIndex = this.currentTrackIndex
     
-    await this.loadTrack({ tracks, currentTrackIndex, firstTrack: true }).then(blobURL => {
+    await this.loadTrack({ tracks, trackIndex: currentTrackIndex, firstTrack: true }).then(blobURL => {
       this.currentBlobURL = blobURL;
       
       this.audioPlayer.src = this.currentBlobURL;
@@ -187,7 +187,7 @@ export class Player {
       
       
       console.log('first blob should be ready');
-      return this.loadTrack({ tracks, nextTrackIndex });
+      return this.loadTrack({ tracks, trackIndex: nextTrackIndex });
       
     }).then(blobURL => {
       this.nextBlobURL = blobURL;
@@ -430,11 +430,10 @@ export class Player {
     // This function calls function which sets correct interval. It changes index to 0 if interval changes,
     // or we should start from the beginning.
     // Then it loads new track to blob.
-    
     console.log('ppp', tracks[trackIndex])
     return fetchWithRetry(tracks[trackIndex], {
-      retries: !firstTrack && 5,
-      retryDelay: !firstTrack && 1000,
+      retries: firstTrack ? 0 : 5,
+      retryDelay: 1000,
       retryOn: function (attempt, error, response) {
         // retry on any network error, or 4xx or 5xx status codes
         if (error !== null || response.status >= 400) {
