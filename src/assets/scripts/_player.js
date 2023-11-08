@@ -432,11 +432,14 @@ export class Player {
     // Then it loads new track to blob.
     console.log('ppp', tracks[trackIndex])
     return fetchWithRetry(tracks[trackIndex], {
-      retries: firstTrack ? 0 : 5,
       retryDelay: 1000,
       retryOn: function (attempt, error, response) {
-        // retry on any network error, or 4xx or 5xx status codes
-        if (error !== null || response.status >= 400) {
+        if (attempt > 4) {
+          // counter starts from 0
+          return false
+        }
+
+        if (error !== null || response.status >= 400 ) {
           console.log(`retrying, attempt number ${attempt + 1}`);
           return true;
         }
