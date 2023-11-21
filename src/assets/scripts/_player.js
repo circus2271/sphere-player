@@ -178,29 +178,29 @@ export class Player {
     this.nextTrackIndex = 1;
     
     // обходим ошибки с потерей контекста
-    const tracks = this.tracks
-    const nextTrackIndex = this.nextTrackIndex
-    const currentTrackIndex = this.currentTrackIndex
+    // const tracks = this.tracks
+    // const nextTrackIndex = this.nextTrackIndex
+    // const currentTrackIndex = this.currentTrackIndex
 
-    await this.loadTrack({ tracks, trackIndex: currentTrackIndex, firstTrack: true })
+    const retryFirstTrack = () => {
+      return this.loadTrack({ tracks: this.tracks, trackIndex: this.currentTrackIndex})
       .catch(() => {
-        console.log('after end (loadTrack)')
-    
+
         this.currentTrackIndex++
-        return this.loadTrack({tracks: this.tracks, trackIndex: this.currentTrackIndex})
+        return retryFirstTrack()
       })
+    }
+  
+    const retrySecondTrack = () => {
+      return this.loadTrack({ tracks: this.tracks, trackIndex: this.nextTrackIndex })
       .catch(() => {
-        console.log('after end (loadTrack)')
-    
-        this.currentTrackIndex++
-        return this.loadTrack({tracks: this.tracks, trackIndex: this.currentTrackIndex})
+  
+        this.nextTrackIndex++
+        return retrySecondTrack()
       })
-      .catch(() => {
-        console.log('after end (loadTrack)')
-    
-        this.currentTrackIndex++
-        return this.loadTrack({tracks: this.tracks, trackIndex: this.currentTrackIndex})
-      })
+    }
+  
+    retryFirstTrack()
     .then(blobURL => {
       this.currentBlobURL = blobURL;
       
@@ -214,28 +214,11 @@ export class Player {
       
       console.log('first blob should be ready');
       // document.getElementById('skip-button').disabled = true
-      return this.loadTrack({ tracks, trackIndex: nextTrackIndex })
-        .catch(() => {
-          console.log('after end (loadTrack)')
-    
-          this.currentTrackIndex++
-          return this.loadTrack({tracks: this.tracks, trackIndex: this.currentTrackIndex})
-        })
-        .catch(() => {
-          console.log('after end (loadTrack)')
-    
-          this.currentTrackIndex++
-          return this.loadTrack({tracks: this.tracks, trackIndex: this.currentTrackIndex})
-        })
-        .catch(() => {
-          console.log('after end (loadTrack)')
-    
-          this.currentTrackIndex++
-          return this.loadTrack({tracks: this.tracks, trackIndex: this.currentTrackIndex})
-        })
+      return retrySecondTrack();
     }).then(blobURL => {
       this.nextBlobURL = blobURL;
-      
+  
+      document.getElementById('skip-button').disabled = false
       console.log('first two tracks of a playlist are initialized')
     }).catch(error => {
       console.error('Error setting the source for the audio player:', error);
@@ -352,8 +335,11 @@ export class Player {
       }, fadeInOutDuration / 20);  // 20 intervals during the fade duration
     }
     
-    const enableAllButtons = () => {
+    // get "exception" key from an object;
+    // if no object -> use empty object by default
+    const enableAllButtons = ({exception} = {}) => {
       this.allButtons.forEach(button => {
+        // if (exception && button.id === exception) return
         button.disabled = false
       })
     }
@@ -440,7 +426,7 @@ export class Player {
         try {
           await this.initializeFirstTwoTracksOfAPlaylist({
             firstTrackLoaded: () => {
-              enableAllButtons()
+              enableAllButtons({exception: 'skip-button'})
             }
           })
         } catch (error) {
@@ -488,10 +474,10 @@ export class Player {
     
     
     // finally, enable all buttons
-    enableAllButtons()
+    enableAllButtons({exception: 'skip-button'})
   }
   
-  loadTrack({ tracks, trackIndex, firstTrack = false }) {
+  loadTrack({ tracks, trackIndex }) {
     // This function calls function which sets correct interval. It changes index to 0 if interval changes,
     // or we should start from the beginning.
     // Then it loads new track to blob.
