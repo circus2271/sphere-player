@@ -41,6 +41,10 @@ let skipped = false
 
 let playlistShouldChange = false
 
+let globalRepeatId = null
+
+const resetRepeatId = () => globalRepeatId = null
+
 export class Player {
   currentTrackIndex = 0;
   nextTrackIndex = 1;
@@ -93,8 +97,11 @@ export class Player {
       const playlistChange = playlistShouldChange
       // reset this global value
       playlistShouldChange = false
-      
-      
+  
+      document.getElementById('skip-button').disabled = true
+  
+  
+  
       const currentTrackUrl = this.tracks[this.currentTrackIndex]
       console.log('currentDayPlaylist', this.currentDayPlaylist)
       
@@ -174,8 +181,27 @@ export class Player {
     const tracks = this.tracks
     const nextTrackIndex = this.nextTrackIndex
     const currentTrackIndex = this.currentTrackIndex
+
+    await this.loadTrack({ tracks, trackIndex: currentTrackIndex, firstTrack: true })
+      .catch(() => {
+        console.log('after end (loadTrack)')
     
-    await this.loadTrack({ tracks, trackIndex: currentTrackIndex, firstTrack: true }).then(blobURL => {
+        this.currentTrackIndex++
+        return this.loadTrack({tracks: this.tracks, trackIndex: this.currentTrackIndex})
+      })
+      .catch(() => {
+        console.log('after end (loadTrack)')
+    
+        this.currentTrackIndex++
+        return this.loadTrack({tracks: this.tracks, trackIndex: this.currentTrackIndex})
+      })
+      .catch(() => {
+        console.log('after end (loadTrack)')
+    
+        this.currentTrackIndex++
+        return this.loadTrack({tracks: this.tracks, trackIndex: this.currentTrackIndex})
+      })
+    .then(blobURL => {
       this.currentBlobURL = blobURL;
       
       this.audioPlayer.src = this.currentBlobURL;
@@ -187,8 +213,26 @@ export class Player {
       
       
       console.log('first blob should be ready');
-      return this.loadTrack({ tracks, trackIndex: nextTrackIndex });
-      
+      // document.getElementById('skip-button').disabled = true
+      return this.loadTrack({ tracks, trackIndex: nextTrackIndex })
+        .catch(() => {
+          console.log('after end (loadTrack)')
+    
+          this.currentTrackIndex++
+          return this.loadTrack({tracks: this.tracks, trackIndex: this.currentTrackIndex})
+        })
+        .catch(() => {
+          console.log('after end (loadTrack)')
+    
+          this.currentTrackIndex++
+          return this.loadTrack({tracks: this.tracks, trackIndex: this.currentTrackIndex})
+        })
+        .catch(() => {
+          console.log('after end (loadTrack)')
+    
+          this.currentTrackIndex++
+          return this.loadTrack({tracks: this.tracks, trackIndex: this.currentTrackIndex})
+        })
     }).then(blobURL => {
       this.nextBlobURL = blobURL;
       
@@ -225,19 +269,32 @@ export class Player {
       
       this.currentIntervalData = this.getCurrentInterval(this.currentDayPlaylist);
       
-      if (this.currentIntervalIndex !== this.currentIntervalData.index) {
-        this.currentIntervalIndex = this.currentIntervalData.index;
-        this.tracks = this.currentIntervalData.urls;
-        this.nextTrackIndex = 0; // Start from the first track in the new interval
-      } else if (this.nextTrackIndex >= this.tracks.length) {
-        // If we're beyond the end of the current tracks, loop back to the start
-        this.nextTrackIndex = 0;
+      const retry = () => {
+        console.log('retry track index:', this.nextTrackIndex)
+        if (this.currentIntervalIndex !== this.currentIntervalData.index) {
+          this.currentIntervalIndex = this.currentIntervalData.index;
+          this.tracks = this.currentIntervalData.urls;
+          this.nextTrackIndex = 0; // Start from the first track in the new interval
+        } else if (this.nextTrackIndex >= this.tracks.length) {
+          // If we're beyond the end of the current tracks, loop back to the start
+          this.nextTrackIndex = 0;
+        }
+        
+        return this.loadTrack({ tracks: this.tracks, trackIndex: this.nextTrackIndex })
+          .catch(() => {
+            this.nextTrackIndex++
+            return retry()
+          })
       }
       
-      await this.loadTrack({ tracks: this.tracks, trackIndex: this.nextTrackIndex }).then(blobURL => {
-        this.nextBlobURL = blobURL;
-      });
-      
+      retry()
+        .then(blobURL => {
+          this.nextBlobURL = blobURL;
+        // })
+        // .then(() => {
+          console.log('track loaded (with or without retry)')
+          document.getElementById('skip-button').disabled = false
+        });
     }
   }
   
@@ -349,8 +406,15 @@ export class Player {
       // playlist button is clicked
       if (event.target.closest('.playlist')) {
         const playlistButton = event.target.closest('.playlist');
-        const playlistName = playlistButton.dataset.playlistName
+        // const playlistName = playlistButton.dataset.playlistName
         
+        if (playlistButton.classList.contains('playlist--selected')) {
+          console.log('playlist already selected');
+          return;
+        }
+        resetRepeatId()
+  
+  
         document.querySelector('.playlist--selected').classList.remove('playlist--selected')
         playlistButton.classList.add('playlist--selected')
         
@@ -368,7 +432,8 @@ export class Player {
         
         
         await this.setPlaylistData({ newPlaylist })
-        
+        // cancel loadtrack repeating if playlist has changed
+        // resetRepeatId()
         // new playlist is set
         // make sure data is updated
         
@@ -430,17 +495,41 @@ export class Player {
     // This function calls function which sets correct interval. It changes index to 0 if interval changes,
     // or we should start from the beginning.
     // Then it loads new track to blob.
+    
+    // use this to handle (cancel) retries
+    const localRepeatId = new Date().getTime();
+    globalRepeatId = localRepeatId
+    
     console.log('ppp', tracks[trackIndex])
     return fetchWithRetry(tracks[trackIndex], {
       retryDelay: 1000,
+      // retryDelay: 0,
       retryOn: function (attempt, error, response) {
-        if (attempt > 4) {
-          // counter starts from 0
+        // alert(1)
+        // console.log('ro', new Date().getTime())
+        console.log('get second', new Date().getSeconds())
+        
+        if (response && response.status === 404) {
+          // похоже что у этого трэка битая ссылка
+          //
+          console.warn('fetch error, 404, track not found')
           return false
         }
 
-        if (error !== null || response.status >= 400 ) {
-          console.log(`retrying, attempt number ${attempt + 1}`);
+        // console.log('lri', localRepeatId)
+        // console.log('gri', globalRepeatId)
+        if (localRepeatId !== globalRepeatId) {
+          console.log('reset counter')
+          console.log('cancel this track loading')
+          return false;
+        }
+
+        if (error !== null || response.status >= 500 ) {
+          // что-то не то, -- делаем повтор запроса
+          console.log('ошибка при получении песни')
+          console.log('делаем повтор запроса...')
+          // console.log('error111', error)
+          console.log('повтор номер', attempt + 1)
           return true;
         }
       }
@@ -459,15 +548,14 @@ export class Player {
         console.warn('Fetch was successful but blob is empty.');
       }
     })
-    .catch(e => {
-      // here will be good idea to try to load track once (but need to track how many tries)
-      // or load +1. anyway its good idea to place setTimer
-      console.error(e);
-    });
+    // .catch(e => {
+    //   // here will be good idea to try to load track once (but need to track how many tries)
+    //   // or load +1. anyway its good idea to place setTimer
+    //   console.error(e);
+    // });
   }
     
-    getCurrentInterval(data)
-    {
+    getCurrentInterval(data) {
       // This function aims to find the current time interval (based on the hour of the day) from a given list of intervals,
       // and return the associated URLs and the index of the interval within the provided list.
       

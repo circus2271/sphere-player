@@ -25,7 +25,8 @@ export const fetchPlaylist = async (baseId, tableId) => {
     return playlist
     
   } catch (error) {
-    console.warn(`"${playlistName}" not found`)
+    console.warn(`there was a network error, when loading ${tableId} playlist`)
+    // console.warn(`"${playlistName}" not found`)
     console.log(error)
   }
 }
