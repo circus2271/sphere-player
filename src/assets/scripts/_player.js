@@ -52,6 +52,7 @@ export class Player {
   currentIntervalData = null;
   nextBlobURL = null;
   currentBlobURL = null;
+  newIntervalFirstTrackBlob = null;
   currentIntervalIndex = -1;
   currentPlaylistInitialData = null
   currentDayPlaylist = null;
@@ -226,6 +227,44 @@ export class Player {
   }
 
   async playAndLoadNextTrack({ trackWasDeleted }) {
+    const currentTrackSignedUrl = this.tracks[this.currentTrackIndex]
+    const currentTrackData = this.currentPlaylistInitialData.find(record => {
+      return record.signedUrl === currentTrackSignedUrl
+    })
+    // alert(currentTrackData.fields['Duration in seconds'])
+    const currentTrackDurationInSeconds = currentTrackData.fields['Duration in seconds']
+    const currentTrackDurationInMilliSeconds = currentTrackDurationInSeconds * 1000
+
+    const currentTime = new Date().getTime()
+    const possibleEndOfTrackTimestamp = new Date( currentTime + currentTrackDurationInMilliSeconds)
+    // alert(possibleEndOfTrackTimestamp.getHours() + ':' + possibleEndOfTrackTimestamp.getMinutes())
+    const trackEndHour = possibleEndOfTrackTimestamp.getHours()
+    // const currentIntervalTimeString = this.getCurrentInterval(this.currentDayPlaylist);
+    // const until = currentIntervalTimeString.split('-')[1]
+
+    const possibleIntervalOnTrackEnd = this.getCurrentInterval(this.currentDayPlaylist, new Date().getHours())
+
+    // let newIntervalFirstTrackBlob;
+    if (possibleIntervalOnTrackEnd.index !== this.currentIntervalIndex.index) {
+      this.loadTrack({tracks: possibleIntervalOnTrackEnd.signedURLs, trackIndex: 0 })
+        .then(blobURL => {
+            this.newIntervalFirstTrackBlob = blobURL;
+              // })
+              // .then(() => {
+              console.log('newIntervalFirstTrackBlob loaded ')
+              // document.getElementById('skip-button').disabled = false
+            }
+        )
+      // this track possibly will end on the next interval
+      // so get first track of this interval as a blob
+      // (to reduce loading time of this track as playlist switches)
+
+    }
+    // if (cur)
+    // if (trackEndHour >= until) {
+    //   //load first track of new interval
+    // }
+    // const currentInterval = this.getCurrentInterval(this.currentDayPlaylist);
     // debugger
     // If there is a next track
     // updateState(tracks[currentTrackIndex]);
@@ -267,7 +306,7 @@ export class Player {
           this.nextTrackIndex = 0;
         }
 
-        // debugger
+        debugger
         // const tracks1 = this.tracks;
         // const trackIndex1 = this.nextTrackIndex;
         return this.loadTrack({ tracks: this.tracks, trackIndex: this.nextTrackIndex })
@@ -549,11 +588,15 @@ export class Player {
     // });
   }
 
-    getCurrentInterval(data) {
+    getCurrentInterval(data, hour) {
       // This function aims to find the current time interval (based on the hour of the day) from a given list of intervals,
       // and return the associated URLs and the index of the interval within the provided list.
 
-      const currentHour = new Date().getHours(); // Get the current hour (0 - 23)
+      // if (!hour) {
+      //   hour = new Date().getHours(); // Get the current hour (0 - 23)
+      // }
+      // name of this constant is not enough correct, but now it's better then rename all the things
+      const currentHour = hour || new Date().getHours(); // Get the current hour (0 - 23)
 
       const currentInterval = data.find((interval, i) => {
         const [start, end] = interval.time.split('-').map(Number); // Convert "12-15" to [12, 15]
@@ -568,10 +611,10 @@ export class Player {
 
       // console.log('currentIII', currentInterval)
 
-      if (currentInterval) {
-        const index = data.findIndex(interval => interval.time === currentInterval.time)
-        currentInterval.index = index
-      }
+      // if (currentInterval) {
+      //   const index = data.findIndex(interval => interval.time === currentInterval.time)
+      //   currentInterval.index = index
+      // }
 
       return currentInterval
       // {time:'11-12', signedURLs: [...]}
@@ -622,12 +665,15 @@ export class Player {
 
       // Convert songIntervals object to the desired array format
       const result = [];
-      for (const interval in songIntervals) {
+      // for (const interval in songIntervals) {
+      // for (const interval in songIntervals) {
+      songIntervals.forEach(((interval, index) => {
         result.push({
           time: interval,
-          signedURLs: shuffle(songIntervals[interval]) // Assuming shuffle is a function you've defined elsewhere
+          signedURLs: shuffle(songIntervals[interval]), // Assuming shuffle is a function you've defined elsewhere
+          index: index
         });
-      }
+      })
 
       // Now, let's sort the intervals
       result.sort((a, b) => {
