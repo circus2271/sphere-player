@@ -165,10 +165,11 @@ export class Player {
     this.currentPlaylistTableName = newPlaylist.playlistName
     this.currentPlaylistInitialData = await fetchPlaylist(this.baseId, this.currentPlaylistTableId)
     this.currentDayPlaylist = this.getCurrentDaySongsInPlaylist(this.currentPlaylistInitialData);
-    const currentInterval = this.getCurrentInterval(this.currentDayPlaylist)
-    this.currentIntervalData = this.getCurrentIntervalRelatedData(currentInterval)
+    // const currentInterval = this.getCurrentInterval(this.currentDayPlaylist)
+    // this.currentIntervalData = this.getCurrentIntervalRelatedData(currentInterval)
+    this.currentIntervalData = this.getCurrentInterval(this.currentDayPlaylist)
     this.currentIntervalIndex = this.currentIntervalData.index;
-    this.tracks = this.currentIntervalData.urls;
+    this.tracks = this.currentIntervalData.signedUrls;
   }
 
   async initializeFirstTwoTracksOfAPlaylist({ firstTrackLoaded }) {
@@ -242,11 +243,13 @@ export class Player {
     // const currentIntervalTimeString = this.getCurrentInterval(this.currentDayPlaylist);
     // const until = currentIntervalTimeString.split('-')[1]
 
-    const possibleIntervalOnTrackEnd = this.getCurrentInterval(this.currentDayPlaylist, new Date().getHours())
+    // const possibleIntervalOnTrackEnd = this.getCurrentInterval(this.currentDayPlaylist, new Date().getHours())
+    // const nextIntervalRelatedData = this.getCurrentIntervalRelatedData(possibleIntervalOnTrackEnd)
+    const nextIntervalRelatedData = this.getCurrentInterval(this.currentDayPlaylist, new Date().getHours())
 
     // let newIntervalFirstTrackBlob;
-    if (possibleIntervalOnTrackEnd.index !== this.currentIntervalIndex.index) {
-      this.loadTrack({tracks: possibleIntervalOnTrackEnd.signedURLs, trackIndex: 0 })
+    if (nextIntervalRelatedData.index !== this.currentIntervalIndex.index) {
+      this.loadTrack({tracks: nextIntervalRelatedData.signedUrls, trackIndex: 0 })
         .then(blobURL => {
             this.newIntervalFirstTrackBlob = blobURL;
               // })
@@ -289,6 +292,8 @@ export class Player {
       //console.log("(checking in audioPlayer on end event) tracks lenght is — " + tracks.length);
       //console.log("(checking in audioPlayer on end event) currentTrackIndex (after ++ above) — " + currentTrackIndex);
 
+      // this.currentInterval = this.getCurrentInterval(this.currentDayPlaylist);
+      // this.currentIntervalData = this.getCurrentIntervalRelatedData(this.currentInterval)
       this.currentIntervalData = this.getCurrentInterval(this.currentDayPlaylist);
 
       const retry = () => {
@@ -298,7 +303,7 @@ export class Player {
           console.log('switched playlist interval')
           console.log('current active interval is', this.currentIntervalData.time)
           this.currentIntervalIndex = this.currentIntervalData.index;
-          this.tracks = this.currentIntervalData.signedURLs;
+          this.tracks = this.currentIntervalData.signedUrls;
           this.nextTrackIndex = 0; // Start from the first track in the new interval
           // debugger
         } else if (this.nextTrackIndex >= this.tracks.length) {
@@ -615,24 +620,28 @@ export class Player {
       //   const index = data.findIndex(interval => interval.time === currentInterval.time)
       //   currentInterval.index = index
       // }
-
-      return currentInterval
-      // {time:'11-12', signedURLs: [...]}
-      // {time:'11-12', signedURLs: [...], index: 0}
-      // {time:'12-21', signedURLs: [...], index: 9}
-    }
-
-    getCurrentIntervalRelatedData(currentInterval) {
       if (currentInterval) {
-        // console.log('currentII', currentInterval)
-        return {
-          urls: currentInterval.signedURLs,
-          index: currentInterval.index
-        };
+        // {time:'11-12', signedURLs: [...], index: 1}
+        // {time:'11-12', signedURLs: [...], index: 0}
+        // {time:'12-21', signedURLs: [...], index: 9}
+        return currentInterval
       }
 
-      return { urls: [], index: -1 }; // Default return if no matching interval is found
+
+      return { time: undefined, signedUrls: [], index: -1 }; // Default return if no matching interval is found
     }
+
+    // getCurrentIntervalRelatedData(currentInterval) {
+    //   if (currentInterval) {
+    //     // console.log('currentII', currentInterval)
+    //     return {
+    //       urls: currentInterval.signedURLs,
+    //       index: currentInterval.index
+    //     };
+    //   }
+    //
+    //   return { urls: [], index: -1 }; // Default return if no matching interval is found
+    // }
 
 
     // returns array of objects
