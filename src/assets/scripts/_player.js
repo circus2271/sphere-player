@@ -165,8 +165,6 @@ export class Player {
     this.currentPlaylistTableName = newPlaylist.playlistName
     this.currentPlaylistInitialData = await fetchPlaylist(this.baseId, this.currentPlaylistTableId)
     this.currentDayPlaylist = this.getCurrentDaySongsInPlaylist(this.currentPlaylistInitialData);
-    // const currentInterval = this.getCurrentInterval(this.currentDayPlaylist)
-    // this.currentIntervalData = this.getCurrentIntervalRelatedData(currentInterval)
     this.currentIntervalData = this.getCurrentInterval(this.currentDayPlaylist)
     this.currentIntervalIndex = this.currentIntervalData.index;
     this.tracks = this.currentIntervalData.signedUrls;
@@ -257,7 +255,10 @@ export class Player {
               console.log('newIntervalFirstTrackBlob loaded ')
               // document.getElementById('skip-button').disabled = false
             }
-        )
+        ).catch(error => {
+          console.error('an error occurred when prefetching a track from a new interval')
+          console.error(error)
+      })
       // this track possibly will end on the next interval
       // so get first track of this interval as a blob
       // (to reduce loading time of this track as playlist switches)
@@ -586,11 +587,6 @@ export class Player {
         console.warn('Fetch was successful but blob is empty.');
       }
     })
-    // .catch(e => {
-    //   // here will be good idea to try to load track once (but need to track how many tries)
-    //   // or load +1. anyway its good idea to place setTimer
-    //   console.error(e);
-    // });
   }
 
     getCurrentInterval(data, hour) {
@@ -616,10 +612,6 @@ export class Player {
 
       // console.log('currentIII', currentInterval)
 
-      // if (currentInterval) {
-      //   const index = data.findIndex(interval => interval.time === currentInterval.time)
-      //   currentInterval.index = index
-      // }
       if (currentInterval) {
         // {time:'11-12', signedURLs: [...], index: 1}
         // {time:'11-12', signedURLs: [...], index: 0}
@@ -630,19 +622,6 @@ export class Player {
 
       return { time: undefined, signedUrls: [], index: -1 }; // Default return if no matching interval is found
     }
-
-    // getCurrentIntervalRelatedData(currentInterval) {
-    //   if (currentInterval) {
-    //     // console.log('currentII', currentInterval)
-    //     return {
-    //       urls: currentInterval.signedURLs,
-    //       index: currentInterval.index
-    //     };
-    //   }
-    //
-    //   return { urls: [], index: -1 }; // Default return if no matching interval is found
-    // }
-
 
     // returns array of objects
     // for example: [{ time: "8-12", signedURLs: ["1.mp3", "2.mp3", "3.mp3"] }, {...} ]
