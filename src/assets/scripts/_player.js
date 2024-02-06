@@ -79,7 +79,7 @@ export class Player {
     // обновляем все данные о плейлисте
     await this.setPlaylistData({ newPlaylist: firstPlaylist })
 
-
+// debugger
     try {
       await this.initializeFirstTwoTracksOfAPlaylist({
         firstTrackLoaded: () => {
@@ -90,6 +90,8 @@ export class Player {
     } catch (error) {
       // console.log('no tracks')
       // this.initializePlayerHTMLControls()
+      const currentIntervalLocalData = this.currentIntervalData
+      debugger
       console.error(`can't first two tracks`)
     }
 
@@ -235,9 +237,11 @@ export class Player {
     // const nextIntervalData = this.getCurrentInterval(this.currentDayPlaylist, new Date().getHours())
     const nextIntervalData = this.getCurrentInterval(this.currentDayPlaylist, possibleEndOfTrackTimestamp.getHours())
 
-    const currentTrackPossiblyEndsAdANewInterval = nextIntervalData.index !== this.currentIntervalIndex.index
+    const currentTrackPossiblyEndsAtANewInterval = nextIntervalData.index !== this.currentIntervalIndex.index
     const firstTrackOfANewIntervalPreloaded = this.nextIntervalFirstTrackBlobUrl !== null
-    if (currentTrackPossiblyEndsAdANewInterval && !firstTrackOfANewIntervalPreloaded) {
+    if (currentTrackPossiblyEndsAtANewInterval && !firstTrackOfANewIntervalPreloaded) {
+      console.log('current track may end in a new interval')
+      console.log('trying to preload first track of a new interval')
       this.loadTrack({tracks: nextIntervalData.signedUrls, trackIndex: 0 })
           // this track possibly will end on the next interval
           // so get first track of this interval as a blob
@@ -260,27 +264,28 @@ export class Player {
         URL.revokeObjectURL(this.currentBlobURL);
       }
 
+      this.currentIntervalData = this.getCurrentInterval(this.currentDayPlaylist);
       // const intervalChanged = this.currentIntervalIndex !== this.currentIntervalData.index
       // const shouldChangeInterval = this.currentIntervalIndex !== this.currentIntervalData.index
-      const intervalShouldBeChanged = this.currentIntervalIndex !== this.currentIntervalData.index
-      if (intervalShouldBeChanged) {
+      const intervalShouldBeChanged = () => this.currentIntervalIndex !== this.currentIntervalData.index
+      if (intervalShouldBeChanged()) {
         if (this.nextIntervalFirstTrackBlobUrl) {
           this.currentBlobURL = this.nextIntervalFirstTrackBlobUrl
           this.nextIntervalFirstTrackBlobUrl = null
           this.nextBlobURL = null
 
-          console.log('intervalShouldBeChanged, currentBlobURL = nextIntrvalFirstTrackBlobUrl')
+          console.log('intervalShouldBeChanged, currentBlobURL = nextIntervalFirstTrackBlobUrl')
         }
 
         if (!this.nextIntervalFirstTrackBlobUrl && this.nextBlobURL) {
           this.currentBlobURL = this.nextBlobURL;
           this.nextBlobURL = null;
 
-          console.log('intervalShouldBeChanged, but there is no nextIntrvalFirstTrackBlobUrl, so currentBlobURL is this.nextBlobURL')
+          console.log('intervalShouldBeChanged, but there is no nextIntervalFirstTrackBlobUrl, so currentBlobURL is this.nextBlobURL')
         }
       }
 
-      if (this.nextBlobURL && !intervalShouldBeChanged) {
+      if (this.nextBlobURL && !intervalShouldBeChanged()) {
         this.currentBlobURL = this.nextBlobURL;
         this.nextBlobURL = null;
 
@@ -297,13 +302,12 @@ export class Player {
         this.nextTrackIndex++;
       }
 
-      this.currentIntervalData = this.getCurrentInterval(this.currentDayPlaylist);
-
       const retry = () => {
         console.log('retry track index:', this.nextTrackIndex)
-        if (intervalShouldBeChanged) {
+        if (intervalShouldBeChanged()) {
           // if (this.currentIntervalIndex !== this.currentIntervalData.index) {
           // change interval
+          console.log('interval has changed')
           console.log('switched playlist interval')
           console.log('current active interval is', this.currentIntervalData.time)
           this.currentIntervalIndex = this.currentIntervalData.index;
@@ -606,9 +610,9 @@ export class Player {
       // console.log('currentIII', currentInterval)
 
       if (currentInterval) {
-        // {time:'11-12', signedURLs: [...], index: 1}
-        // {time:'11-12', signedURLs: [...], index: 0}
-        // {time:'12-21', signedURLs: [...], index: 9}
+        // {time:'11-12', signedUrls: [...], index: 1}
+        // {time:'11-12', signedUrls: [...], index: 0}
+        // {time:'12-21', signedUrls: [...], index: 9}
         return currentInterval
       }
 
@@ -617,7 +621,7 @@ export class Player {
     }
 
     // returns array of objects
-    // for example: [{ time: "8-12", signedURLs: ["1.mp3", "2.mp3", "3.mp3"] }, {...} ]
+    // for example: [{ time: "8-12", signedUrls: ["1.mp3", "2.mp3", "3.mp3"] }, {...} ]
     getCurrentDaySongsInPlaylist(playlistArray) {
       // THIS function works (getting as an argument) the whole playlist with all the days intervals
       // IT RETURNS the array with intervals for a particular day. The result of interval sets is time-sorted
@@ -647,10 +651,11 @@ export class Player {
       // Convert songIntervals object to the desired array format
       const result = [];
       // for (const interval in songIntervals) {
-      songIntervals.forEach((interval, index) => {
+      // debugger
+      Object.keys(songIntervals).forEach((interval, index) => {
         result.push({
           time: interval,
-          signedURLs: shuffle(songIntervals[interval]), // Assuming shuffle is a function you've defined elsewhere
+          signedUrls: shuffle(songIntervals[interval]), // Assuming shuffle is a function you've defined elsewhere
           index: index
         });
       })
@@ -668,10 +673,11 @@ export class Player {
       });
 
       // We get here array of objects which look like this, they are sorted from early to late:
-      // { time: "8-12", signedURLs: ["1.mp3", "2.mp3", "3.mp3"] },
-      // { time: "12-16", signedURLs: ["4.mp3", "5.mp3", "6.mp3"] },
-      // { time: "16-20", signedURLs: ["7.mp3", "8.mp3", "9.mp3"] }
+      // { time: "8-12", signedUrls: ["1.mp3", "2.mp3", "3.mp3"] },
+      // { time: "12-16", signedUrls: ["4.mp3", "5.mp3", "6.mp3"] },
+      // { time: "16-20", signedUrls: ["7.mp3", "8.mp3", "9.mp3"] }
       // console.log('resultlll', result)
+      // debugger
       return result;
     }
 
