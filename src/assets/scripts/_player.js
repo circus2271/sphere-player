@@ -240,18 +240,18 @@ export class Player {
     const currentTrackPossiblyEndsAtANewInterval = nextIntervalData.index !== this.currentIntervalIndex.index
     const firstTrackOfANewIntervalPreloaded = this.nextIntervalFirstTrackBlobUrl !== null
     if (currentTrackPossiblyEndsAtANewInterval && !firstTrackOfANewIntervalPreloaded) {
-      console.log('current track may end in a new interval')
-      console.log('trying to preload first track of a new interval')
+      console.log('%cinterval', 'color: green', 'current track may end in a new interval')
+      console.log('%cinterval', 'color: green','trying to preload first track of a new interval')
       this.loadTrack({tracks: nextIntervalData.signedUrls, trackIndex: 0 })
           // this track possibly will end on the next interval
           // so get first track of this interval as a blob
           // (to reduce loading time of this track as playlist switches)
           .then(blobURL => {
             this.nextIntervalFirstTrackBlobUrl = blobURL;
-              console.log('newIntervalFirstTrackBlob loaded ')
+              console.log('%cinterval', 'color: green', 'newIntervalFirstTrackBlob loaded ')
             }
         ).catch(error => {
-          console.error('an error occurred when prefetching a track from a new interval')
+          console.error('%cinterval', 'color: green', 'an error occurred when prefetching a track from a new interval')
           console.error(error)
       })
     }
@@ -274,14 +274,14 @@ export class Player {
           this.nextIntervalFirstTrackBlobUrl = null
           this.nextBlobURL = null
 
-          console.log('intervalShouldBeChanged, currentBlobURL = nextIntervalFirstTrackBlobUrl')
+          console.log('%cinterval', 'color: green', 'intervalShouldBeChanged, currentBlobURL = nextIntervalFirstTrackBlobUrl')
         }
 
         if (!this.nextIntervalFirstTrackBlobUrl && this.nextBlobURL) {
           this.currentBlobURL = this.nextBlobURL;
           this.nextBlobURL = null;
 
-          console.log('intervalShouldBeChanged, but there is no nextIntervalFirstTrackBlobUrl, so currentBlobURL is this.nextBlobURL')
+          console.log('%cinterval', 'color: green', 'intervalShouldBeChanged, but there is no nextIntervalFirstTrackBlobUrl, so currentBlobURL is this.nextBlobURL')
         }
       }
 
@@ -289,7 +289,7 @@ export class Player {
         this.currentBlobURL = this.nextBlobURL;
         this.nextBlobURL = null;
 
-        console.log('there is no intervalChange, so currentBlobURL is this.nextBlobURL')
+        console.log('%cinterval', 'color: green', 'there is no intervalChange, so currentBlobURL is this.nextBlobURL')
       }
 
       this.audioPlayer.src = this.currentBlobURL;
@@ -307,9 +307,9 @@ export class Player {
         if (intervalShouldBeChanged()) {
           // if (this.currentIntervalIndex !== this.currentIntervalData.index) {
           // change interval
-          console.log('interval has changed')
-          console.log('switched playlist interval')
-          console.log('current active interval is', this.currentIntervalData.time)
+          console.log('%cinterval', 'color: green', 'interval has changed')
+          console.log('%cinterval', 'color: green', 'switched playlist interval')
+          console.log('%cinterval', 'color: green', 'current active interval is', this.currentIntervalData.time)
           this.currentIntervalIndex = this.currentIntervalData.index;
           this.tracks = this.currentIntervalData.signedUrls;
           this.nextTrackIndex = 0; // Start from the first track in the new interval
