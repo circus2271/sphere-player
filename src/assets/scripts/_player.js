@@ -234,24 +234,30 @@ export class Player {
     const possibleEndOfTrackTimestamp = new Date( currentTime + currentTrackDurationInMilliSeconds)
     // const trackEndHour = possibleEndOfTrackTimestamp.getHours()
     // const trackEndHour = possibleEndOfTrackTimestamp.getHours()
-    // const nextIntervalData = this.getCurrentInterval(this.currentDayPlaylist, new Date().getHours())
-    const nextIntervalData = this.getCurrentInterval(this.currentDayPlaylist, possibleEndOfTrackTimestamp.getHours())
+    // const nextPossibleIntervalData = this.getCurrentInterval(this.currentDayPlaylist, new Date().getHours())
+    const nextPossibleIntervalData = this.getCurrentInterval(this.currentDayPlaylist, possibleEndOfTrackTimestamp.getHours())
 
-    const currentTrackPossiblyEndsAtANewInterval = nextIntervalData.index !== this.currentIntervalIndex.index
+    const currentTrackPossiblyEndsAtANewInterval = nextPossibleIntervalData.index !== this.currentIntervalIndex
     const firstTrackOfANewIntervalPreloaded = this.nextIntervalFirstTrackBlobUrl !== null
     if (currentTrackPossiblyEndsAtANewInterval && !firstTrackOfANewIntervalPreloaded) {
       console.log('%cinterval', 'color: green', 'current track may end in a new interval')
       console.log('%cinterval', 'color: green','trying to preload first track of a new interval')
-      this.loadTrack({tracks: nextIntervalData.signedUrls, trackIndex: 0 })
+      this.loadTrack({tracks: nextPossibleIntervalData.signedUrls, trackIndex: 0 })
           // this track possibly will end on the next interval
           // so get first track of this interval as a blob
           // (to reduce loading time of this track as playlist switches)
           .then(blobURL => {
             this.nextIntervalFirstTrackBlobUrl = blobURL;
-              console.log('%cinterval', 'color: green', 'newIntervalFirstTrackBlob loaded ')
+              console.log(
+                  '%cinterval', 'color: green',
+                  'newIntervalFirstTrackBlob loaded '
+              )
             }
         ).catch(error => {
-          console.error('%cinterval', 'color: green', 'an error occurred when prefetching a track from a new interval')
+          console.error(
+              '%cinterval', 'color: green',
+              'an error occurred when prefetching a track from a new interval'
+          )
           console.error(error)
       })
     }
@@ -274,14 +280,20 @@ export class Player {
           this.nextIntervalFirstTrackBlobUrl = null
           this.nextBlobURL = null
 
-          console.log('%cinterval', 'color: green', 'intervalShouldBeChanged, currentBlobURL = nextIntervalFirstTrackBlobUrl')
+          console.log(
+              '%cinterval', 'color: green',
+              'intervalShouldBeChanged, currentBlobURL = nextIntervalFirstTrackBlobUrl'
+          )
         }
 
         if (!this.nextIntervalFirstTrackBlobUrl && this.nextBlobURL) {
           this.currentBlobURL = this.nextBlobURL;
           this.nextBlobURL = null;
 
-          console.log('%cinterval', 'color: green', 'intervalShouldBeChanged, but there is no nextIntervalFirstTrackBlobUrl, so currentBlobURL is this.nextBlobURL')
+          console.log(
+              '%cinterval', 'color: green',
+              'intervalShouldBeChanged, but there is no nextIntervalFirstTrackBlobUrl, so currentBlobURL gets from this.nextBlobURL'
+          )
         }
       }
 
@@ -289,7 +301,9 @@ export class Player {
         this.currentBlobURL = this.nextBlobURL;
         this.nextBlobURL = null;
 
-        console.log('%cinterval', 'color: green', 'there is no intervalChange, so currentBlobURL is this.nextBlobURL')
+        console.log(
+            '%cinterval', 'color: green',
+            'there is no intervalChange, so currentBlobURL gets from this.nextBlobURL')
       }
 
       this.audioPlayer.src = this.currentBlobURL;
