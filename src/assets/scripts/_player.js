@@ -222,39 +222,6 @@ export class Player {
   }
 
   async playAndLoadNextTrack({ trackWasDeleted }) {
-    // const currentTrackSignedUrl = this.tracks[this.currentTrackIndex]
-    // const currentTrackData = this.currentPlaylistInitialData.find(record => {
-    //   return record.signedUrl === currentTrackSignedUrl
-    // })
-    // const currentTrackDurationInSeconds = currentTrackData.fields['Duration in seconds']
-    // const currentTrackDurationInMilliSeconds = currentTrackDurationInSeconds * 1000
-
-    // const currentTime = new Date().getTime()
-    // const possibleEndOfTrackTimestamp = new Date( currentTime + currentTrackDurationInMilliSeconds)
-    // const trackEndHour = possibleEndOfTrackTimestamp.getHours()
-    // const trackEndHour = possibleEndOfTrackTimestamp.getHours()
-    // const nextPossibleIntervalData = this.getCurrentInterval(this.currentDayPlaylist, new Date().getHours())
-    // const nextPossibleIntervalData = this.getCurrentInterval(this.currentDayPlaylist, possibleEndOfTrackTimestamp.getHours())
-
-    // const currentTrackPossiblyEndsAtANewInterval = nextPossibleIntervalData.index !== this.currentIntervalIndex
-    // const firstTrackOfANewIntervalPreloaded = this.nextIntervalFirstTrackBlobUrl !== null
-    // if (currentTrackPossiblyEndsAtANewInterval && !firstTrackOfANewIntervalPreloaded) {
-    //   logIntervalData('current track may end in a new interval')
-    //   logIntervalData('trying to preload first track of a new interval')
-    //   this.loadTrack({tracks: nextPossibleIntervalData.signedUrls, trackIndex: 0 })
-    //     // this track possibly will end on the next interval
-    //     // so get first track of this interval as a blob
-    //     // (to reduce loading time of this track as playlist switches)
-    //     .then(blobURL => {
-    //       this.nextIntervalFirstTrackBlobUrl = blobURL;
-    //         logIntervalData('newIntervalFirstTrackBlob loaded')
-    //     })
-    //     .catch(error => {
-    //       logIntervalData('an error occurred when prefetching a track from a new interval')
-    //       console.error(error)
-    //   })
-    // }
-
 
     console.log('tracks[currentTrackIndex] and signedURL is ' + this.tracks[this.currentTrackIndex])
     if (this.nextBlobURL || this.nextIntervalFirstTrackBlobUrl) {
