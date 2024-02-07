@@ -99,6 +99,14 @@ export const sendSongStats = async data => {
   }
 }
 
+export const logIntervalData = (message) => {
+  // make green interval label for this console.log
+  console.log(
+      '%cinterval', 'color: green',
+      message
+  )
+}
+
 // not old, but probably not needed
 export const getCurrentTableId = (playlistsInfo) => {
   const currentSelectedPlaylistButton = document.querySelector('.playlist--selected')
