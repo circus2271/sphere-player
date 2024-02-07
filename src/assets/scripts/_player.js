@@ -91,7 +91,7 @@ export class Player {
       // console.log('no tracks')
       // this.initializePlayerHTMLControls()
       const currentIntervalLocalData = this.currentIntervalData
-      debugger
+      // debugger
       console.error(`can't first two tracks`)
     }
 
@@ -240,7 +240,7 @@ export class Player {
           this.nextIntervalFirstTrackBlobUrl = null
           this.nextBlobURL = null
 
-          logIntervalData('intervalShouldBeChanged, currentBlobURL = nextIntervalFirstTrackBlobUrl'
+          logIntervalData('intervalShouldBeChanged, currentBlobURL = nextIntervalFirstTrackBlobUrl')
         }
 
         if (!this.nextIntervalFirstTrackBlobUrl && this.nextBlobURL) {
@@ -328,7 +328,9 @@ export class Player {
           // so get first track of this interval as a blob
           // (to reduce loading time of this track as playlist switches)
           .then(blobURL => {
+            // debugger
             this.nextIntervalFirstTrackBlobUrl = blobURL;
+            // debugger
             logIntervalData('newIntervalFirstTrackBlob loaded')
           })
           .catch(error => {
