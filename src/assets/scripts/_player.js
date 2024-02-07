@@ -275,7 +275,7 @@ export class Player {
           // change interval
           logIntervalData('interval has changed')
           logIntervalData('switched playlist interval')
-          logIntervalData('current active interval is', this.currentIntervalData.time)
+          logIntervalData(`current active interval is ${this.currentIntervalData.time}`)
           this.currentIntervalIndex = this.currentIntervalData.index;
           this.tracks = this.currentIntervalData.signedUrls;
           this.nextTrackIndex = 0; // Start from the first track in the new interval
