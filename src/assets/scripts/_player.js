@@ -1,5 +1,5 @@
 import fetchRetry from 'fetch-retry'
-import { shuffle, sendLikeDislike, sendSongStats, fetchPlaylist } from './_helpers';
+import { randomize, sendLikeDislike, sendSongStats, fetchPlaylist } from './_helpers';
 
 const fetchWithRetry = fetchRetry(fetch);
 
@@ -625,7 +625,7 @@ export class Player {
       for (const interval in songIntervals) {
         result.push({
           time: interval,
-          signedURLs: shuffle(songIntervals[interval]) // Assuming shuffle is a function you've defined elsewhere
+          signedURLs: randomize(songIntervals[interval]) // Assuming shuffle is a function you've defined elsewhere
         });
       }
 

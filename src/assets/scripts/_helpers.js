@@ -45,6 +45,55 @@ export function shuffle(array) {
   return array;
 }
 
+// function splitArrayIntoTens(array) {
+//   const result = [];
+//   const length = array.length;
+//
+//   for (let i = 0; i < length; i += 10) {
+//     const chunk = array.slice(i, i + 10);
+//     result.push(chunk);
+//   }
+//
+//   return result;
+// }
+// Example usage:
+// const originalArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+// const splitArrays = splitArrayIntoTens(originalArray);
+// console.log(splitArrays);
+
+
+// split all interval tracks into 10's
+// then shuffle each 10
+// then add extra shuffling for each 3'rd track
+export function randomize(array) {
+  const chunks = [];
+  const length = array.length;
+
+  for (let i = 0; i < length; i += 10) {
+    const chunk = array.slice(i, i + 10);
+    // const randomized = shuffle(chunk)
+    chunks.push(shuffle(chunk));
+  }
+
+  // [[1,2,3],[4,5,6]] -> [1,2,3,4,5,6]
+  //
+  const shuffledTracks = chunks.flat()
+
+  const thirds = []
+  for (let i = 2; i < length; i += 3) {
+    thirds.push(shuffledTracks[i])
+  }
+
+  const randomizedThirds = shuffle(thirds)
+  let counter = 0
+  for (let i = 2; i < length; i += 3) {
+    const randomizedTrack = randomizedThirds[counter]
+    counter++
+    shuffledTracks[i] = randomizedTrack
+  }
+
+  return shuffledTracks
+}
 // data = {
 //   baseId: 'example baseId',
 //   tableId: 'example tableId', // can be either actual id (e.g. 'tbls88896G6g') or just regular table name (.e.g. 'My awesome table')
