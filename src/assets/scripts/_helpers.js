@@ -64,10 +64,12 @@ export function shuffle(array) {
 
 // split all interval tracks into 10's
 // then shuffle each 10
-// then add extra shuffling for each 3'rd track
+// then add extra shuffling for each 2nd track
 export function randomize(array) {
   const chunks = [];
   const length = array.length;
+
+  console.log('initial array of tracks', array)
 
   for (let i = 0; i < length; i += 10) {
     const chunk = array.slice(i, i + 10);
@@ -78,19 +80,6 @@ export function randomize(array) {
   // [[1,2,3],[4,5,6]] -> [1,2,3,4,5,6]
   //
   const shuffledTracks = chunks.flat()
-
-  // const thirds = []
-  // for (let i = 2; i < length; i += 3) {
-  //   thirds.push(shuffledTracks[i])
-  // }
-  //
-  // const randomizedThirds = shuffle(thirds)
-  // let counter = 0
-  // for (let i = 2; i < length; i += 3) {
-  //   const randomizedTrack = randomizedThirds[counter]
-  //   counter++
-  //   shuffledTracks[i] = randomizedTrack
-  // }
 
   const secondTracks = []
   for (let i = 1; i < length; i += 2) {
@@ -105,6 +94,7 @@ export function randomize(array) {
     shuffledTracks[i] = randomizedTrack
   }
 
+  console.log(`shuffledTracks (at first shuffled by 10, then also randomized each 2nd)`, shuffledTracks)
   return shuffledTracks
 }
 // data = {
