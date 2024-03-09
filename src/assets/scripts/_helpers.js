@@ -79,15 +79,28 @@ export function randomize(array) {
   //
   const shuffledTracks = chunks.flat()
 
-  const thirds = []
-  for (let i = 2; i < length; i += 3) {
-    thirds.push(shuffledTracks[i])
+  // const thirds = []
+  // for (let i = 2; i < length; i += 3) {
+  //   thirds.push(shuffledTracks[i])
+  // }
+  //
+  // const randomizedThirds = shuffle(thirds)
+  // let counter = 0
+  // for (let i = 2; i < length; i += 3) {
+  //   const randomizedTrack = randomizedThirds[counter]
+  //   counter++
+  //   shuffledTracks[i] = randomizedTrack
+  // }
+
+  const secondTracks = []
+  for (let i = 1; i < length; i += 2) {
+    secondTracks.push(shuffledTracks[i])
   }
 
-  const randomizedThirds = shuffle(thirds)
+  const randomizedSecondTracks = shuffle(secondTracks)
   let counter = 0
-  for (let i = 2; i < length; i += 3) {
-    const randomizedTrack = randomizedThirds[counter]
+  for (let i = 1; i < length; i += 2) {
+    const randomizedTrack = randomizedSecondTracks[counter]
     counter++
     shuffledTracks[i] = randomizedTrack
   }
