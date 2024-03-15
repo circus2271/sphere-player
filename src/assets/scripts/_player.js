@@ -48,6 +48,9 @@ const resetRepeatId = () => globalRepeatId = null
 export class Player {
   currentTrackIndex = 0;
   nextTrackIndex = 1;
+  // track urls are used as a lightweight version of id
+  currentTrackUrl = null;
+  nextTrackUrl = null;
   tracks = null;
   currentIntervalData = null;
   nextBlobURL = null;
@@ -102,10 +105,14 @@ export class Player {
 
 
 
-      const currentTrackUrl = this.tracks[this.currentTrackIndex]
-      console.log('currentDayPlaylist', this.currentDayPlaylist)
+      const currentTrackUrl = this.currentTrackUrl
+      // console.log('currentDayPlaylist', this.currentDayPlaylist)
 
       const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.signedUrl === currentTrackUrl)
+      // debugger;
+      console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
+      console.log('currentTrackUrl', currentTrackUrl)
+      // debugger
       const currentTrackId = currentTrackInitialData.id
 
 
@@ -203,6 +210,7 @@ export class Player {
     retryFirstTrack()
     .then(blobURL => {
       this.currentBlobURL = blobURL;
+      this.currentTrackUrl = this.tracks[this.currentTrackIndex]
 
       this.audioPlayer.src = this.currentBlobURL;
 
@@ -217,6 +225,7 @@ export class Player {
       return retrySecondTrack();
     }).then(blobURL => {
       this.nextBlobURL = blobURL;
+      this.nextTrackUrl = this.tracks[this.nextTrackIndex]
 
       document.getElementById('skip-button').disabled = false
       console.log('first two tracks of a playlist are initialized')
@@ -238,6 +247,8 @@ export class Player {
 
       this.currentBlobURL = this.nextBlobURL;
       this.nextBlobURL = null;
+      this.currentTrackUrl = this.nextTrackUrl
+      this.nextTrackUrl = null;
       this.audioPlayer.src = this.currentBlobURL;
       this.audioPlayer.play();
       // console.log(tracks[currentTrackIndex]);
@@ -247,8 +258,6 @@ export class Player {
         this.currentTrackIndex = this.nextTrackIndex;
         this.nextTrackIndex++;
       }
-      //console.log("(checking in audioPlayer on end event) tracks lenght is — " + tracks.length);
-      //console.log("(checking in audioPlayer on end event) currentTrackIndex (after ++ above) — " + currentTrackIndex);
 
       this.currentIntervalData = this.getCurrentInterval(this.currentDayPlaylist);
 
@@ -281,6 +290,8 @@ export class Player {
       retry()
         .then(blobURL => {
           this.nextBlobURL = blobURL;
+          this.nextTrackUrl = this.tracks[this.nextTrackIndex]
+
         // })
         // .then(() => {
           console.log('track loaded (with or without retry)')
@@ -479,6 +490,7 @@ export class Player {
         scheduleLikeDislike({ newStatus: 'Dislike' })
       }
     })
+
 
 
     // finally, enable all buttons
