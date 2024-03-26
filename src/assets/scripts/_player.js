@@ -240,7 +240,8 @@ export class Player {
       document.querySelector('#current-playlist').innerHTML = this.currentPlaylistTableName
 
 
-      console.log('first blob should be ready');
+      // console.log('first blob should be ready');
+      console.log('first track should be ready to play to an end');
       // document.getElementById('skip-button').disabled = true
       return retrySecondTrack();
     }).then(blobURL => {
