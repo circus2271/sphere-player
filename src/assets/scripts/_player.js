@@ -379,7 +379,7 @@ export class Player {
     // if no object -> use empty object by default
     const enableAllButtons = ({exception} = {}) => {
       this.allButtons.forEach(button => {
-        // if (exception && button.id === exception) return
+        if (exception && button.id === exception) return
         button.disabled = false
       })
     }
