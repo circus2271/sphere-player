@@ -190,12 +190,26 @@ export class Player {
     // const currentTrackIndex = this.currentTrackIndex
 
     const retryFirstTrack = () => {
-      return this.loadTrack({ tracks: this.tracks, trackIndex: this.currentTrackIndex})
-      .catch(() => {
 
-        this.currentTrackIndex++
-        return retryFirstTrack()
-      })
+        const preloadEnoughOfAudioSrc = () => {
+          return new Promise((resolve, reject) => {
+            const audio = new Audio()
+
+            // oncanplaythrough event happens when there is enough of a track loaded,
+            // so it can play to an end without interruption
+            audio.oncanplaythrough = () => resolve(audio.src)
+            audio.onerror = () => reject()
+
+            audio.src = this.tracks[this.currentTrackIndex]
+          })
+        }
+
+        return preloadEnoughOfAudioSrc()
+        .catch(() => {
+          // try with a next track
+          this.currentTrackIndex++
+          return preloadEnoughOfAudioSrc()
+        })
     }
 
     const retrySecondTrack = () => {
@@ -208,11 +222,17 @@ export class Player {
     }
 
     retryFirstTrack()
-    .then(blobURL => {
-      this.currentBlobURL = blobURL;
-      this.currentTrackUrl = this.tracks[this.currentTrackIndex]
+    .then(currentTrackUrl => {
+      // save this value to a Player property
+      // p.s you can also get this value from this.tracks array (by index)
+      // this.currentTrackUrl = this.tracks[this.currentTrackIndex]
+      this.currentTrackUrl = currentTrackUrl
 
-      this.audioPlayer.src = this.currentBlobURL;
+      // we don't use blob preloading for a first track of a playlist
+      // just use signedUrl as is
+      // (now we're already have some audio preloaded,
+      // and it should be enough to play this track to an end without interruption)
+      this.audioPlayer.src = this.currentTrackUrl;
 
       firstTrackLoaded()
 
