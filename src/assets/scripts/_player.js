@@ -1,5 +1,5 @@
 import fetchRetry from 'fetch-retry'
-import { randomize, sendLikeDislike, sendSongStats, fetchPlaylist } from './_helpers';
+import {randomize, sendLikeDislike, sendSongStats, fetchPlaylist, preloadEnoughOfAudioSrc} from './_helpers';
 
 const fetchWithRetry = fetchRetry(fetch);
 
@@ -53,8 +53,6 @@ export class Player {
   nextTrackUrl = null;
   tracks = null;
   currentIntervalData = null;
-  nextBlobURL = null;
-  currentBlobURL = null;
   currentIntervalIndex = -1;
   currentPlaylistInitialData = null
   currentDayPlaylist = null;
@@ -90,8 +88,6 @@ export class Player {
         }
       })
     } catch (error) {
-      // console.log('no tracks')
-      // this.initializePlayerHTMLControls()
       console.error(`can't first two tracks`)
     }
 
@@ -106,15 +102,14 @@ export class Player {
 
 
       const currentTrackUrl = this.currentTrackUrl
-      // console.log('currentDayPlaylist', this.currentDayPlaylist)
 
-      // const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.signedUrl === currentTrackUrl)
       const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
       // debugger;
       console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
       console.log('currentTrackUrl', currentTrackUrl)
-      // debugger
+      console.log('currentTrackInitialData', currentTrackInitialData)
       const currentTrackId = currentTrackInitialData.id
+      // debugger
 
 
       // this object will be sent to server
@@ -184,16 +179,27 @@ export class Player {
     // reset
     this.currentTrackIndex = 0;
     this.nextTrackIndex = 1;
+    this.currentTrackUrl = null;
+    this.nextTrackUrl = null;
 
     // обходим ошибки с потерей контекста
     // const tracks = this.tracks
     // const nextTrackIndex = this.nextTrackIndex
     // const currentTrackIndex = this.currentTrackIndex
 
-    const retryFirstTrack = () => {
-      return this.loadTrack({ tracks: this.tracks, trackIndex: this.currentTrackIndex})
-      .catch(() => {
+    const retryFirstTrack = async () => {
 
+      if (this.tracks.length === 0) {
+        console.warn('there are no tracks to preload')
+
+        // return
+      }
+
+      const trackUrl = this.tracks[this.currentTrackIndex]
+
+      return preloadEnoughOfAudioSrc(trackUrl)
+      .catch(() => {
+        // try with a next track
         this.currentTrackIndex++
         return retryFirstTrack()
       })
@@ -209,11 +215,17 @@ export class Player {
     }
 
     retryFirstTrack()
-    .then(blobURL => {
-      this.currentBlobURL = blobURL;
-      this.currentTrackUrl = this.tracks[this.currentTrackIndex]
+    .then(currentTrackUrl => {
+      // save this value to a Player property
+      // p.s you can also get this value from this.tracks array (by index)
+      // this.currentTrackUrl = this.tracks[this.currentTrackIndex]
+      this.currentTrackUrl = currentTrackUrl
 
-      this.audioPlayer.src = this.currentBlobURL;
+      // we don't use blob preloading for a first track of a playlist
+      // just use signedUrl as is
+      // (now we're already have some audio preloaded,
+      // and it should be enough to play this track to an end without interruption)
+      this.audioPlayer.src = this.currentTrackUrl;
 
       firstTrackLoaded()
 
@@ -221,12 +233,12 @@ export class Player {
       document.querySelector('#current-playlist').innerHTML = this.currentPlaylistTableName
 
 
-      console.log('first blob should be ready');
+      // console.log('first blob should be ready');
+      console.log('first track should be ready to play to an end');
       // document.getElementById('skip-button').disabled = true
       return retrySecondTrack();
-    }).then(blobURL => {
-      this.nextBlobURL = blobURL;
-      this.nextTrackUrl = this.tracks[this.nextTrackIndex]
+    }).then(nextTrackUrl => {
+      this.nextTrackUrl = nextTrackUrl
 
       document.getElementById('skip-button').disabled = false
       console.log('first two tracks of a playlist are initialized')
@@ -241,17 +253,10 @@ export class Player {
     // updateState(tracks[currentTrackIndex]);
     // console.log('tracks[currentTrackIndex] and signedURL is ' + this.tracks[this.currentTrackIndex])
     console.log('tracks[currentTrackIndex] and encodedURL is ' + this.tracks[this.currentTrackIndex])
-    if (this.nextBlobURL) {
-      // Revoke the blob URL of the track that just finished playing
-      if (this.currentBlobURL) {
-        URL.revokeObjectURL(this.currentBlobURL);
-      }
-
-      this.currentBlobURL = this.nextBlobURL;
-      this.nextBlobURL = null;
+    if (this.nextTrackUrl) {
       this.currentTrackUrl = this.nextTrackUrl
       this.nextTrackUrl = null;
-      this.audioPlayer.src = this.currentBlobURL;
+      this.audioPlayer.src = this.currentTrackUrl;
       this.audioPlayer.play();
       // console.log(tracks[currentTrackIndex]);
       if (!trackWasDeleted) {
@@ -280,10 +285,7 @@ export class Player {
         }
 
         // debugger
-        // const tracks1 = this.tracks;
-        // const trackIndex1 = this.nextTrackIndex;
         return this.loadTrack({ tracks: this.tracks, trackIndex: this.nextTrackIndex })
-        // return this.loadTrack({ tracks: tracks1, trackIndex: trackIndex1 })
           .catch(() => {
             this.nextTrackIndex++
             return retry()
@@ -291,12 +293,9 @@ export class Player {
       }
 
       retry()
-        .then(blobURL => {
-          this.nextBlobURL = blobURL;
-          this.nextTrackUrl = this.tracks[this.nextTrackIndex]
+        .then(trackUrl => {
+          this.nextTrackUrl = trackUrl
 
-        // })
-        // .then(() => {
           console.log('track loaded (with or without retry)')
           document.getElementById('skip-button').disabled = false
         });
@@ -361,7 +360,7 @@ export class Player {
     // if no object -> use empty object by default
     const enableAllButtons = ({exception} = {}) => {
       this.allButtons.forEach(button => {
-        // if (exception && button.id === exception) return
+        if (exception && button.id === exception) return
         button.disabled = false
       })
     }
@@ -398,10 +397,6 @@ export class Player {
       })
     }
 
-    // const disableButton = (button) => button.setAttribute('disabled', '')
-    // const enableButton = (button) => button.removeAttribute('disabled')
-    //
-    //
     const fadeOutPlayingState = () => {
       playButton.classList.remove('playing')
       fadeAudioToPause()
@@ -414,7 +409,6 @@ export class Player {
       // playlist button is clicked
       if (event.target.closest('.playlist')) {
         const playlistButton = event.target.closest('.playlist');
-        // const playlistName = playlistButton.dataset.playlistName
 
         if (playlistButton.classList.contains('playlist--selected')) {
           console.log('playlist already selected');
@@ -509,10 +503,11 @@ export class Player {
     const localRepeatId = new Date().getTime();
     globalRepeatId = localRepeatId
 
-    console.log('ppp', tracks[trackIndex])
-    return fetchWithRetry(tracks[trackIndex], {
+    const trackUrl = tracks[trackIndex]
+    return fetchWithRetry(trackUrl, {
       retryDelay: 1000,
       // retryDelay: 0,
+      method: 'HEAD',
       retryOn: function (attempt, error, response) {
         // alert(1)
         // console.log('ro', new Date().getTime())
@@ -525,8 +520,6 @@ export class Player {
           return false
         }
 
-        // console.log('lri', localRepeatId)
-        // console.log('gri', globalRepeatId)
         if (localRepeatId !== globalRepeatId) {
           console.log('reset counter')
           console.log('cancel this track loading')
@@ -547,27 +540,9 @@ export class Player {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      // return response.blob();
 
-      // specify blob type to hopefully avoid safari bug
-      const arrayBuffer = await response.arrayBuffer();
-      const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
-
-      return blob
+      return preloadEnoughOfAudioSrc(trackUrl)
     })
-    .then(blob => {
-      if (blob.size > 0) {
-        console.log('Successfully fetched and have content in blob.');
-        return URL.createObjectURL(blob);
-      } else {
-        console.warn('Fetch was successful but blob is empty.');
-      }
-    })
-    // .catch(e => {
-    //   // here will be good idea to try to load track once (but need to track how many tries)
-    //   // or load +1. anyway its good idea to place setTimer
-    //   console.error(e);
-    // });
   }
 
     getCurrentInterval(data) {

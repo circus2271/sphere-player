@@ -12,6 +12,25 @@ export function debounce(func, timeout) {
 }
 
 
+export const preloadEnoughOfAudioSrc = (trackUrl) => {
+  return new Promise((resolve, reject) => {
+    const audio = new Audio()
+
+    // track url in audio.src will eventually be encoded
+    // for example, 'https://example.com/track name' will be 'https://example.com/track%20name'
+    // not encoded version may be useful when it's needed to search for track data
+    //
+    // oncanplaythrough event happens when there is enough of a track loaded,
+    // so it can play to an end without interruption
+    audio.oncanplaythrough = () => resolve(trackUrl)
+    audio.onerror = () => reject()
+
+    audio.src = trackUrl
+    audio.load()
+  })
+}
+
+
 // fetch playlists from airtable
 export const fetchPlaylist = async (baseId, tableId) => {
   const queryParams = { baseId, tableId }
