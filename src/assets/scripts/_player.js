@@ -108,7 +108,8 @@ export class Player {
       const currentTrackUrl = this.currentTrackUrl
       // console.log('currentDayPlaylist', this.currentDayPlaylist)
 
-      const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.signedUrl === currentTrackUrl)
+      // const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.signedUrl === currentTrackUrl)
+      const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
       // debugger;
       console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
       console.log('currentTrackUrl', currentTrackUrl)
@@ -238,7 +239,8 @@ export class Player {
     // debugger
     // If there is a next track
     // updateState(tracks[currentTrackIndex]);
-    console.log('tracks[currentTrackIndex] and signedURL is ' + this.tracks[this.currentTrackIndex])
+    // console.log('tracks[currentTrackIndex] and signedURL is ' + this.tracks[this.currentTrackIndex])
+    console.log('tracks[currentTrackIndex] and encodedURL is ' + this.tracks[this.currentTrackIndex])
     if (this.nextBlobURL) {
       // Revoke the blob URL of the track that just finished playing
       if (this.currentBlobURL) {
@@ -268,7 +270,8 @@ export class Player {
           console.log('switched playlist interval')
           console.log('current active interval is', this.currentIntervalData.time)
           this.currentIntervalIndex = this.currentIntervalData.index;
-          this.tracks = this.currentIntervalData.signedURLs;
+          // this.tracks = this.currentIntervalData.signedURLs;
+          this.tracks = this.currentIntervalData.encodedURLs;
           this.nextTrackIndex = 0; // Start from the first track in the new interval
           // debugger
         } else if (this.nextTrackIndex >= this.tracks.length) {
@@ -595,7 +598,8 @@ export class Player {
       if (currentInterval) {
         // console.log('currentII', currentInterval)
         return {
-          urls: currentInterval.signedURLs,
+          // urls: currentInterval.signedURLs,
+          urls: currentInterval.encodedURLs,
           index: currentInterval.index
         };
       }
@@ -627,7 +631,8 @@ export class Player {
             songIntervals[interval] = [];
           }
           // Add the song's signedUrl to the interval array
-          songIntervals[interval].push(song.signedUrl);
+          // songIntervals[interval].push(song.signedUrl);
+          songIntervals[interval].push(song.fields['Full link']);
         }
       });
 
@@ -637,7 +642,8 @@ export class Player {
       for (const interval in songIntervals) {
         result.push({
           time: interval,
-          signedURLs: randomize(songIntervals[interval]) // Assuming shuffle is a function you've defined elsewhere
+          // signedURLs: randomize(songIntervals[interval]), // Assuming shuffle is a function you've defined elsewhere
+          encodedURLs: randomize(songIntervals[interval]) // Assuming shuffle is a function you've defined elsewhere
         });
       }
 
