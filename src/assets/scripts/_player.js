@@ -1,5 +1,12 @@
 import fetchRetry from 'fetch-retry'
-import { randomize, sendLikeDislike, sendSongStats, fetchPlaylist } from './_helpers';
+import {
+  randomize,
+  sendLikeDislike,
+  sendSongStats,
+  fetchPlaylist,
+  checkIfCurrentIntervalExists,
+  enableOnlyPlaylistsButtons
+} from './_helpers';
 
 const fetchWithRetry = fetchRetry(fetch);
 
@@ -81,20 +88,36 @@ export class Player {
     // обновляем все данные о плейлисте
     await this.setPlaylistData({ newPlaylist: firstPlaylist })
 
+    // if currentIntervalExists
+    // const noIntervalMatched = checkIfCurrentIntervalExists(this.currentIntervalIndex)
+    // const hasMatchedInterval = !noIntervalMatched
 
-    try {
-      await this.initializeFirstTwoTracksOfAPlaylist({
-        firstTrackLoaded: () => {
-          this.initializePlayerHTMLControls();
-          document.body.classList.add('first-track-loaded');
-        }
-      })
-    } catch (error) {
-      // console.log('no tracks')
-      // this.initializePlayerHTMLControls()
-      console.error(`can't first two tracks`)
+    const noIntervalMatched = this.currentIntervalIndex === -1
+    const hasMatchedInterval = !noIntervalMatched
+
+    if (noIntervalMatched) {
+      // initialize html controls, but don't show "play", "skip" and other similar actions
+      // just enable playlist buttons, so it is possible to switch playlist
+      this.initializePlayerHTMLControls({noIntervalMatched: true})
     }
 
+    if (hasMatchedInterval) {
+      try {
+        await this.initializeFirstTwoTracksOfAPlaylist({
+          firstTrackLoaded: () => {
+            this.initializePlayerHTMLControls();
+            document.body.classList.add('first-track-loaded');
+          }
+        })
+      } catch (error) {
+        // console.log('no tracks')
+        // this.initializePlayerHTMLControls()
+        console.error(`can't load first two tracks`)
+      }
+    }
+
+    // and add this handler finally
+    // this handles some stuff on song end
     this.audioPlayer.addEventListener('ended', async (event) => {
       // if playlist is changing, don't load next song of current playlist
       const playlistChange = playlistShouldChange
@@ -176,6 +199,7 @@ export class Player {
     this.currentIntervalData = this.getCurrentIntervalRelatedData(currentInterval)
     this.currentIntervalIndex = this.currentIntervalData.index;
     this.tracks = this.currentIntervalData.urls;
+    // debugger
   }
 
   async initializeFirstTwoTracksOfAPlaylist({ firstTrackLoaded }) {
@@ -303,7 +327,9 @@ export class Player {
     }
   }
 
-  initializePlayerHTMLControls() {
+  // seT default value for { noIntervalMatched } options object
+  // without it this method will fall if called without parameters (call this method as initializePlayerHTMLControls() will cause an error)
+  initializePlayerHTMLControls({ noIntervalMatched } = {}) {
     const audioPlayer = this.audioPlayer
 
     // player 'play' settings and event handlers
@@ -372,6 +398,18 @@ export class Player {
       })
     }
 
+    // const enableOnlyPlaylistsButtons = () => {
+    //   // this.allButtons.forEach(button => {
+    //   //   if (button.classList.contains('playlist')) {
+    //   //     button.disabled = false
+    //   //   }
+    //   // })
+    //   const playlistButtons = document.querySelectorAll('button.playlist')
+    //   playlistButtons.forEach(button => {
+    //     button.disabled = false
+    //   })
+    // }
+
     // player audio controls
     function togglePlayPause() {
       if (audioPlayer.paused || audioPlayer.ended) {
@@ -436,7 +474,14 @@ export class Player {
         // end current track, so statistics and 'like'/'dislike' could be sent
         skipped = true
         playlistShouldChange = true
-        this.audioPlayer.dispatchEvent(new Event('ended'))
+
+        // const currentIntervalExists = checkIfCurrentIntervalExists(this.currentIntervalIndex)
+        const currentIntervalExists = this.currentIntervalIndex !== -1
+
+        if (currentIntervalExists) {
+          // there will be an error, if to send this event when current interval does not exist
+          this.audioPlayer.dispatchEvent(new Event('ended'))
+        }
 
 
         await this.setPlaylistData({ newPlaylist })
@@ -445,14 +490,40 @@ export class Player {
         // new playlist is set
         // make sure data is updated
 
-        try {
-          await this.initializeFirstTwoTracksOfAPlaylist({
-            firstTrackLoaded: () => {
-              enableAllButtons({exception: 'skip-button'})
-            }
-          })
-        } catch (error) {
-          console.error(`playlist error: can't load first two tracks of a new playlist`)
+
+        // default index if no interval is matched is -1
+
+        // const noIntervalMatched = checkIfCurrentIntervalExists(this.currentIntervalIndex)
+        // const hasMatchedInterval = !noIntervalMatched
+
+        const noIntervalMatched = this.currentIntervalIndex === -1;
+        const hasMatchedInterval = !noIntervalMatched
+
+        if (noIntervalMatched) {
+          console.warn('this (new) playlist has no matched interval')
+        }
+
+        if (hasMatchedInterval) {
+
+          try {
+            await this.initializeFirstTwoTracksOfAPlaylist({
+              firstTrackLoaded: () => {
+                enableAllButtons({exception: 'skip-button'})
+
+                if (!document.body.classList.contains('first-track-loaded')) {
+                  // this may happen if first playlist has no matched interval
+                  // so no tracks were loaded
+                  // and action buttons ("play", "skip", "like", "dislike")
+                  // weren't enabled
+
+                  // make them visible now
+                  document.body.classList.add('first-track-loaded');
+                }
+              }
+            })
+          } catch (error) {
+            console.error(`playlist error: can't load first two tracks of a new playlist`)
+          }
         }
       }
     })
@@ -496,8 +567,20 @@ export class Player {
 
 
 
-    // finally, enable all buttons
-    enableAllButtons({exception: 'skip-button'})
+
+    if (noIntervalMatched) {
+      // don't show "play", "skip" and other similar actions
+      // just unfreeze playlst buttons
+      console.warn('noIntervalMatched')
+      // console.warn('noIntervalMatched')
+      console.log('no interval has matched, only playlist buttons are enabled')
+      enableOnlyPlaylistsButtons()
+      return
+    }
+
+    // if interval is motched, enable all buttons
+    // enableAllButtons({exception: 'skip-button'})
+    enableAllButtons()
   }
 
   loadTrack({ tracks, trackIndex }) {
@@ -516,21 +599,22 @@ export class Player {
       retryOn: function (attempt, error, response) {
         // alert(1)
         // console.log('ro', new Date().getTime())
-        console.log('get second', new Date().getSeconds())
+        console.log('retry')
+        console.log('current second', new Date().getSeconds())
 
-        if (response && response.status === 404) {
-          // похоже что у этого трэка битая ссылка
-          //
-          console.warn('fetch error, 404, track not found')
-          return false
-        }
+        // console.log('retry, current second', new Date().getSeconds())
 
-        // console.log('lri', localRepeatId)
-        // console.log('gri', globalRepeatId)
         if (localRepeatId !== globalRepeatId) {
           console.log('reset counter')
           console.log('cancel this track loading')
           return false;
+        }
+
+        if (response && response.status === 404) {
+          // трэк не найден
+
+          enableOnlyPlaylistsButtons() // so it is possible to switch playlist
+          return false
         }
 
         if (error !== null || response.status >= 500 ) {
@@ -539,6 +623,8 @@ export class Player {
           console.log('делаем повтор запроса...')
           // console.log('error111', error)
           console.log('повтор номер', attempt + 1)
+
+          enableOnlyPlaylistsButtons() // so it is possible to switch playlist
           return true;
         }
       }
@@ -586,7 +672,6 @@ export class Player {
           return currentHour >= start && currentHour < end
         }
       })
-
       // console.log('currentIII', currentInterval)
 
       if (currentInterval) {
@@ -648,7 +733,7 @@ export class Player {
       for (const interval in songIntervals) {
         result.push({
           time: interval,
-          // signedURLs: randomize(songIntervals[interval]), // Assuming shuffle is a function you've defined elsewhere
+           // signedURLs: randomize(songIntervals[interval]), // Assuming shuffle is a function you've defined elsewhere
           encodedURLs: randomize(songIntervals[interval]) // Assuming shuffle is a function you've defined elsewhere
         });
       }

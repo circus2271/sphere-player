@@ -45,6 +45,33 @@ export function shuffle(array) {
   return array;
 }
 
+// export const  = (currentIntervalIndex) => {
+//   return currentIntervalIndex !== -1
+// }
+
+export const enableOnlyPlaylistsButtons = () => {
+  // this.allButtons.forEach(button => {
+  //   if (button.classList.contains('playlist')) {
+  //     button.disabled = false
+  //   }
+  // })
+  const playlistButtons = document.querySelectorAll('button.playlist')
+  playlistButtons.forEach(button => {
+    button.disabled = false
+  })
+}
+
+// default index if no interval is matched is -1
+// export const checkIfCurrentIntervalExists = (currentIntervalIndex) => {
+//   const noIntervalMatched = currentIntervalIndex === -1;
+//   const hasMatchedInterval = !noIntervalMatched
+//
+//   return {
+//     noIntervalMatched,
+//     hasMatchedInterval
+//   }
+// }
+
 // function splitArrayIntoTens(array) {
 //   const result = [];
 //   const length = array.length;
