@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<audio controls preload="auto"
+       src="https://spheresounds.cc/musicLibrary/Ashley%20Henry%20-%20My%20Voice%20-%20Single%20Edit%20(%20My%20Voice%20-%202023%20).mp3">
+</audio>
+
+<button type="button">preload next track</button>
+<script>
+  document.querySelector('button').onclick = () => preloadNextTrack()
+
+  let counter = 0
+  const preloadNextTrack = () => {
+    const nextTrack = tracks[counter]
+
+    const audioElement = document.createElement('audio')
+    audioElement.preload = 'auto'
+    audioElement.controls = true // to show this element on a page
+    audioElement.src = nextTrack
+
+    // document.body.append(audioElement)
+    counter++
+  }
+
+  const tracks = [
+    'https://spheresounds.cc/musicLibrary/30_70%20-%20JAY%20LUV%20(%20ART%20MAKE%20LOVE%20-%202023%20).mp3',
+    'https://spheresounds.cc/musicLibrary/Alfa%20Mist%2C%20Kaya%20Thomas-Dyke%20-%20Aged%20Eyes%20(%20Variables%20-%202023%20).mp3',
+    'https://spheresounds.cc/musicLibrary/Allysha%20Joy%20-%20Honesty%20(%20Acadie%20_%20Raw%20-%202018%20).mp3',
+    'https://spheresounds.cc/musicLibrary/Aldorande%20-%20Petite%20Che%CC%81rie%20(%20Aldorande%20-%202019%20).mp3',
+    'https://spheresounds.cc/musicLibrary/30_70%20-%20Push%20and%20Pull%20(%20Fluid%20Motion%20-%202019%20).mp3',
+    'https://spheresounds.cc/musicLibrary/30_70%20-%20Flowers%20(%20Fluid%20Motion%20-%202019%20).mp3',
+    'https://spheresounds.cc/musicLibrary/Aldorande%20-%20Beauty%20Island%20(%20Aldorande%20-%202019%20).mp3',
+    'https://spheresounds.cc/musicLibrary/Allysha%20Joy%20-%20Watercolours%20(%20Light%20It%20Again%20-%202020%20).mp3',
+    'https://spheresounds.cc/musicLibrary/Andrew%20Ashong%2C%20Theo%20Parrish%20-%20Flowers%20(%20Flowers%20-%202012%20).mp3',
+    'https://spheresounds.cc/musicLibrary/30_70%20-%20Breaking%20-%20For%20This%20World%20to%20Change%20(%20Elevate%20-%202017%20).mp3',
+    'https://spheresounds.cc/musicLibrary/Ashley%20Henry%2C%20Theo%20Croker%20-%20Introspection%20(feat.%20Theo%20Croker)%20(%20Beautiful%20Vinyl%20Hunter%20-%202019%20).mp3',
+    'https://spheresounds.cc/musicLibrary/A%CC%80ba%CC%81se%2C%20douniah%20-%20Bamba%20(Pt.%202)%20feat.%20douniah%20(%20Bamba%20(Pt.%202)%20feat.%20douniah%20-%202023%20).mp3',
+    'https://spheresounds.cc/musicLibrary/Blue%20Lab%20Beats%20-%20Never%20Doubt%20(%20Never%20Doubt%20-%202023%20).mp3',
+    'https://spheresounds.cc/musicLibrary/Darkhouse%20Family%20-%20Heart%20of%20Medina%20(%20The%20Offering%20-%202017%20).mp3',
+    'https://spheresounds.cc/musicLibrary/Ashley%20Henry%2C%20Ben%20Marc%20-%20THE%20MIGHTY%20(feat.%20Ben%20Marc)%20(%20Beautiful%20Vinyl%20Hunter%20-%202019%20).mp3',
+  ]
+</script>
+
+</body>
+</html>

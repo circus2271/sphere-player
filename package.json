@@ -7,6 +7,7 @@
   },
   "scripts": {
     "dev": "npm run clean-up && parcel watch src/index.html --no-hmr & live-server --port=8000 ./dist/",
+    "test-page": "npm run clean-up && parcel watch src/test-page.html --no-hmr & live-server --port=8000 ./dist/",
     "build": "npm run clean-up && parcel build src/index.html",
     "clean-up": "rimraf ./dist && rimraf ./.parcel-cache"
   },
