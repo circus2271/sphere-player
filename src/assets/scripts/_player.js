@@ -543,11 +543,17 @@ export class Player {
         }
       }
     })
-    .then(response => {
+    .then(async (response) => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      return response.blob();
+      // return response.blob();
+
+      // specify blob type to hopefully avoid safari bug
+      const arrayBuffer = await response.arrayBuffer();
+      const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
+
+      return blob
     })
     .then(blob => {
       if (blob.size > 0) {
