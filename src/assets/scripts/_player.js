@@ -113,8 +113,9 @@ export class Player {
       // debugger;
       console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
       console.log('currentTrackUrl', currentTrackUrl)
-      // debugger
+      console.log('currentTrackInitialData', currentTrackInitialData)
       const currentTrackId = currentTrackInitialData.id
+      // debugger
 
 
       // this object will be sent to server
@@ -184,16 +185,44 @@ export class Player {
     // reset
     this.currentTrackIndex = 0;
     this.nextTrackIndex = 1;
+    this.currentTrackUrl = null;
+    this.nextTrackUrl = null;
 
     // обходим ошибки с потерей контекста
     // const tracks = this.tracks
     // const nextTrackIndex = this.nextTrackIndex
     // const currentTrackIndex = this.currentTrackIndex
 
-    const retryFirstTrack = () => {
-      return this.loadTrack({ tracks: this.tracks, trackIndex: this.currentTrackIndex})
-      .catch(() => {
+    const retryFirstTrack = async () => {
 
+      if (this.tracks.length === 0) {
+        console.warn('there are no tracks to preload')
+
+        // return
+      }
+
+      const preloadEnoughOfAudioSrc = () => {
+        return new Promise((resolve, reject) => {
+          const audio = new Audio()
+
+          // track url in audio.src will eventually be encoded
+          // for example, 'https://example.com/track name' will be 'https://example.com/track%20name'
+          // not encoded version may be useful when it's needed to search for track data
+          //
+          const trackUrl = this.tracks[this.currentTrackIndex]
+          // oncanplaythrough event happens when there is enough of a track loaded,
+          // so it can play to an end without interruption
+          audio.oncanplaythrough = () => resolve(trackUrl)
+          audio.onerror = () => reject()
+
+          audio.src = trackUrl
+          audio.load()
+        })
+      }
+
+      return preloadEnoughOfAudioSrc()
+      .catch(() => {
+        // try with a next track
         this.currentTrackIndex++
         return retryFirstTrack()
       })
@@ -209,11 +238,17 @@ export class Player {
     }
 
     retryFirstTrack()
-    .then(blobURL => {
-      this.currentBlobURL = blobURL;
-      this.currentTrackUrl = this.tracks[this.currentTrackIndex]
+    .then(currentTrackUrl => {
+      // save this value to a Player property
+      // p.s you can also get this value from this.tracks array (by index)
+      // this.currentTrackUrl = this.tracks[this.currentTrackIndex]
+      this.currentTrackUrl = currentTrackUrl
 
-      this.audioPlayer.src = this.currentBlobURL;
+      // we don't use blob preloading for a first track of a playlist
+      // just use signedUrl as is
+      // (now we're already have some audio preloaded,
+      // and it should be enough to play this track to an end without interruption)
+      this.audioPlayer.src = this.currentTrackUrl;
 
       firstTrackLoaded()
 
@@ -221,7 +256,8 @@ export class Player {
       document.querySelector('#current-playlist').innerHTML = this.currentPlaylistTableName
 
 
-      console.log('first blob should be ready');
+      // console.log('first blob should be ready');
+      console.log('first track should be ready to play to an end');
       // document.getElementById('skip-button').disabled = true
       return retrySecondTrack();
     }).then(blobURL => {
@@ -361,7 +397,7 @@ export class Player {
     // if no object -> use empty object by default
     const enableAllButtons = ({exception} = {}) => {
       this.allButtons.forEach(button => {
-        // if (exception && button.id === exception) return
+        if (exception && button.id === exception) return
         button.disabled = false
       })
     }
