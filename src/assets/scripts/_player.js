@@ -1,5 +1,5 @@
 import fetchRetry from 'fetch-retry'
-import { randomize, sendLikeDislike, sendSongStats, fetchPlaylist } from './_helpers';
+import {randomize, sendLikeDislike, sendSongStats, fetchPlaylist, preloadEnoughOfAudioSrc} from './_helpers';
 
 const fetchWithRetry = fetchRetry(fetch);
 
@@ -53,8 +53,8 @@ export class Player {
   nextTrackUrl = null;
   tracks = null;
   currentIntervalData = null;
-  nextBlobURL = null;
-  currentBlobURL = null;
+  // nextBlobURL = null;
+  // currentBlobURL = null;
   currentIntervalIndex = -1;
   currentPlaylistInitialData = null
   currentDayPlaylist = null;
@@ -201,26 +201,9 @@ export class Player {
         // return
       }
 
-      const preloadEnoughOfAudioSrc = () => {
-        return new Promise((resolve, reject) => {
-          const audio = new Audio()
+      const trackUrl = this.tracks[this.currentTrackIndex]
 
-          // track url in audio.src will eventually be encoded
-          // for example, 'https://example.com/track name' will be 'https://example.com/track%20name'
-          // not encoded version may be useful when it's needed to search for track data
-          //
-          const trackUrl = this.tracks[this.currentTrackIndex]
-          // oncanplaythrough event happens when there is enough of a track loaded,
-          // so it can play to an end without interruption
-          audio.oncanplaythrough = () => resolve(trackUrl)
-          audio.onerror = () => reject()
-
-          audio.src = trackUrl
-          audio.load()
-        })
-      }
-
-      return preloadEnoughOfAudioSrc()
+      return preloadEnoughOfAudioSrc(trackUrl)
       .catch(() => {
         // try with a next track
         this.currentTrackIndex++
@@ -260,9 +243,15 @@ export class Player {
       console.log('first track should be ready to play to an end');
       // document.getElementById('skip-button').disabled = true
       return retrySecondTrack();
-    }).then(blobURL => {
-      this.nextBlobURL = blobURL;
-      this.nextTrackUrl = this.tracks[this.nextTrackIndex]
+    // }).then(blobURL => {
+    //   this.nextBlobURL = blobURL;
+    //   this.nextTrackUrl = this.tracks[this.nextTrackIndex]
+
+    }).then(nextTrackUrl => {
+      // this.nextBlobURL = blobURL;
+      // this.nextTrackUrl = this.tracks[this.nextTrackIndex]
+      this.nextTrackUrl = nextTrackUrl
+      //this.tracks[this.nextTrackIndex]
 
       document.getElementById('skip-button').disabled = false
       console.log('first two tracks of a playlist are initialized')
@@ -277,17 +266,19 @@ export class Player {
     // updateState(tracks[currentTrackIndex]);
     // console.log('tracks[currentTrackIndex] and signedURL is ' + this.tracks[this.currentTrackIndex])
     console.log('tracks[currentTrackIndex] and encodedURL is ' + this.tracks[this.currentTrackIndex])
-    if (this.nextBlobURL) {
+    // if (this.nextBlobURL) {
+    if (this.nextTrackUrl) {
       // Revoke the blob URL of the track that just finished playing
-      if (this.currentBlobURL) {
-        URL.revokeObjectURL(this.currentBlobURL);
-      }
+      // if (this.currentBlobURL) {
+      //   URL.revokeObjectURL(this.currentBlobURL);
+      // }
 
-      this.currentBlobURL = this.nextBlobURL;
-      this.nextBlobURL = null;
+      // this.currentBlobURL = this.nextBlobURL;
+      // this.nextBlobURL = null;
       this.currentTrackUrl = this.nextTrackUrl
       this.nextTrackUrl = null;
-      this.audioPlayer.src = this.currentBlobURL;
+      // this.audioPlayer.src = this.currentBlobURL;
+      this.audioPlayer.src = this.currentTrackUrl;
       this.audioPlayer.play();
       // console.log(tracks[currentTrackIndex]);
       if (!trackWasDeleted) {
@@ -327,12 +318,14 @@ export class Player {
       }
 
       retry()
-        .then(blobURL => {
-          this.nextBlobURL = blobURL;
-          this.nextTrackUrl = this.tracks[this.nextTrackIndex]
+        // .then(blobURL => {
+        //   this.nextBlobURL = blobURL;
+        //   this.nextTrackUrl = this.tracks[this.nextTrackIndex]
+        .then(trackUrl => {
+          // this.nextBlobURL = blobURL;
+          // this.nextTrackUrl = this.tracks[this.nextTrackIndex]
+          this.nextTrackUrl = trackUrl
 
-        // })
-        // .then(() => {
           console.log('track loaded (with or without retry)')
           document.getElementById('skip-button').disabled = false
         });
@@ -545,10 +538,13 @@ export class Player {
     const localRepeatId = new Date().getTime();
     globalRepeatId = localRepeatId
 
-    console.log('ppp', tracks[trackIndex])
-    return fetchWithRetry(tracks[trackIndex], {
+    // console.log('ppp', tracks[trackIndex])
+    // return fetchWithRetry(tracks[trackIndex], {
+    const trackUrl = tracks[trackIndex]
+    return fetchWithRetry(trackUrl, {
       retryDelay: 1000,
       // retryDelay: 0,
+      method: 'HEAD',
       retryOn: function (attempt, error, response) {
         // alert(1)
         // console.log('ro', new Date().getTime())
@@ -583,22 +579,32 @@ export class Player {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
+
+      return preloadEnoughOfAudioSrc(trackUrl)
       // return response.blob();
 
       // specify blob type to hopefully avoid safari bug
-      const arrayBuffer = await response.arrayBuffer();
-      const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
-
-      return blob
+      // const arrayBuffer = await response.arrayBuffer();
+      // const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
+      //
+      // return blob
+      // .then(blob => {
+      //   if (blob.size > 0) {
+      //     console.log('Successfully fetched and have content in blob.');
+      //     return URL.createObjectURL(blob);
+      //   } else {
+      //     console.warn('Fetch was successful but blob is empty.');
+      //   }
+      // })
     })
-    .then(blob => {
-      if (blob.size > 0) {
-        console.log('Successfully fetched and have content in blob.');
-        return URL.createObjectURL(blob);
-      } else {
-        console.warn('Fetch was successful but blob is empty.');
-      }
-    })
+    // .then(blob => {
+    //   if (blob.size > 0) {
+    //     console.log('Successfully fetched and have content in blob.');
+    //     return URL.createObjectURL(blob);
+    //   } else {
+    //     console.warn('Fetch was successful but blob is empty.');
+    //   }
+    // })
     // .catch(e => {
     //   // here will be good idea to try to load track once (but need to track how many tries)
     //   // or load +1. anyway its good idea to place setTimer
