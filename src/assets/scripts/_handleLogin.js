@@ -1,4 +1,4 @@
-import { debounce } from './_helpers.js'
+import {debounce, pageLanguage} from './_helpers.js'
 import { loginApiEndpoint } from './_apiEndpoints.js'
 
 const loginScreenAnimationDuration = 250
@@ -112,10 +112,11 @@ export const handleLogin = async (callback) => {
     const delay = 250 // add delay, so popup will animate not immediately, but after some amount of milliseconds
     setTimeout(() => showLoginPopup(), loadingPlaceholderAnimationDuration + delay)
   })()
-  
-  
-  const usernameInput = loginForm.querySelector('.js-login-input');
-  const passwordInput = loginForm.querySelector('.js-password-input')
+
+
+
+  const usernameInput = loginForm.querySelector(`.js-login-input.${pageLanguage}`);
+  const passwordInput = loginForm.querySelector(`.js-password-input.${pageLanguage}`)
   
   loginForm.onsubmit = async (e) => {
     e.preventDefault()

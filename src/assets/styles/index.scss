@@ -24,6 +24,15 @@ body {
   max-height: 100vh;
   //fix mobile 100vh bug with content overflowing
   max-height: -webkit-fill-available;
+
+
+  &.en .ru {
+    display: none;
+  }
+
+  &.ru .en {
+    display: none;
+  }
 }
 
 button {
