@@ -1,5 +1,5 @@
 import fetchRetry from 'fetch-retry'
-import { randomize, sendLikeDislike, sendSongStats, fetchPlaylist } from './_helpers';
+import {randomize, sendLikeDislike, sendSongStats, fetchPlaylist, showPageRefreshPopup} from './_helpers';
 
 const fetchWithRetry = fetchRetry(fetch);
 
@@ -38,6 +38,18 @@ const resetLikeDislikeScheduledValues = () => {
 }
 
 let skipped = false
+
+// if 2 hours after last intercation -> show popup with a page refresh button
+let timeFromLastInteraction = null
+let checkLastInteractionInterval = setInterval(() => {
+  const currentTime = new Date().getTime()
+  const deltaTime = currentTime - timeFromLastInteraction
+
+  if (deltaTime >= 1000 * 60 * 2) {
+    showPageRefreshPopup()
+  }
+}, )
+
 
 let playlistShouldChange = false
 
@@ -103,6 +115,8 @@ export class Player {
 
       document.getElementById('skip-button').disabled = true
 
+      // reset interaction timer
+      timeFromLastInteraction = new Date().getTime()
 
 
       const currentTrackUrl = this.currentTrackUrl
@@ -321,7 +335,12 @@ export class Player {
       // после отправки данных, возвращаем флаг в значение false (это уже в самом onend обработчике)
       this.audioPlayer.dispatchEvent(new Event('ended'))
     })
-    playButton.addEventListener('click', togglePlayPause);
+    playButton.addEventListener('click', () => {
+      togglePlayPause()
+
+      // reset interaction timer
+      timeFromLastInteraction = new Date().getTime()
+    });
 
     const fadeInOutDuration = 800; // 2000ms = 2 seconds
     // set css custom variable for css animations

@@ -11,6 +11,11 @@ export function debounce(func, timeout) {
   }
 }
 
+export const showPageRefreshPopup = () => {
+  const pageRefreshPopup = document.querySelector('#page-refresh-popup')
+
+  pageRefreshPopup.classList.add('visible')
+}
 
 // fetch playlists from airtable
 export const fetchPlaylist = async (baseId, tableId) => {
