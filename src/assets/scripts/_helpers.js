@@ -1,4 +1,5 @@
 import { updateRecordApiEndpoint, updateSongStatsApiEndpoint, getRecordsApiEndpoint } from './_apiEndpoints'
+import {de} from "yarn/lib/cli";
 
 export const pageLanguage = document.body.classList.contains('ru') ? 'ru' : 'en'
 
@@ -13,6 +14,23 @@ export function debounce(func, timeout) {
   }
 }
 
+// show popup after some delay
+export const showRefreshPagePopup = ({ delay, from }) => {
+
+  const interval = setInterval(() => {
+    const currentTime = new Date().getTime()
+
+    if (currentTime - from > delay) {
+      clearInterval(interval)
+
+      const popup = document.querySelector('#js-refresh-popup')
+      popup.classList.add('visible')
+
+      const refreshButton = popup.querySelector('#js-refresh-button')
+      refreshButton.onclick = () => window.location = window.location // resets current url. this refreshes a page
+    }
+  })
+}
 
 // fetch playlists from airtable
 export const fetchPlaylist = async (baseId, tableId) => {

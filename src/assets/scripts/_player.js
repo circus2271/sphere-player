@@ -1,5 +1,5 @@
 import fetchRetry from 'fetch-retry'
-import { randomize, sendLikeDislike, sendSongStats, fetchPlaylist } from './_helpers';
+import {randomize, sendLikeDislike, sendSongStats, fetchPlaylist, showRefreshPagePopup} from './_helpers';
 
 const fetchWithRetry = fetchRetry(fetch);
 
@@ -270,6 +270,21 @@ export class Player {
           console.log('switched playlist interval')
           console.log('current active interval is', this.currentIntervalData.time)
           this.currentIntervalIndex = this.currentIntervalData.index;
+          if (this.currentIntervalIndex === -1) {
+            // playlist ended (no interval is matched)
+            // but there was an interval that matched before (so it is switched to "no interval matched" state)
+
+            // show refresh page popup (after some time)
+            // for user to refresh the page
+
+            showRefreshPagePopup({
+              delay: 60 * 60 * 1000 + 60 * 1000, // show popup after 61 minute from now
+              from: new Date().getTime()
+            })
+
+            return
+          }
+
           // this.tracks = this.currentIntervalData.signedURLs;
           this.tracks = this.currentIntervalData.encodedURLs;
           this.nextTrackIndex = 0; // Start from the first track in the new interval
