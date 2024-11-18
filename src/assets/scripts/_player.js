@@ -277,9 +277,18 @@ export class Player {
             // show refresh page popup (after some time)
             // for user to refresh the page
 
-            showRefreshPagePopup({
-              delay: 60 * 60 * 1000 + 60 * 1000, // show popup after 61 minute from now
-              from: new Date().getTime()
+            // showRefreshPagePopup({
+            //   delay: 60 * 60 * 1000 + 60 * 1000, // show popup after 61 minute from now
+            //   from: new Date().getTime()
+            // })
+            const interval = setInterval(() => {
+              const currentTime = new Date().getTime()
+
+              if (currentTime - from > delay) {
+                clearInterval(interval)
+
+                showRefreshPopup()
+              }
             })
 
             return

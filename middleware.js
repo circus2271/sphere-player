@@ -1,3 +1,11 @@
+import {inject} from "@vercel/analytics";
+
+// if (process.env.NODE_ENV !== 'production') {
+//
+//     return
+// }
+
+
 // use this code only for "/" root url:
 // play.sphere.care and not play.sphere.care/images... and so on
 import { next } from "@vercel/edge";

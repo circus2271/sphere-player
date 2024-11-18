@@ -41,7 +41,6 @@
     "@vercel/edge": "^1.1.2",
     "fetch-retry": "^5.0.6",
     "howler": "^2.2.3",
-    "node-html-parser": "^6.1.13",
-    "yarn": "^1.22.22"
+    "node-html-parser": "^6.1.13"
   }
 }

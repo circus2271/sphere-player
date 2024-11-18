@@ -12,14 +12,42 @@
   <link rel="stylesheet" href="~/src/assets/styles/index.scss">
 </head>
 <body class="ru">
-<div id="js-refresh-popup" class="refresh-popup">
-  <h2>
-    refresh page
-  </h2>
-  <button id="js-refresh-button" type="button">
-    click to refresh a page
-  </button>
-</div>
+  <div class="refresh-popup__container visible" id="js-refresh-popup__container">
+    <div class="overlay"></div>
+      <div class="refresh-popup">
+        <div class="refresh-popup__wrapper">
+          <header class="refresh-popup__header">
+            <h2 class="refresh-popup__title">
+              <span class="en">
+                hi
+              </span>
+              <span class="ru">
+                привет
+              </span>
+            </h2>
+            <p class="refresh-popup__description">
+              <span class="en">
+                please, refresh this page to continue
+              </span>
+              <span class="ru">
+                пожалуйста, перезагрузите вашу стринцу для продолжения
+              </span>
+            </p>
+          </header>
+          <div class="refresh-popup__button-wrapper">
+            <button type="button" id="js-refresh-button">
+              <span class="en">
+                click to refresh
+              </span>
+              <span class="ru">
+                нажмите, чтобы перезагрузить страницу
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="initial-login-screen" id="login-screen">
     <div class="overlay"></div>
     <div class="login-form-wrapper">
