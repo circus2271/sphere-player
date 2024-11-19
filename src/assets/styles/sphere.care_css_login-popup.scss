@@ -67,8 +67,8 @@
 }
 
 
-//@mixin fullpage-container($overlay-color) {
-@mixin fullpage-container() {
+@mixin fullpage-container($overlay-color) {
+//@mixin fullpage-container() {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,14 +93,15 @@
     right: 0;
     bottom: 0;
     z-index: 1;
-    background-color: #424242;
-    //background-color: $overlay-color;
+    //background-color: #424242;
+    //background-color: #424242;
+    background-color: $overlay-color;
   }
 }
 
 .initial-login-screen {
-  //@include fullpage-container(#424242);
-  @include fullpage-container();
+  @include fullpage-container(#424242);
+  //@include fullpage-container();
 
   .login-form-wrapper {
     max-width: 337px;
@@ -213,7 +214,7 @@
 
 
 .refresh-popup__container {
-  @include fullpage-container();
+  @include fullpage-container(rgb(51 51 51 / 93%));
 
   &.visible {
     opacity: 1;
@@ -222,7 +223,7 @@
 
   .overlay {
     // additional overlay styles
-    filter: blur(1.5px);
+    //filter: blur(1.5px);
   }
 
 }
