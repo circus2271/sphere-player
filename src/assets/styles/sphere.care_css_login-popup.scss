@@ -37,10 +37,38 @@
     line-height: 21px;
     margin-bottom: 15px;
   }
+
+  //&__action-button {
+  //  padding: 9px 15px;
+  //  background-color: transparent;
+  //  border: 1px solid #CCCCCC;
+  //  border-radius: 4px;
+  //  color: #D97F5F;
+  //  font-style: normal;
+  //  font-weight: 350;
+  //  font-size: 19px;
+  //  line-height: 23px;
+  //  cursor: pointer;
+  //}
+
+  .button--action-button {
+  //.action-button {
+    padding: 9px 15px;
+    background-color: transparent;
+    border: 1px solid #CCCCCC;
+    border-radius: 4px;
+    color: #D97F5F;
+    font-style: normal;
+    font-weight: 350;
+    font-size: 19px;
+    line-height: 23px;
+    cursor: pointer;
+  }
 }
 
 
-@mixin fullpage-container($overlay-color) {
+//@mixin fullpage-container($overlay-color) {
+@mixin fullpage-container() {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,12 +93,13 @@
     right: 0;
     bottom: 0;
     z-index: 1;
-    //background-color: #424242;
-    background-color: $overlay-color;
+    background-color: #424242;
+    //background-color: $overlay-color;
   }
 }
 
 .initial-login-screen {
+  //@include fullpage-container(#424242);
   @include fullpage-container();
 
   .login-form-wrapper {
@@ -156,17 +185,18 @@
     align-items: center;
   }
 
-  &__sign-in-button {
-    padding: 9px 15px;
-    background-color: transparent;
-    border: 1px solid #CCCCCC;
-    border-radius: 4px;
-    color: #D97F5F;
-    font-style: normal;
-    font-weight: 350;
-    font-size: 19px;
-    line-height: 23px;
-    cursor: pointer;
+  //&__sign-in-button {
+  &__sign-in-button { // popup action button
+    //padding: 9px 15px;
+    //background-color: transparent;
+    //border: 1px solid #CCCCCC;
+    //border-radius: 4px;
+    //color: #D97F5F;
+    //font-style: normal;
+    //font-weight: 350;
+    //font-size: 19px;
+    //line-height: 23px;
+    //cursor: pointer;
   }
 
   &__error-message {
@@ -184,36 +214,16 @@
 
 .refresh-popup__container {
   @include fullpage-container();
-  //
-  //position: fixed;
-  //top: 0;
-  //left: 0;
-  //right: 0;
-  //bottom: 0;
-  //z-index: 3;
-  //display: flex;
-  //align-items: center;
-  //justify-content: center;
-  //opacity: 0;
-  //visibility: hidden;
-  //
-  //
+
   &.visible {
     opacity: 1;
     visibility: visible;
   }
-  //
-  //.overlay {
-  //  position: absolute;
-  //  top: 0;
-  //  left: 0;
-  //  right: 0;
-  //  bottom: 0;
-  //  z-index: 1;
-  //  //background-color: #424242;
-  //  filter: blur(1.5px);
-  //}
 
+  .overlay {
+    // additional overlay styles
+    filter: blur(1.5px);
+  }
 
 }
 
