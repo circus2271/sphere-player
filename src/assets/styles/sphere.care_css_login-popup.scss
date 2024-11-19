@@ -1,4 +1,46 @@
-.initial-login-screen {
+//.login-popup, .refresh-popup {
+.popup {
+  padding: 27px 0 29px;
+  position: relative;
+  z-index: 3;
+  background: #E8E8E8;
+  box-shadow: 1px 4px 4px rgba(0, 0, 0, 0.1), inset 3px 2px 9px rgba(255, 255, 255, 0.39);
+  border-radius: 20px;
+
+  transition-property: opacity, visibility;
+  visibility: hidden;
+  opacity: 0;
+
+  &__wrapper {
+    max-width: 297px;
+    width: 88%; /* 297 / 337 */
+    /* wrapper-width / popup-width */
+    margin: 0 auto;
+
+    @media screen and (min-width: 695px) {
+      max-width: 373px;
+    }
+  }
+
+  &__title {
+    font-size: 27px;
+    font-weight: 500;
+    line-height: 32px;
+    color: #181818;
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+
+  &__description {
+    font-size: 18px;
+    font-weight: 350;
+    line-height: 21px;
+    margin-bottom: 15px;
+  }
+}
+
+
+@mixin fullpage-container($overlay-color) {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,8 +65,13 @@
     right: 0;
     bottom: 0;
     z-index: 1;
-    background-color: #424242;
+    //background-color: #424242;
+    background-color: $overlay-color;
   }
+}
+
+.initial-login-screen {
+  @include fullpage-container();
 
   .login-form-wrapper {
     max-width: 337px;
@@ -84,46 +131,6 @@
   }
 }
 
-//.login-popup, .refresh-popup {
-.popup {
-  padding: 27px 0 29px;
-  position: relative;
-  z-index: 3;
-  background: #E8E8E8;
-  box-shadow: 1px 4px 4px rgba(0, 0, 0, 0.1), inset 3px 2px 9px rgba(255, 255, 255, 0.39);
-  border-radius: 20px;
-
-  transition-property: opacity, visibility;
-  visibility: hidden;
-  opacity: 0;
-
-  &__wrapper {
-    max-width: 297px;
-    width: 88%; /* 297 / 337 */
-    /* wrapper-width / popup-width */
-    margin: 0 auto;
-
-    @media screen and (min-width: 695px) {
-      max-width: 373px;
-    }
-  }
-
-  &__title {
-    font-size: 27px;
-    font-weight: 500;
-    line-height: 32px;
-    color: #181818;
-    margin-top: 0;
-    margin-bottom: 12px;
-  }
-
-  &__description {
-    font-size: 18px;
-    font-weight: 350;
-    line-height: 21px;
-    margin-bottom: 15px;
-  }
-}
 
 .login-form {
   &__input-field {
@@ -176,34 +183,36 @@
 
 
 .refresh-popup__container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  visibility: hidden;
-
-
+  @include fullpage-container();
+  //
+  //position: fixed;
+  //top: 0;
+  //left: 0;
+  //right: 0;
+  //bottom: 0;
+  //z-index: 3;
+  //display: flex;
+  //align-items: center;
+  //justify-content: center;
+  //opacity: 0;
+  //visibility: hidden;
+  //
+  //
   &.visible {
     opacity: 1;
     visibility: visible;
   }
-
-  .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
-    //background-color: #424242;
-    filter: blur(1.5px);
-  }
+  //
+  //.overlay {
+  //  position: absolute;
+  //  top: 0;
+  //  left: 0;
+  //  right: 0;
+  //  bottom: 0;
+  //  z-index: 1;
+  //  //background-color: #424242;
+  //  filter: blur(1.5px);
+  //}
 
 
 }
@@ -224,6 +233,7 @@
   /*opacity: 0;*/
   //margin-top: -51px;
   margin-top: -165px;
+  // or maybe margin-top: -105px; fits better
 
 
   @media screen and (min-width: 695px) {
