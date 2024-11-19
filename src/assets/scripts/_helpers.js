@@ -19,7 +19,10 @@ const refreshPopupContainer = document.querySelector('#js-refresh-popup__contain
 const refreshButton = refreshPopupContainer.querySelector('#js-refresh-button')
 refreshButton.onclick = () => window.location = window.location // resets current url. this refreshes a page
 
-export const showRefreshPopup = () => refreshPopupContainer.classList.add('visible')
+export const showRefreshPopup = () => {
+  refreshButton.disabled = false; // just in case
+  refreshPopupContainer.classList.add('visible')
+}
 const hideRefreshPopup = () => refreshPopupContainer.classList.remove('visible')
 
 // for debug purposes only
