@@ -35,7 +35,7 @@ const getBaseId = async () => {
   const baseId = await getBaseId()
   const queryParams = { baseId, tableId: 'Info' }
   const searchParams = new URLSearchParams(queryParams)
-  const urlToFetchRecords = `${getRecordsApiEndpoint}?${searchParams}`
+  const urlToFetchRecords = `${getRecordsApiEndpoint()}?${searchParams}`
   const response = await fetch(urlToFetchRecords)
   const playlistsInfo = await response.json()
   

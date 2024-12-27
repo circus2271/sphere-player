@@ -33,7 +33,7 @@ export async function fetchWithTimeout(url, options = {}) {
 export const fetchPlaylist = async (baseId, tableId) => {
   const queryParams = { baseId, tableId }
   const searchParams = new URLSearchParams(queryParams)
-  const urlToFetchRecords = `${getRecordsApiEndpoint}?${searchParams}`
+  const urlToFetchRecords = `${getRecordsApiEndpoint()}?${searchParams}`
   
   try {
     const response = await fetch(urlToFetchRecords)
@@ -125,7 +125,7 @@ export const sendLikeDislike = async data => {
   
   try {
     
-    const response = await fetch(updateRecordApiEndpoint, {
+    const response = await fetch(updateRecordApiEndpoint(), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -153,7 +153,7 @@ export const sendSongStats = async data => {
   
   try {
     
-    const response = await fetch(updateSongStatsApiEndpoint, {
+    const response = await fetch(updateSongStatsApiEndpoint(), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
