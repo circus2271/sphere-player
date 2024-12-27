@@ -1,5 +1,5 @@
-import {debounce, pageLanguage} from './_helpers.js'
-import { loginApiEndpoint } from './_apiEndpoints.js'
+import {debounce, fetchWithTimeout, pageLanguage} from './_helpers.js'
+import {enableProxy, loginApiEndpoint} from './_apiEndpoints.js'
 
 const loginScreenAnimationDuration = 250
 const loginPopupAnimationDuration = loginScreenAnimationDuration
@@ -31,9 +31,9 @@ const showLoginPopup = () => {
 
 const logIn = async (username, password) => {
   // const requestUrl = 'http://localhost:8095/'
-  const requestUrl = loginApiEndpoint
+  const requestUrl = loginApiEndpoint()
   
-  return fetch(requestUrl, {
+  return fetchWithTimeout(requestUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -42,6 +42,13 @@ const logIn = async (username, password) => {
       login: username,
       password: password
     })
+  }).catch(error => {
+    if (error.name === 'AbortError') {
+      // if error is due to timeout, enable proxy
+      enableProxy()
+    }
+
+    return logIn(username, password)
   })
 }
 
