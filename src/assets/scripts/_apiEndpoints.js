@@ -11,6 +11,8 @@ export const enableProxy =  async () => {
   })
 }
 
+// use those functions as a getter
+// bacause basePath may be changed
 export const loginApiEndpoint = () => `${basePath}/login`
 export const getRecordsApiEndpoint = () => `${basePath}/getRecordsFromCdn` // info + tracks
 export const updateRecordApiEndpoint = () => `${basePath}/updateRecordStatus`
