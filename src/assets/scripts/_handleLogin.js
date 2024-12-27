@@ -28,7 +28,7 @@ const showLoginPopup = () => {
   loginPopup.style.visibility = 'visible'
   loginPopup.style.opacity = 1
 }
-
+let i = 0
 
 const logIn = async (username, password) => {
   // const requestUrl = 'http://localhost:8095/'
@@ -36,6 +36,7 @@ const logIn = async (username, password) => {
   const requestUrl = loginApiEndpoint()
 
   return fetchWithTimeout(requestUrl, {
+    timeout: i === 0 ? 2 : 8000,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -46,9 +47,10 @@ const logIn = async (username, password) => {
     })
   }).catch(async error => {
     console.log(error)
+    i++
     if (error.name === 'AbortError') {
       // if error is due to timeout, enable proxy
-      enableProxy()
+      await enableProxy()
     }
     //
     return logIn(username, password)
