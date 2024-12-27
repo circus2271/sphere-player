@@ -1,5 +1,3 @@
-import {getProxyStatus} from "./_proxy";
-
 let basePath = 'https://europe-central2-sphere-385104.cloudfunctions.net'
 
 // export const changeBasePath = (url) = basePath = url
