@@ -15,7 +15,8 @@ export function debounce(func, timeout) {
 
 // https://medium.com/@YassineDev/how-to-timeout-a-fetch-request-2100dfee0762
 export async function fetchWithTimeout(url, options = {}) {
-  const { timeout = 8000 } = options;
+  // const { timeout = 8000 } = options;
+  const { timeout = 0000 } = options;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeout);
