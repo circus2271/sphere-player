@@ -46,7 +46,6 @@ const logIn = async (username, password) => {
     })
   }).catch(async error => {
     console.log(error)
-    i++
     if (error.name === 'AbortError') {
       // if error is due to timeout, enable proxy
       enableProxy()
