@@ -45,6 +45,11 @@ let globalRepeatId = null
 
 const resetRepeatId = () => globalRepeatId = null
 
+// ...
+// let nextTrackBlobSize = null
+let nextTrackDownloadSpeed = null
+let nextTrackDownloadTime = null
+
 export class Player {
   currentTrackIndex = 0;
   nextTrackIndex = 1;
@@ -122,7 +127,17 @@ export class Player {
         baseId: this.baseId,
         tableId: this.currentPlaylistTableId,
         recordId: currentTrackId,
+        currentIndex: this.currentTrackIndex,
+        // first and second tracks of a playlist are without speed and time calculations, so use empty strings instead...
+        downloadingSpeed: nextTrackDownloadSpeed ? nextTrackDownloadSpeed.toFixed(1) : '',
+        downloadingTime: nextTrackDownloadTime ? nextTrackDownloadTime.toFixed(1) : ''
       }
+
+      // console.log('dataaaa', data)
+      // debugger
+      // reset this global variable
+      nextTrackDownloadSpeed = null
+      nextTrackDownloadTime = null
 
       let trackWasDeleted;
       if (likeDislikeStatus.scheduled) {
@@ -145,7 +160,7 @@ export class Player {
       const stats = data
       stats.skipped = skipped
       stats.playlistName = this.currentPlaylistTableName
-      stats.timestamp = new Date().toLocaleString("ru-RU")
+      stats.timestamp = new Date().toLocaleString('ru-RU')
 
       setTimeout(() => {
         sendSongStats(stats)
@@ -282,8 +297,29 @@ export class Player {
         // debugger
         // const tracks1 = this.tracks;
         // const trackIndex1 = this.nextTrackIndex;
-        return this.loadTrack({ tracks: this.tracks, trackIndex: this.nextTrackIndex })
-        // return this.loadTrack({ tracks: tracks1, trackIndex: trackIndex1 })
+        const downloadingTimeStart = new Date().getTime()
+        let downLoadingTimeEnd;
+        // const returnOnlyBlob = true
+        return this.loadTrack({ tracks: this.tracks, trackIndex: this.nextTrackIndex, returnOnlyBlob: true })
+            .then((blob) => {
+              // on success, calculate how much time it took to download this track
+              downLoadingTimeEnd = new Date().getTime()
+              const downloadTimeInSeconds = (downLoadingTimeEnd - downloadingTimeStart) / 1000
+
+              if (blob.size > 0) {
+                const blobSizeMb = blob.size / 1024 / 1024
+                nextTrackDownloadTime = downloadTimeInSeconds
+                nextTrackDownloadSpeed = blobSizeMb/downloadTimeInSeconds
+
+                // debugger
+                console.log('Successfully fetched and have content in blob.');
+                return URL.createObjectURL(blob);
+              } else {
+                console.warn('Fetch was successful but blob is empty.');
+
+                return null
+              }
+            })
           .catch(() => {
             this.nextTrackIndex++
             return retry()
@@ -500,7 +536,7 @@ export class Player {
     enableAllButtons({exception: 'skip-button'})
   }
 
-  loadTrack({ tracks, trackIndex }) {
+  loadTrack({ tracks, trackIndex, returnOnlyBlob }) {
     // This function calls function which sets correct interval. It changes index to 0 if interval changes,
     // or we should start from the beginning.
     // Then it loads new track to blob.
@@ -556,18 +592,20 @@ export class Player {
       return blob
     })
     .then(blob => {
+      if (returnOnlyBlob) {
+        return blob
+      }
+
       if (blob.size > 0) {
         console.log('Successfully fetched and have content in blob.');
         return URL.createObjectURL(blob);
       } else {
         console.warn('Fetch was successful but blob is empty.');
+
+        // maybe return null
+        // return null
       }
     })
-    // .catch(e => {
-    //   // here will be good idea to try to load track once (but need to track how many tries)
-    //   // or load +1. anyway its good idea to place setTimer
-    //   console.error(e);
-    // });
   }
 
     getCurrentInterval(data) {
