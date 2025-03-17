@@ -8,3 +8,4 @@ export const getRecordsApiEndpoint = `${basePath}/getRecordsFromCdn` // info + t
 export const updateRecordApiEndpoint = `${basePath}/updateRecordStatus`
 export const updateSongStatsApiEndpoint = `${basePath}/updateSongStats`
 
+export const updateHostingStatsApiEndpoint = `${basePath}/updateHostingStats`

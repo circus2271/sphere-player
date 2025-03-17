@@ -1,6 +1,8 @@
 import { handleLogin } from './_handleLogin'
 import { getRecordsApiEndpoint } from './_apiEndpoints'
 import { Player } from './_player'
+import { REINITIALIZE_APP_EVENT, setPlayerTitle } from './_helpers';
+import { playerState } from './_playerState';
 
 const getBaseId = async () => {
   const baseId = await new Promise(resolve => {
@@ -31,18 +33,24 @@ const getBaseId = async () => {
 //   },
 // ];
 
-(async () => {
+// (async () => {
+//   await initialize()
+//
+//   window.addEventListener('reinitialize-app', () => initialize())
+// })()
+
+const initialize = async () => {
   const baseId = await getBaseId()
   const queryParams = { baseId, tableId: 'Info' }
   const searchParams = new URLSearchParams(queryParams)
   const urlToFetchRecords = `${getRecordsApiEndpoint}?${searchParams}`
   const response = await fetch(urlToFetchRecords)
   const playlistsInfo = await response.json()
-  
+
   console.log('playlistsInfo', playlistsInfo)
-  
+
   const playlists = document.querySelector('#playlists')
-  
+
   const renderPlaylistsMarkup = () => {
     playlists.innerHTML = ''
     playlistsInfo.forEach((playlist, i) => {
@@ -50,11 +58,12 @@ const getBaseId = async () => {
       const playlistDescription = playlist.fields['Notes']
       // const { playlistName, playlistDescription } = playlist
       const selected = i === 0
-      
+
       if (selected) {
-        document.querySelector('#current-playlist').innerHTML = playlistName
+        // document.querySelector('#current-playlist').innerHTML = playlistName
+        setPlayerTitle(playlistName)
       }
-      
+
       const html = `
         <button disabled class="playlist ${selected ? 'playlist--selected' : ''}" data-playlist-name="${playlistName}">
           <span class="playlist__name">
@@ -65,28 +74,47 @@ const getBaseId = async () => {
           </span>
         </button>
       `
-      
+
       playlists.innerHTML += html
     })
   }
-  
+
   renderPlaylistsMarkup();
-  
-  
+
+
   console.log('ap', playlistsInfo)
   const availablePlaylists = playlistsInfo.map(playlist => {
     const playlistName = playlist.fields['Name']
     const tableId = playlist.tableId
-    
+
     return {
       playlistName,
       tableId
     }
   })
-  
-  
+
+
   // handlePlayer(availablePlaylists, baseId)
+  // const player = new Player()
   const player = new Player()
   await player.initializePlayer(availablePlaylists, baseId);
-})()
 
+
+}
+
+
+(async () => {
+  await initialize()
+
+  // window.addEventListener('reinitialize-app', async () => await initialize())
+  window.addEventListener(REINITIALIZE_APP_EVENT, async () => {
+    // maybe prepare some additional data to use in next player initialization iteration
+    // ...
+    console.warn('the player is attempting to reinitialize')
+    // alert(5)
+
+    setPlayerTitle('the player is attempting to update..')
+    await initialize()
+    playerState.playlistEnded = false // as it is reinitialized
+  })
+})()

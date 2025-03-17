@@ -105,7 +105,7 @@ h1 {
     position: absolute;
     top: 0;
     left: 12px;
-    background-image: url('~/src/assets/media/images/blurry-background_(login-popup).svg');
+    background-image: url('~/src/media/images/blurry-background_(login-popup).svg');
     width: 358px;
     height: 278px;
     background-repeat: no-repeat;
