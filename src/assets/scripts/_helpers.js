@@ -13,6 +13,23 @@ export function debounce(func, timeout) {
   }
 }
 
+export const replaceUrls = playlist => {
+  const p = playlist
+
+  const cloudflareDomainPart = 'https://spheresounds.cc'
+  const yandexProxyDomain = 'https://d5d0b9cabj7ttci8bakd.k1mxzkh0.apigw.yandexcloud.net'
+
+
+  p.forEach(trackData => {
+    const initialUrl = trackData.fields['Full link']
+
+    const newUrl = initialUrl.replace(cloudflareDomainPart, yandexProxyDomain)
+
+    trackData.fields['Full link'] = newUrl
+  })
+
+  return p
+}
 
 // fetch playlists from airtable
 export const fetchPlaylist = async (baseId, tableId) => {
