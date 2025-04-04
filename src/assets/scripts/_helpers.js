@@ -16,14 +16,16 @@ export function debounce(func, timeout) {
 export const replaceUrls = playlist => {
   const p = playlist
 
-  const cloudflareDomainPart = 'https://spheresounds.cc'
-  const yandexProxyDomain = 'https://d5d0b9cabj7ttci8bakd.k1mxzkh0.apigw.yandexcloud.net'
+  const hosting = 'https://spheresounds.cc'
+  const proxy = 'https://lively-term-4582.hi-c5b.workers.dev'
 
 
   p.forEach(trackData => {
     const initialUrl = trackData.fields['Full link']
 
-    const newUrl = initialUrl.replace(cloudflareDomainPart, yandexProxyDomain)
+    const newUrl = initialUrl
+        .replace(hosting, proxy)
+        .replace('.mp3', '')
 
     trackData.fields['Full link'] = newUrl
   })
