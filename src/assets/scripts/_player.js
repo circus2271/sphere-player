@@ -1,5 +1,5 @@
 import fetchRetry from 'fetch-retry'
-import { randomize, sendLikeDislike, sendSongStats, fetchPlaylist } from './_helpers';
+import { randomize, sendLikeDislike, sendSongStats, fetchPlaylist, replaceUrls } from './_helpers';
 
 const fetchWithRetry = fetchRetry(fetch);
 
@@ -185,7 +185,12 @@ export class Player {
 
     this.currentPlaylistTableId = newPlaylist.tableId
     this.currentPlaylistTableName = newPlaylist.playlistName
-    this.currentPlaylistInitialData = await fetchPlaylist(this.baseId, this.currentPlaylistTableId)
+    const currentPlaylistInitialData = await fetchPlaylist(this.baseId, this.currentPlaylistTableId)
+
+    // replace urls and set it as initial data (although it's not 100% accurate naming, but this is made because of simplicity)
+    const dataWithReplacedUrls = replaceUrls(currentPlaylistInitialData)
+
+    this.currentPlaylistInitialData = dataWithReplacedUrls
     this.currentDayPlaylist = this.getCurrentDaySongsInPlaylist(this.currentPlaylistInitialData);
     const currentInterval = this.getCurrentInterval(this.currentDayPlaylist)
     this.currentIntervalData = this.getCurrentIntervalRelatedData(currentInterval)
