@@ -1,5 +1,5 @@
 import fetchRetry from 'fetch-retry'
-import { randomize, sendLikeDislike, sendSongStats, fetchPlaylist } from './_helpers';
+import { randomize, sendLikeDislike, sendSongStats, fetchPlaylist, replaceUrls } from './_helpers';
 
 const fetchWithRetry = fetchRetry(fetch);
 
@@ -45,6 +45,7 @@ let globalRepeatId = null
 
 const resetRepeatId = () => globalRepeatId = null
 
+let hostingWasChanged = false
 // ...
 // let nextTrackBlobSize = null
 let nextTrackDownloadSpeed = null
@@ -185,7 +186,20 @@ export class Player {
 
     this.currentPlaylistTableId = newPlaylist.tableId
     this.currentPlaylistTableName = newPlaylist.playlistName
-    this.currentPlaylistInitialData = await fetchPlaylist(this.baseId, this.currentPlaylistTableId)
+    // this.currentPlaylistInitialData = await fetchPlaylist(this.baseId, this.currentPlaylistTableId)
+    const currentPlaylistInitialData = await fetchPlaylist(this.baseId, this.currentPlaylistTableId)
+
+    this.updatePlaylistData(currentPlaylistInitialData)
+  }
+
+  updatePlaylistData(currentPlaylistInitialData, shouldReplaceHostingPartOfUrl) {
+    if (shouldReplaceHostingPartOfUrl) {
+      this.currentPlaylistInitialData = replaceUrls(currentPlaylistInitialData)
+    } else {
+      this.currentPlaylistInitialData = currentPlaylistInitialData
+    }
+
+    // replace urls and set it as initial data (although it's not 100% accurate naming, but this is made because of simplicity)
     this.currentDayPlaylist = this.getCurrentDaySongsInPlaylist(this.currentPlaylistInitialData);
     const currentInterval = this.getCurrentInterval(this.currentDayPlaylist)
     this.currentIntervalData = this.getCurrentIntervalRelatedData(currentInterval)
@@ -446,7 +460,6 @@ export class Player {
     // if playlist button is clicked
     // change playlist and load first two tracks of it
     document.querySelector('#playlists').addEventListener('click', async (event) => {
-
       // playlist button is clicked
       if (event.target.closest('.playlist')) {
         const playlistButton = event.target.closest('.playlist');
@@ -457,6 +470,8 @@ export class Player {
           return;
         }
         resetRepeatId()
+        // reset this sh..
+        hostingWasChanged = false
 
 
         document.querySelector('.playlist--selected').classList.remove('playlist--selected')
@@ -545,6 +560,7 @@ export class Player {
     const localRepeatId = new Date().getTime();
     globalRepeatId = localRepeatId
 
+    const self = this
     console.log('ppp', tracks[trackIndex])
     return fetchWithRetry(tracks[trackIndex], {
       retryDelay: 1000,
@@ -560,7 +576,6 @@ export class Player {
           console.warn('fetch error, 404, track not found')
           return false
         }
-
         // console.log('lri', localRepeatId)
         // console.log('gri', globalRepeatId)
         if (localRepeatId !== globalRepeatId) {
@@ -570,6 +585,17 @@ export class Player {
         }
 
         if (error !== null || response.status >= 500 ) {
+          // или ошибка сети, илп ошибка сервера
+          if (error !== null && !hostingWasChanged) {
+            // debugger
+            // alert(attempt)
+            if (attempt === 2) {
+              self.updatePlaylistData(self.currentPlaylistInitialData, true)
+              hostingWasChanged = true
+              return false
+            }
+          }
+
           // что-то не то, -- делаем повтор запроса
           console.log('ошибка при получении песни')
           console.log('делаем повтор запроса...')
@@ -579,7 +605,10 @@ export class Player {
         }
       }
     })
+        // .catch(error => {debugger;console.error(error)})
+        // .catch(error => {})
     .then(async (response) => {
+      // debugger
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
