@@ -66,6 +66,7 @@ export class Player {
     // const play = playlist
 // debugger
     const retryFirstTrack = () => {
+      // debugger
       return loadTrack({ tracks: playlist.tracks, trackIndex: this.currentTrackIndex})
       .catch(() => {
 

@@ -3,7 +3,7 @@ import { playlist } from './_playlist'
 
 class IntervalManager {
     #preparedIntervals = null
-    selectedIntervalIndex = -1;
+    // selectedIntervalIndex = -1;
 
     hasCurrentInterval() {
         return !!this.currentInterval
@@ -32,7 +32,7 @@ class IntervalManager {
         // return interval and set currentIntervalIndex
         // it's needed to decided if it's needed to change interval (later in code
         if (currentInterval) {
-            this.selectedIntervalIndex = currentInterval.index
+            // this.selectedIntervalIndex = currentInterval.index
             return currentInterval
         }
 
@@ -41,7 +41,7 @@ class IntervalManager {
             index: -1
         }
 
-        this.selectedIntervalIndex = fallbackInterval.index
+        // this.selectedIntervalIndex = fallbackInterval.index
 
         return fallbackInterval
     }

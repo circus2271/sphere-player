@@ -108,7 +108,7 @@ export const initializePlayerHTMLControls = (playerInstance) => {
             // If so, we'll try to update and restart a player
             intervalId = setInterval(() => {
 
-                playerState.playlistEnded = intervalManager.hasCurrentInterval()
+                playerState.playlistEnded = !intervalManager.hasCurrentInterval()
                 if (playerState.playlistEnded) {
                     clearInterval(intervalId)
                 }
@@ -169,6 +169,7 @@ export const initializePlayerHTMLControls = (playerInstance) => {
                     }
                 })
             } catch (error) {
+                console.error(error)
                 console.error(`playlist error: can't load first two tracks of a new playlist`)
             }
         }

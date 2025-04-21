@@ -4,7 +4,7 @@ class PlayerState {
     playlistShouldChange = false
     globalRepeatId = null
     playlistEnded = false
-    currentInterval = null
+    // currentInterval = null
     baseId = null;
     availablePlaylists = null;
 
