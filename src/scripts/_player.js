@@ -63,7 +63,8 @@ export class Player {
     // reset
     this.currentTrackIndex = 0;
     this.nextTrackIndex = 1;
-
+    // const play = playlist
+// debugger
     const retryFirstTrack = () => {
       return loadTrack({ tracks: playlist.tracks, trackIndex: this.currentTrackIndex})
       .catch(() => {
@@ -85,6 +86,7 @@ export class Player {
     retryFirstTrack()
     .then(blobURL => {
       this.currentBlobURL = blobURL;
+      // this.currentTrackId = playlist.getTrackId(this.currentTrackIndex) // should be defined
       this.currentTrackId = playlist.getTrackId(this.currentTrackIndex) // should be defined
 
       this.audioPlayer.src = this.currentBlobURL;
@@ -133,7 +135,7 @@ export class Player {
       downloadingSpeed: nextTrackDownloadSpeed ? nextTrackDownloadSpeed.toFixed(1) : '',
       downloadingTime: nextTrackDownloadTime ? nextTrackDownloadTime.toFixed(1) : ''
     }
-
+// debugger
     // reset this global variable
     nextTrackDownloadSpeed = null
     nextTrackDownloadTime = null
@@ -220,12 +222,9 @@ export class Player {
       const retry = () => {
         console.log('retry track index:', this.nextTrackIndex)
 
-        if (intervalManager.currentIntervalIndex !== possiblyNewInterval.index) {
+        if (intervalManager.currentInterval.index !== possiblyNewInterval.index) {
           console.log('switched playlist interval')
           console.log('current active interval is', possiblyNewInterval.time)
-
-          // intervalManager.updateCurrentIntervalData(possiblyNewInterval)
-          intervalManager.updateCurrentIntervalData(possiblyNewInterval)
 
           playlist.setTracksFromCurrentInterval()
 
@@ -266,7 +265,7 @@ export class Player {
       retry()
         .then(blobURL => {
           this.nextBlobURL = blobURL;
-          this.nextTrackUrl = playlist.tracks[this.nextTrackIndex]
+          this.nextTrackUrl = playlist.tracks[this.nextTrackIndex].url
 
           console.log('track loaded (with or without retry)')
           document.getElementById('skip-button').disabled = false

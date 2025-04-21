@@ -15,13 +15,15 @@ export const loadTrack = ({ tracks, trackIndex, returnOnlyBlob }) => {
     const localRepeatId = new Date().getTime();
     playerState.globalRepeatId = localRepeatId
 
-    console.log('ppp', tracks[trackIndex])
-    return fetchWithRetry(tracks[trackIndex], {
+    // const fetchOfflineErrors = []
+    let fetchOfflineErrorsCounter = 0
+    let networkErrorsCounter = 0
+
+    const trackUrl = tracks[trackIndex].url
+    return fetchWithRetry(trackUrl, {
         retryDelay: 1000,
         // retryDelay: 0,
         retryOn: function (attempt, error, response) {
-            // alert(1)
-            // console.log('ro', new Date().getTime())
             console.log('get second', new Date().getSeconds())
 
             if (response && response.status === 404) {
@@ -39,12 +41,21 @@ export const loadTrack = ({ tracks, trackIndex, returnOnlyBlob }) => {
 
             if (error !== null || response.status >= 500 ) {
                 if (error !== null && !hostingWasChanged) {
-                    // debugger
-                    // alert(attempt)
+                    const isOnline = navigator.onLine
+
+                    if (isOnline) {
+                        networkErrorsCounter++
+                    }
+
                     if (attempt === 2) {
-                        self.updatePlaylistData(self.currentPlaylistInitialData, true)
-                        // playlist.replaceTracksDomainIfNeeded()
-                        playlist.replaceTracksDomain()
+                        if (networkErrorsCounter === 3) {
+                            // if 3 network errors in a row, and it's not because the user is offline
+                            // so it's probably an error due to blocked in rf hosting
+                            // so, try to switch a domain to a fallback one
+
+
+                        }
+
                         return false
                     }
                 }

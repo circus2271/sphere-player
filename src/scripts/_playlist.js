@@ -4,19 +4,17 @@ import { playerState } from './_playerState';
 
 class Playlist {
     currentPlaylistInitialData = null
-    currentDayPlaylist = null;
     currentPlaylistTableId = null;
     currentPlaylistTableName = null;
     tracks = []
     isDomainReplaced = false
 
     setTracksFromCurrentInterval() {
-        this.tracks = intervalManager.currentInterval.urls
-
-        this.replaceTracksDomain()
+        this.tracks = intervalManager.currentInterval.tracks
     }
 
     async setPlaylistData({ newPlaylist }) {
+        // reset this value
         this.isDomainReplaced = false
         // show user friendly message
         setPlayerTitle('loading playlist...')
@@ -25,29 +23,8 @@ class Playlist {
         this.currentPlaylistTableName = newPlaylist.playlistName
         this.currentPlaylistInitialData = await fetchPlaylist(playerState.baseId, this.currentPlaylistTableId)
 
-        const currentIntervalData = intervalManager.currentInterval
-        intervalManager.updateCurrentIntervalData(currentIntervalData)
-
-        this.tracks = intervalManager.currentIntervalData.urls;
-
-    }
-
-    replaceTracksDomain() {
-        if (this.isDomainReplaced) return
-
-        const hostingDomain = 'https://spheresounds.cc'
-        const proxyDomain = 'https://d5d0b9cabj7ttci8bakd.k1mxzkh0.apigw.yandexcloud.net'
-
-        this.tracks.forEach(track => {
-            const link = track.fields['Full link']
-
-            const newLink = link.replace(hostingDomain, proxyDomain)
-
-            track.fields['Full link'] = newLink
-        })
-
-        this.isDomainReplaced = true
-        updateHostingStats({playlistName: playlist.currentPlaylistTableName})
+        intervalManager.prepareIntervals()
+        this.tracks = intervalManager.currentInterval.tracks
     }
 
     getTrackById(id) {
@@ -70,6 +47,26 @@ class Playlist {
     // removeTrackFromPlaylist(id) {
     //     this.tracks = this.tracks.filter(track => track.id !== id)
     // }
+
+    changeTracksDomain() {
+        if (this.isDomainReplaced) return
+
+        const hostingDomain = 'https://spheresounds.cc'
+        const proxyDomain = 'https://d5d0b9cabj7ttci8bakd.k1mxzkh0.apigw.yandexcloud.net'
+
+        const changeUrl = (track) => {
+            const initialUrl = track.url
+            const newUrl = initialUrl.replace(hostingDomain, proxyDomain)
+
+            track.url = newUrl
+        }
+
+        intervalManager.changeTracksDomain(track => changeUrl(track))
+        this.tracks.forEach(track => changeUrl(track))
+
+        this.isDomainReplaced = true
+        updateHostingStats({playlistName: playlist.currentPlaylistTableName})
+    }
 
     removeTrack(id) {
         this.tracks = this.tracks.filter(track => track.id !== id)

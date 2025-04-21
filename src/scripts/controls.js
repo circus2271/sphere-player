@@ -7,7 +7,7 @@ import { playlist } from './_playlist'
 
 const playButton = document.getElementById('play-button');
 const skipButton = document.getElementById('skip-button');
-const allButtons = document.querySelector('button')
+let allButtons;
 
 let player;
 let audioPlayer;
@@ -22,6 +22,10 @@ playButton.style.setProperty('--animation-duration', fadeInOutDuration + 'ms')
 // event handlers are subscribed not via addEventListener but via onclick and onsubmit properties
 // it's made to avoid complexity when reinitializing player (as it will be needed to call removeEventListeners)
 export const initializePlayerHTMLControls = (playerInstance) => {
+    // playlist buttons aren't defined before the playerInstance
+    // so wait for their appearing in markup
+    allButtons = document.querySelectorAll('button')
+
     // it's made to have this variables as a global variables
     // so functions above could have access to those variables (and you don't have to pass it to each function manually)
     player = playerInstance;
@@ -140,7 +144,7 @@ export const initializePlayerHTMLControls = (playerInstance) => {
             playlistButton.classList.add('playlist--selected')
 
             const newPlaylistName = playlistButton.dataset.playlistName
-            const newPlaylist = player.availablePlaylists.find(playlist => playlist.playlistName === newPlaylistName)
+            const newPlaylist = playerState.availablePlaylists.find(playlist => playlist.playlistName === newPlaylistName)
 
             fadeOutPlayingState()
             // disable all buttons until first track is ready
@@ -222,7 +226,7 @@ function fadeAudioToPause() {
 
 // get "exception" key from an object;
 // if no object -> use empty object by default
-function  enableAllButtons({exception} = {}) {
+function enableAllButtons({exception} = {}) {
     allButtons.forEach(button => {
         // if (exception && button.id === exception) return
         button.disabled = false
