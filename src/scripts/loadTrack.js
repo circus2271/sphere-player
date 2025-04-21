@@ -4,7 +4,7 @@ import { playlist } from './_playlist';
 
 const fetchWithRetry = fetchRetry(fetch);
 
-
+// a = 0
 export const loadTrack = ({ tracks, trackIndex, returnOnlyBlob }) => {
 
     // it may happen that user has switched a playlist when a track was retrying to load.
@@ -15,10 +15,15 @@ export const loadTrack = ({ tracks, trackIndex, returnOnlyBlob }) => {
     const localRepeatId = new Date().getTime();
     playerState.globalRepeatId = localRepeatId
 
-    // const fetchOfflineErrors = []
-    let fetchOfflineErrorsCounter = 0
     let networkErrorsCounter = 0
 
+    // console.log(tracks.length)
+    // console.log(++a)
+    // t = tracks[trackIndex]
+    // debugger
+    // if (trackIndex >= tracks.length) {
+    //     return
+    // }
     const trackUrl = tracks[trackIndex].url
     return fetchWithRetry(trackUrl, {
         retryDelay: 1000,
@@ -40,7 +45,7 @@ export const loadTrack = ({ tracks, trackIndex, returnOnlyBlob }) => {
             }
 
             if (error !== null || response.status >= 500 ) {
-                if (error !== null && !hostingWasChanged) {
+                if (error !== null) {
                     const isOnline = navigator.onLine
 
                     if (isOnline) {
@@ -53,7 +58,8 @@ export const loadTrack = ({ tracks, trackIndex, returnOnlyBlob }) => {
                             // so it's probably an error due to blocked in rf hosting
                             // so, try to switch a domain to a fallback one
 
-
+                            playlist.changeTracksDomain()
+                            return false
                         }
 
                         return false

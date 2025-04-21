@@ -51,7 +51,8 @@ class Playlist {
     changeTracksDomain() {
         if (this.isDomainReplaced) return
 
-        const hostingDomain = 'https://spheresounds.cc'
+        // const hostingDomain = 'https://spheresounds.cc'
+        const hostingDomain = 'https://papervpn.io'
         const proxyDomain = 'https://d5d0b9cabj7ttci8bakd.k1mxzkh0.apigw.yandexcloud.net'
 
         const changeUrl = (track) => {

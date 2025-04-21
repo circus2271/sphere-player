@@ -1,5 +1,10 @@
-import { updateRecordApiEndpoint, updateSongStatsApiEndpoint, getRecordsApiEndpoint } from './_apiEndpoints'
-import {credentials} from "./_credentials";
+import {
+  updateRecordApiEndpoint,
+  updateSongStatsApiEndpoint,
+  getRecordsApiEndpoint,
+  updateHostingStatsApiEndpoint
+} from './_apiEndpoints'
+import { credentials } from './_credentials';
 
 export const pageLanguage = document.body.classList.contains('ru') ? 'ru' : 'en'
 
@@ -165,7 +170,7 @@ export const updateHostingStats = async ({playlistName}) => {
     return response.text()
 
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 

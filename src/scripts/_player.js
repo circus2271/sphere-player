@@ -46,7 +46,7 @@ export class Player {
         }
       })
     } catch (error) {
-
+      console.error(error)
       console.error(`can't load first 2 tracks`)
     }
 
