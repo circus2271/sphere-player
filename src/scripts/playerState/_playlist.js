@@ -1,6 +1,6 @@
-import { fetchPlaylist, setPlayerTitle, updateHostingStats } from './_helpers';
+import { fetchPlaylist, setPlayerTitle, updateHostingStats } from '../utils/_helpers';
 import { intervalManager } from './_intervalManager';
-import { playerState } from './_playerState';
+// import { playerState } from './_playerState';
 
 class Playlist {
     currentPlaylistInitialData = null
@@ -13,7 +13,7 @@ class Playlist {
         this.tracks = intervalManager.currentInterval.tracks
     }
 
-    async setPlaylistData({ newPlaylist }) {
+    async setPlaylistData({ newPlaylist, baseId }) {
         // reset this value
         this.isDomainReplaced = false
         // show user friendly message
@@ -21,7 +21,8 @@ class Playlist {
 
         this.currentPlaylistTableId = newPlaylist.tableId
         this.currentPlaylistTableName = newPlaylist.playlistName
-        this.currentPlaylistInitialData = await fetchPlaylist(playerState.baseId, this.currentPlaylistTableId)
+        // this.currentPlaylistInitialData = await fetchPlaylist(playerState.baseId, this.currentPlaylistTableId)
+        this.currentPlaylistInitialData = await fetchPlaylist(baseId, this.currentPlaylistTableId)
 
         intervalManager.prepareIntervals()
         this.tracks = intervalManager.currentInterval.tracks

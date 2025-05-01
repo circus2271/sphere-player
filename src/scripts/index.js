@@ -1,8 +1,8 @@
-import { handleLogin } from './_handleLogin'
-import { getRecordsApiEndpoint } from './_apiEndpoints'
+import { handleLogin } from './utils/_handleLogin'
+import { getRecordsApiEndpoint } from './utils/_apiEndpoints'
 import { Player } from './_player'
-import { REINITIALIZE_APP_EVENT, setPlayerTitle } from './_helpers';
-import { playerState } from './_playerState';
+import { REINITIALIZE_APP_EVENT, setPlayerTitle } from './utils/_helpers';
+import { playerState } from './playerState/_playerState';
 
 const getBaseId = async () => {
   const baseId = await new Promise(resolve => {
@@ -56,7 +56,6 @@ const initialize = async () => {
     playlistsInfo.forEach((playlist, i) => {
       const playlistName = playlist.fields['Name']
       const playlistDescription = playlist.fields['Notes']
-      // const { playlistName, playlistDescription } = playlist
       const selected = i === 0
 
       if (selected) {

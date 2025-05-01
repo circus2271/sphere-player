@@ -1,3 +1,5 @@
+import {intervalManager} from "./_intervalManager";
+import {playlist} from "./_playlist";
 
 class PlayerState {
     skipped = false
@@ -7,6 +9,8 @@ class PlayerState {
     // currentInterval = null
     baseId = null;
     availablePlaylists = null;
+    playlist = playlist
+    intervalManager = intervalManager
 
     resetRepeatId() {
         this.globalRepeatId = null

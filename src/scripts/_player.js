@@ -1,10 +1,10 @@
-import { sendLikeDislike, sendSongStats, setPlayerTitle } from './_helpers';
-import { intervalManager } from './_intervalManager';
-import { initializePlayerHTMLControls } from './controls';
-import { loadTrack } from './loadTrack';
-import { playerState } from './_playerState';
-import { likeDislikeService } from './likeDislikeService';
-import { playlist } from './_playlist';
+import { sendLikeDislike, sendSongStats, setPlayerTitle } from './utils/_helpers';
+import { intervalManager } from './playerState/_intervalManager';
+import { initializePlayerHTMLControls } from './_controls';
+import { loadTrack } from './utils/_loadTrack';
+import { playerState } from './playerState/_playerState';
+import { likeDislikeService } from './utils/_likeDislikeService';
+import { playlist } from './playerState/_playlist';
 
 
 // ...

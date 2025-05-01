@@ -1,6 +1,6 @@
 import fetchRetry from 'fetch-retry'
-import { playerState } from './_playerState';
-import { playlist } from './_playlist';
+import { playerState } from '../playerState/_playerState';
+// import { playlist } from './_playlist';
 
 const fetchWithRetry = fetchRetry(fetch);
 
@@ -58,7 +58,7 @@ export const loadTrack = ({ tracks, trackIndex, returnOnlyBlob }) => {
                             // so it's probably an error due to blocked in rf hosting
                             // so, try to switch a domain to a fallback one
 
-                            playlist.changeTracksDomain()
+                            playerState.playlist.changeTracksDomain()
                             return false
                         }
 

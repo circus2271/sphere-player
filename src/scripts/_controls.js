@@ -1,8 +1,8 @@
-import { likeDislikeService } from './likeDislikeService';
-import { playerState } from './_playerState';
-import { intervalManager } from './_intervalManager';
-import { REINITIALIZE_APP_EVENT } from './_helpers';
-import { playlist } from './_playlist'
+import { likeDislikeService } from './utils/_likeDislikeService';
+import { playerState } from './playerState/_playerState';
+import { intervalManager } from './playerState/_intervalManager';
+import { REINITIALIZE_APP_EVENT } from './utils/_helpers';
+import { playlist } from './playerState/_playlist'
 
 
 const playButton = document.getElementById('play-button');

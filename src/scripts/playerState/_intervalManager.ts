@@ -1,5 +1,14 @@
-import { randomize } from './_helpers';
-import { playlist } from './_playlist'
+import { randomize } from '../utils/_helpers';
+
+type Track = {
+    id: string,
+    url: string
+}
+
+type Interval = {
+    time: string,
+    tracks: Track[]
+}
 
 class IntervalManager {
     #preparedIntervals = null
@@ -11,7 +20,7 @@ class IntervalManager {
 
     // an object with a structure like follows:
     // {time: '8-12', tracks: [{id: 'fdf', url: 'https://example.com'}]}
-    get currentInterval() {
+    get currentInterval(): Interval {
         // This function aims to find the current time interval (based on the hour of the day) from a given list of intervals,
         // and return the associated URLs and the index of the interval within the provided list.
 
@@ -61,8 +70,8 @@ class IntervalManager {
 
     // returns array of objects
     // for example: [{time: '8-12', tracks: [{id: 'fdf', url: 'https://example.com'}]}]
-    get #intervals() {
-        // const { initialPlaylistData } = playlist
+    get #intervals(): Interval[] {
+    // get #intervals(): Array<Interval> {
         const { currentPlaylistInitialData: initialPlaylistData } = playlist
         // THIS function works (getting as an argument) the whole playlist with all the days intervals
         // IT RETURNS the array with intervals for a particular day. The result of interval sets is time-sorted
