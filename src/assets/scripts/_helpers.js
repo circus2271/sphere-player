@@ -17,7 +17,8 @@ export const replaceUrls = playlist => {
   const p = playlist
 
   const hostingDomain = 'https://spheresounds.cc'
-  const proxyDomain = 'https://d5d0b9cabj7ttci8bakd.k1mxzkh0.apigw.yandexcloud.net'
+  // const proxyDomain = 'https://d5d0b9cabj7ttci8bakd.k1mxzkh0.apigw.yandexcloud.net'
+  const proxyDomain = 'https://storage.yandexcloud.net/sphere-bucket'
 
 
   p.forEach(trackData => {
