@@ -51,6 +51,7 @@ let nextTrackDownloadSpeed = null
 let nextTrackDownloadTime = null
 
 export class Player {
+  allTracks = [] // dirtyHack
   currentTrackIndex = 0;
   nextTrackIndex = 1;
   // track urls are used as a lightweight version of id
@@ -114,7 +115,8 @@ export class Player {
       // console.log('currentDayPlaylist', this.currentDayPlaylist)
 
       // const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.signedUrl === currentTrackUrl)
-      const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
+      // const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
+      const currentTrackInitialData = this.allTracks.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
       // debugger;
       console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
       console.log('currentTrackUrl', currentTrackUrl)
@@ -184,7 +186,8 @@ export class Player {
   onError(event, reason) {
     const currentTrackUrl = this.currentTrackUrl
 
-    const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
+    // const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
+    const currentTrackInitialData = this.allTracks.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
     // debugger;
     console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
     // console.log('currentTrackUrl', currentTrackUrl)
@@ -231,6 +234,7 @@ export class Player {
     const dataWithReplacedUrls = replaceUrls(currentPlaylistInitialData)
 
     this.currentPlaylistInitialData = dataWithReplacedUrls
+    this.allTracks.push(...currentPlaylistInitialData)
     this.currentDayPlaylist = this.getCurrentDaySongsInPlaylist(this.currentPlaylistInitialData);
     const currentInterval = this.getCurrentInterval(this.currentDayPlaylist)
     this.currentIntervalData = this.getCurrentIntervalRelatedData(currentInterval)

@@ -24,6 +24,8 @@ export const replaceUrls = playlist => {
   p.forEach(trackData => {
     const initialUrl = trackData.fields['Full link']
 
+    if (!initialUrl.startsWith(hostingDomain)) return trackData
+
     const newUrl = initialUrl.replace(hostingDomain, proxyDomain)
 
     trackData.fields['Full link'] = newUrl
