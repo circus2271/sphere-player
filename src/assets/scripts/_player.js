@@ -178,43 +178,45 @@ export class Player {
       }
     });
 
-    this.audioPlayer.addEventListener('error', (event) => {
-      const currentTrackUrl = this.currentTrackUrl
+    this.audioPlayer.addEventListener('error', () => this.onError());
+  }
 
-      const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
-      // debugger;
-      console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
-      // console.log('currentTrackUrl', currentTrackUrl)
-      // debugger
-      const currentTrackId = currentTrackInitialData.id
-      // Build the same stats payload you use on 'ended'
+  onError(event, reason) {
+    const currentTrackUrl = this.currentTrackUrl
 
-      const data = {
-        baseId:          this.baseId,
-        tableId:         this.currentPlaylistTableId,
-        // recordId:        this.currentTrackId,       // same ID you use in 'ended'
-        recordId:        currentTrackId,       // same ID you use in 'ended'
-        currentIndex:    this.currentTrackIndex,
-        downloadingSpeed: '',                        // no new download here
-        downloadingTime:  ''
-      };
+    const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
+    // debugger;
+    console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
+    // console.log('currentTrackUrl', currentTrackUrl)
+    // debugger
+    const currentTrackId = currentTrackInitialData.id
+    // Build the same stats payload you use on 'ended'
 
-      // Mirror your 'ended' logic
-      const stats = data;
-      stats.skipped      = skipped;                // if the user hit “skip”
-      stats.playlistName = this.currentPlaylistTableName;
-      stats.timestamp    = new Date().toLocaleString('ru-RU');
-      // stats.error        = true;                   // mark it as an error
-      stats.networkError = event.message ||
-          (this.audioPlayer.error && `Code ${this.audioPlayer.error.code}`);
+    const data = {
+      baseId:          this.baseId,
+      tableId:         this.currentPlaylistTableId,
+      // recordId:        this.currentTrackId,       // same ID you use in 'ended'
+      recordId:        currentTrackId,       // same ID you use in 'ended'
+      currentIndex:    this.currentTrackIndex,
+      downloadingSpeed: '',                        // no new download here
+      downloadingTime:  ''
+    };
 
-      // Send with the same 3-second debounce to avoid rate-limits
-      setTimeout(() => {
-        sendSongStats(stats);
-      }, 2200);
+    // Mirror your 'ended' logic
+    const stats = data;
+    stats.skipped      = skipped;                // if the user hit “skip”
+    stats.playlistName = this.currentPlaylistTableName;
+    stats.timestamp    = new Date().toLocaleString('ru-RU');
+    // stats.error        = true;                   // mark it as an error
+    stats.networkError = reason || event.message ||
+        (this.audioPlayer.error && `Code ${this.audioPlayer.error.code}`);
 
-      console.warn('Audio playback error, stats sent:', stats);
-    });
+    // Send with the same 3-second debounce to avoid rate-limits
+    setTimeout(() => {
+      sendSongStats(stats);
+    }, 2200);
+
+    console.warn('Audio playback error, stats sent:', stats);
   }
 
   async setPlaylistData({ newPlaylist }) {
@@ -635,6 +637,17 @@ export class Player {
 
       if (arrayBuffer.byteLength !== +declaredFileSize) {
         throw new Error('chatgpt says that may leed to an error')
+      }
+
+      try {
+        const audioContext = new AudioContext();
+        await audioContext.decodeAudioData(arrayBuffer.slice(0), () => {}, err => { throw err; });
+        // await decodeAudioData(arrayBuffer.slice(0), () => {}, err => { throw err; });
+      } catch(error) {
+        const errorMessage = 'error while blob decoding'
+        this.onError(null, errorMessage)
+
+        throw new Error(errorMessage)
       }
 
       const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
