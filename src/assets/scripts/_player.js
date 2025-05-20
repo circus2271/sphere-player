@@ -178,6 +178,43 @@ export class Player {
       }
     });
 
+    this.audioPlayer.addEventListener('error', (event) => {
+      const currentTrackUrl = this.currentTrackUrl
+
+      const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
+      // debugger;
+      console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
+      // console.log('currentTrackUrl', currentTrackUrl)
+      // debugger
+      const currentTrackId = currentTrackInitialData.id
+      // Build the same stats payload you use on 'ended'
+
+      const data = {
+        baseId:          this.baseId,
+        tableId:         this.currentPlaylistTableId,
+        // recordId:        this.currentTrackId,       // same ID you use in 'ended'
+        recordId:        currentTrackId,       // same ID you use in 'ended'
+        currentIndex:    this.currentTrackIndex,
+        downloadingSpeed: '',                        // no new download here
+        downloadingTime:  ''
+      };
+
+      // Mirror your 'ended' logic
+      const stats = data;
+      stats.skipped      = skipped;                // if the user hit “skip”
+      stats.playlistName = this.currentPlaylistTableName;
+      stats.timestamp    = new Date().toLocaleString('ru-RU');
+      // stats.error        = true;                   // mark it as an error
+      stats.networkError = event.message ||
+          (this.audioPlayer.error && `Code ${this.audioPlayer.error.code}`);
+
+      // Send with the same 3-second debounce to avoid rate-limits
+      setTimeout(() => {
+        sendSongStats(stats);
+      }, 2200);
+
+      console.warn('Audio playback error, stats sent:', stats);
+    });
   }
 
   async setPlaylistData({ newPlaylist }) {
@@ -593,6 +630,13 @@ export class Player {
 
       // specify blob type to hopefully avoid safari bug
       const arrayBuffer = await response.arrayBuffer();
+
+      const declaredFileSize = response.headers.get('content-length')
+
+      if (arrayBuffer.byteLength !== +declaredFileSize) {
+        throw new Error('chatgpt says that may leed to an error')
+      }
+
       const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
 
       return blob
