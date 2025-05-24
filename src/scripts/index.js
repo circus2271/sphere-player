@@ -2,7 +2,7 @@ import { handleLogin } from './utils/_handleLogin'
 import { getRecordsApiEndpoint } from './utils/_apiEndpoints'
 import { Player } from './_player'
 import { REINITIALIZE_APP_EVENT, setPlayerTitle } from './utils/_helpers';
-import { playerState } from './playerState/_playerState';
+
 
 const getBaseId = async () => {
   const baseId = await new Promise(resolve => {

@@ -1,5 +1,7 @@
-import { fetchPlaylist, setPlayerTitle, updateHostingStats } from '../utils/_helpers';
-import { intervalManager } from './_intervalManager';
+import { fetchPlaylist, setPlayerTitle, updateHostingStats } from '../../utils/_helpers';
+// import { intervalManager } from './_intervalManager';
+import IntervalManager from './_intervalManager';
+import PlayerState from "../PlayerState";
 // import { playerState } from './_playerState';
 
 class Playlist {
@@ -8,9 +10,19 @@ class Playlist {
     currentPlaylistTableName = null;
     tracks = []
     isDomainReplaced = false
+    // playerState = new PlayerState()
+    intervalManager = new IntervalManager(this)
+
+
+    constructor(playerState) {
+        this.playerState = playerState // backfard ref
+    }
+    // constructor(playerState) {
+    //     this.playerState = playerState // backfard ref
+    // }
 
     setTracksFromCurrentInterval() {
-        this.tracks = intervalManager.currentInterval.tracks
+        this.tracks = this.intervalManager.currentInterval.tracks
     }
 
     async setPlaylistData({ newPlaylist, baseId }) {
@@ -24,12 +36,15 @@ class Playlist {
         // this.currentPlaylistInitialData = await fetchPlaylist(playerState.baseId, this.currentPlaylistTableId)
         this.currentPlaylistInitialData = await fetchPlaylist(baseId, this.currentPlaylistTableId)
 
-        intervalManager.prepareIntervals()
-        this.tracks = intervalManager.currentInterval.tracks
+        this.intervalManager.prepareIntervals()
+        this.tracks = this.intervalManager.currentInterval.tracks
+
+        this.playerState.allTracks.push(...this.tracks)
     }
 
     getTrackById(id) {
         return this.tracks.find(track => track.id === id)
+        // return this.playerState.allTracks.find(track => track.id === id)
     }
 
     getTrackByIndex(index) {
@@ -37,7 +52,8 @@ class Playlist {
     }
 
     getTrackId(index) {
-        const track = this.tracks.find((track, i) => i === index)
+        // const track = this.tracks.find((track, i) => i === index)
+        const track = this.pla.allTracks.find((track, i) => i === index)
 
         return track ? track.id : null
     }
@@ -63,11 +79,12 @@ class Playlist {
             track.url = newUrl
         }
 
-        intervalManager.changeTracksDomain(track => changeUrl(track))
+        this.intervalManager.changeTracksDomain(track => changeUrl(track))
         this.tracks.forEach(track => changeUrl(track))
 
         this.isDomainReplaced = true
-        updateHostingStats({playlistName: playlist.currentPlaylistTableName})
+        // updateHostingStats({playlistName: playlist.currentPlaylistTableName})
+        // updateHostingStats({playlistName: this.currentPlaylistTableName})
     }
 
     removeTrack(id) {
@@ -75,4 +92,11 @@ class Playlist {
     }
 }
 
-export const playlist = new Playlist()
+// export const playlist = new Playlist()
+
+// export Playlist
+
+// module.exports = {Playlist}
+
+export default Playlist
+// module.exports = {Playlist}

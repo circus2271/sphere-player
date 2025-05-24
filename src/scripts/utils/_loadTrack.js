@@ -1,11 +1,8 @@
 import fetchRetry from 'fetch-retry'
-import { playerState } from '../playerState/_playerState';
-// import { playlist } from './_playlist';
 
 const fetchWithRetry = fetchRetry(fetch);
 
-// a = 0
-export const loadTrack = ({ tracks, trackIndex, returnOnlyBlob }) => {
+export const loadTrack = ({ tracks, trackIndex, returnOnlyBlob, player }) => {
 // debugger
     // it may happen that user has switched a playlist when a track was retrying to load.
     // so, reset this id when user is switching a playlist.
@@ -13,17 +10,11 @@ export const loadTrack = ({ tracks, trackIndex, returnOnlyBlob }) => {
     // ...
     // ... currently a function called "resetRepeatId" is used for this purpose
     const localRepeatId = new Date().getTime();
-    playerState.globalRepeatId = localRepeatId
+    // playerState.globalRepeatId = localRepeatId
+    player.playerState.globalRepeatId = localRepeatId
 
     let networkErrorsCounter = 0
 
-    // console.log(tracks.length)
-    // console.log(++a)
-    // t = tracks[trackIndex]
-    // debugger
-    // if (trackIndex >= tracks.length) {
-    //     return
-    // }
     const trackUrl = tracks[trackIndex].url
     return fetchWithRetry(trackUrl, {
         retryDelay: 1000,
@@ -38,7 +29,7 @@ export const loadTrack = ({ tracks, trackIndex, returnOnlyBlob }) => {
                 return false
             }
 
-            if (localRepeatId !== playerState.globalRepeatId) {
+            if (localRepeatId !== player.playerState.globalRepeatId) {
                 console.log('reset counter')
                 console.log('cancel this track loading')
                 return false;
@@ -58,7 +49,7 @@ export const loadTrack = ({ tracks, trackIndex, returnOnlyBlob }) => {
                             // so it's probably an error due to blocked in rf hosting
                             // so, try to switch a domain to a fallback one
 
-                            playerState.playlist.changeTracksDomain()
+                            player.playerState.playlist.changeTracksDomain()
                             return false
                         }
 

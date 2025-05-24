@@ -1,8 +1,5 @@
 import { likeDislikeService } from './utils/_likeDislikeService';
-import { playerState } from './playerState/_playerState';
-import { intervalManager } from './playerState/_intervalManager';
 import { REINITIALIZE_APP_EVENT } from './utils/_helpers';
-import { playlist } from './playerState/_playlist'
 
 
 const playButton = document.getElementById('play-button');
@@ -32,7 +29,7 @@ export const initializePlayerHTMLControls = (playerInstance) => {
     audioPlayer = playerInstance.audioPlayer
 
     // clean up
-    playerState.resetRepeatId()
+    playerInstance.playerState.resetRepeatId()
     clearInterval(intervalId)
     intervalId = null;
 
@@ -41,7 +38,7 @@ export const initializePlayerHTMLControls = (playerInstance) => {
     // skipButton.addEventListener('click', () => {
     skipButton.onclick = () => {
         // ставим флаг skipped в значение true
-        playerState.skipped = true
+        playerInstance.playerState.skipped = true
 
         // здесь должна происходить перемотка трэка в конец,
         // чтобы потом автоматически сработала функция в onend у плеера,
@@ -57,7 +54,7 @@ export const initializePlayerHTMLControls = (playerInstance) => {
         // togglePlayPause()
 
 
-        const hasCurrentInterval = intervalManager.hasCurrentInterval()
+        const hasCurrentInterval = playerInstance.playerState.intervalManager.hasCurrentInterval()
         // const paused = audioPlayer.paused || audioPlayer.ended
         // const playing = !paused
         const shouldStart = audioPlayer.paused || audioPlayer.ended
@@ -72,7 +69,7 @@ export const initializePlayerHTMLControls = (playerInstance) => {
 
 
             if (!hasCurrentInterval) {
-                playerState.playlistEnded = true
+                playerInstance.playerState.playlistEnded = true
 
                 console.warn('there is no current interval')
                 // don't start a song, because there is no song and also no interval
@@ -82,7 +79,7 @@ export const initializePlayerHTMLControls = (playerInstance) => {
             if (hasCurrentInterval) {
                 // check if playlist was ended
 
-                if (playerState.playlistEnded) {
+                if (playerInstance.playerState.playlistEnded) {
                     // reset a player
                     // because it seems it was stopped, had no interval, and now it again has an interval
 
@@ -108,8 +105,8 @@ export const initializePlayerHTMLControls = (playerInstance) => {
             // If so, we'll try to update and restart a player
             intervalId = setInterval(() => {
 
-                playerState.playlistEnded = !intervalManager.hasCurrentInterval()
-                if (playerState.playlistEnded) {
+                playerInstance.playerState.playlistEnded = !playerInstance.playerState.intervalManager.hasCurrentInterval()
+                if (playerInstance.playerState.playlistEnded) {
                     clearInterval(intervalId)
                 }
             }, 1000 * 60) // check every minute
@@ -137,22 +134,22 @@ export const initializePlayerHTMLControls = (playerInstance) => {
                 console.log('playlist already selected');
                 return;
             }
-            playerState.resetRepeatId()
+            playerInstance.playerState.resetRepeatId()
 
 
             document.querySelector('.playlist--selected').classList.remove('playlist--selected')
             playlistButton.classList.add('playlist--selected')
 
             const newPlaylistName = playlistButton.dataset.playlistName
-            const newPlaylist = playerState.availablePlaylists.find(playlist => playlist.playlistName === newPlaylistName)
+            const newPlaylist = playerInstance.playerState.availablePlaylists.find(playlist => playlist.playlistName === newPlaylistName)
 
             fadeOutPlayingState()
             // disable all buttons until first track is ready
             disableAllButtons()
 
             // end current track, so statistics and 'like'/'dislike' could be sent
-            playerState.skipped = true
-            playerState.playlistShouldChange = true
+            playerInstance.playerState.skipped = true
+            playerInstance.playerState.playlistShouldChange = true
             audioPlayer.dispatchEvent(new Event('ended'))
 
 
@@ -163,7 +160,8 @@ export const initializePlayerHTMLControls = (playerInstance) => {
             // make sure data is updated
 
             try {
-                await player.initializeFirstTwoTracksOfAPlaylist({
+                // await player.initializeFirstTwoTracksOfAPlaylist({
+                await playerInstance.initializeFirstTwoTracksOfAPlaylist({
                     firstTrackLoaded: () => {
                         enableAllButtons({exception: 'skip-button'})
                     }

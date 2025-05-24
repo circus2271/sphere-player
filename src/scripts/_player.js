@@ -1,10 +1,10 @@
 import { sendLikeDislike, sendSongStats, setPlayerTitle } from './utils/_helpers';
-import { intervalManager } from './playerState/_intervalManager';
 import { initializePlayerHTMLControls } from './_controls';
 import { loadTrack } from './utils/_loadTrack';
-import { playerState } from './playerState/_playerState';
+// import { playerState } from './playerState/PlayerState';
+// import { playerState } from './playerState/PlayerState';
+import PlayerState from './playerState/PlayerState';
 import { likeDislikeService } from './utils/_likeDislikeService';
-import { playlist } from './playerState/_playlist';
 
 
 // ...
@@ -20,22 +20,27 @@ export class Player {
   nextBlobURL = null;
   currentBlobURL = null;
   audioPlayer = document.getElementById('audioPlayer');
+  playerState = new PlayerState()
 
   constructor() {
     if (!this.audioPlayer) {
       throw Error('Error: audioPlayer html element must be set for player to initialize')
     }
 
+    // this.playerState = new PlayerState()
+    // this.playerState = playerState
+
+
   }
 
   async initializePlayer(availablePlaylists, baseId) {
-    playerState.availablePlaylists = availablePlaylists
-    playerState.baseId = baseId
+    this.playerState.availablePlaylists = availablePlaylists
+    this.playerState.baseId = baseId
 
     // Запрашиваем первый плейлист
     const firstPlaylist = availablePlaylists[0]
     // обновляем все данные о плейлисте
-    await playlist.setPlaylistData({ newPlaylist: firstPlaylist })
+    await this.playerState.playlist.setPlaylistData({ newPlaylist: firstPlaylist })
 
 
     try {
@@ -67,7 +72,7 @@ export class Player {
 // debugger
     const retryFirstTrack = () => {
       // debugger
-      return loadTrack({ tracks: playlist.tracks, trackIndex: this.currentTrackIndex})
+      return loadTrack({ tracks: this.playerState.playlist.tracks, trackIndex: this.currentTrackIndex, player: this})
       .catch(() => {
 
         this.currentTrackIndex++
@@ -76,7 +81,7 @@ export class Player {
     }
 
     const retrySecondTrack = () => {
-      return loadTrack({ tracks: playlist.tracks, trackIndex: this.nextTrackIndex })
+      return loadTrack({ tracks: this.playerState.playlist.tracks, trackIndex: this.nextTrackIndex, player: this })
       .catch(() => {
 
         this.nextTrackIndex++
@@ -88,7 +93,7 @@ export class Player {
     .then(blobURL => {
       this.currentBlobURL = blobURL;
       // this.currentTrackId = playlist.getTrackId(this.currentTrackIndex) // should be defined
-      this.currentTrackId = playlist.getTrackId(this.currentTrackIndex) // should be defined
+      this.currentTrackId = this.playerState.playlist.getTrackId(this.currentTrackIndex) // should be defined
 
       this.audioPlayer.src = this.currentBlobURL;
 
@@ -96,13 +101,13 @@ export class Player {
 
       // show the name of a playlist to an user
 
-      setPlayerTitle(playlist.currentPlaylistTableName)
+      setPlayerTitle(this.playerState.playlist.currentPlaylistTableName)
 
       console.log('first blob should be ready');
       return retrySecondTrack();
     }).then(blobURL => {
       this.nextBlobURL = blobURL;
-      this.nextTrackId = playlist.getTrackId(this.nextTrackIndex)
+      this.nextTrackId = this.playerState.playlist.getTrackId(this.nextTrackIndex)
 
       document.getElementById('skip-button').disabled = false
       console.log('first two tracks of a playlist are initialized')
@@ -113,14 +118,14 @@ export class Player {
 
   async onTrackEnd() {
     // if playlist is changing, don't load next song of current playlist
-    const playlistChange = playerState.playlistShouldChange
+    const playlistChange = this.playerState.playlistShouldChange
     // reset this global value
-    playerState.playlistShouldChange = false
+    this.playerState.playlistShouldChange = false
 
     document.getElementById('skip-button').disabled = true
 
 
-    const currentTrackId = playlist.getTrackId(this.currentTrackIndex)
+    const currentTrackId = this.playerState.playlist.getTrackId(this.currentTrackIndex)
 
     console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
     console.log('currentTrackUrl', currentTrackId)
@@ -128,8 +133,8 @@ export class Player {
 
     // this object will be sent to server
     const data = {
-      baseId: playerState.baseId,
-      tableId: playlist.currentPlaylistTableId,
+      baseId: this.playerState.baseId,
+      tableId: this.playerState.playlist.currentPlaylistTableId,
       recordId: currentTrackId,
       currentIndex: this.currentTrackIndex,
       // first and second tracks of a playlist are without speed and time calculations, so use empty strings instead...
@@ -149,7 +154,7 @@ export class Player {
 
       if (newStatus === 'Dislike') {
         // delete track from current playlist locally
-        playlist.removeTrack(currentTrackId)
+        this.playerState.playlist.removeTrack(currentTrackId)
         trackWasDeleted = true
       }
 
@@ -160,8 +165,8 @@ export class Player {
     }
 
     const stats = data
-    stats.skipped = playerState.skipped
-    stats.playlistName = playlist.currentPlaylistTableName
+    stats.skipped = this.playerState.skipped
+    stats.playlistName = this.playerState.playlist.currentPlaylistTableName
     stats.timestamp = new Date().toLocaleString('ru-RU')
 
     setTimeout(() => {
@@ -170,13 +175,52 @@ export class Player {
     }, 3000)
 
     // reset skipped to initial value
-    playerState.skipped = false
+    this.playerState.skipped = false
 
     console.log('audioPlayer ended')
     // if track is ended due to playlist change, don't load next track
     if (!playlistChange) {
       await this.playAndLoadNextTrack({trackWasDeleted})
     }
+  }
+
+  onError(event, reason) {
+    // const currentTrackUrl = this.currentTrackUrl
+
+    // const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
+    // const currentTrackInitialData = this.allTracks.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
+    // debugger;
+    console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
+    // console.log('currentTrackUrl', currentTrackUrl)
+    // debugger
+    const currentTrackId = currentTrackInitialData.id
+    // Build the same stats payload you use on 'ended'
+
+    const data = {
+      baseId:          this.playerState.baseId,
+      tableId:         this.playerState.playlist.currentPlaylistTableId,
+      // recordId:        this.currentTrackId,       // same ID you use in 'ended'
+      recordId:        currentTrackId,       // same ID you use in 'ended'
+      currentIndex:    this.currentTrackIndex,
+      downloadingSpeed: '',                        // no new download here
+      downloadingTime:  ''
+    };
+
+    // Mirror your 'ended' logic
+    const stats = data;
+    stats.skipped      = skipped;                // if the user hit “skip”
+    stats.playlistName = this.currentPlaylistTableName;
+    stats.timestamp    = new Date().toLocaleString('ru-RU');
+    // stats.error        = true;                   // mark it as an error
+    stats.networkError = reason || event.message ||
+        (this.audioPlayer.error && `Code ${this.audioPlayer.error.code}`);
+
+    // Send with the same 3-second debounce to avoid rate-limits
+    setTimeout(() => {
+      sendSongStats(stats);
+    }, 2200);
+
+    console.warn('Audio playback error, stats sent:', stats);
   }
 
   async playAndLoadNextTrack({ trackWasDeleted }) {
@@ -208,10 +252,10 @@ export class Player {
       // const currentInterval = intervalManager.getCurrentInterval(this.currentDayPlaylist);
       // const currentIntervalData = intervalManager.getCurrentIntervalRelatedData(currentInterval)
 
-      const possiblyNewInterval = intervalManager.currentInterval
+      const possiblyNewInterval = this.playerState.playlist.intervalManager.currentInterval
       if (possiblyNewInterval.index === -1) {
         // switched to no interval time
-        playerState.playlistEnded = true
+        this.playerState.playlistEnded = true
 
         console.warn('playlist has ended')
         console.warn('if user presses play and there is a new interval already, a player should reinitialize')
@@ -223,14 +267,14 @@ export class Player {
       const retry = () => {
         console.log('retry track index:', this.nextTrackIndex)
 
-        if (intervalManager.currentInterval.index !== possiblyNewInterval.index) {
+        if (this.playerState.playlist.intervalManager.currentInterval.index !== possiblyNewInterval.index) {
           console.log('switched playlist interval')
           console.log('current active interval is', possiblyNewInterval.time)
 
-          playlist.setTracksFromCurrentInterval()
+          this.playerState.playlist.setTracksFromCurrentInterval()
 
           this.nextTrackIndex = 0; // Start from the first track in the new interval
-        } else if (this.nextTrackIndex >= playlist.tracks.length) {
+        } else if (this.nextTrackIndex >= this.playerState.playlist.tracks.length) {
           // If we're beyond the end of the current tracks, loop back to the start
           this.nextTrackIndex = 0;
         }
@@ -238,7 +282,7 @@ export class Player {
         const downloadingTimeStart = new Date().getTime()
         let downLoadingTimeEnd;
 
-        return loadTrack({ tracks: playlist.tracks, trackIndex: this.nextTrackIndex, returnOnlyBlob: true })
+        return loadTrack({ tracks: this.playerState.playlist.tracks, trackIndex: this.nextTrackIndex, returnOnlyBlob: true, player: this })
             .then((blob) => {
               // on success, calculate how much time it took to download this track
               downLoadingTimeEnd = new Date().getTime()
@@ -266,7 +310,7 @@ export class Player {
       retry()
         .then(blobURL => {
           this.nextBlobURL = blobURL;
-          this.nextTrackUrl = playlist.tracks[this.nextTrackIndex].url
+          this.nextTrackUrl = this.playerState.playlist.tracks[this.nextTrackIndex].url
 
           console.log('track loaded (with or without retry)')
           document.getElementById('skip-button').disabled = false

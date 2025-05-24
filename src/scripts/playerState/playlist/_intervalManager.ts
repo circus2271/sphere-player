@@ -1,4 +1,4 @@
-import { randomize } from '../utils/_helpers';
+import { randomize } from '../../utils/_helpers';
 
 type Track = {
     id: string,
@@ -12,7 +12,10 @@ type Interval = {
 
 class IntervalManager {
     #preparedIntervals = null
-    // selectedIntervalIndex = -1;
+
+    constructor(playlist) {
+        this.playlist = playlist
+    }
 
     hasCurrentInterval() {
         return !!this.currentInterval
@@ -71,8 +74,7 @@ class IntervalManager {
     // returns array of objects
     // for example: [{time: '8-12', tracks: [{id: 'fdf', url: 'https://example.com'}]}]
     get #intervals(): Interval[] {
-    // get #intervals(): Array<Interval> {
-        const { currentPlaylistInitialData: initialPlaylistData } = playlist
+        const { currentPlaylistInitialData: initialPlaylistData } = this.playlist
         // THIS function works (getting as an argument) the whole playlist with all the days intervals
         // IT RETURNS the array with intervals for a particular day. The result of interval sets is time-sorted
 
@@ -124,4 +126,6 @@ class IntervalManager {
     }
 }
 
-export const intervalManager = new IntervalManager()
+// export const intervalManager = new IntervalManager()
+// export const intervalManager = new IntervalManager()
+export default IntervalManager

@@ -8,8 +8,6 @@ import { credentials } from './_credentials';
 
 export const pageLanguage = document.body.classList.contains('ru') ? 'ru' : 'en'
 
-// export const REINITIALIZE_APP_EVENT = new CustomEvent('reinitialize-app')
-// export const REINITIALIZE_APP_EVENT = new CustomEvent('reinitialize-app')
 export const REINITIALIZE_APP_EVENT = 'reinitialize-app'
 
 export const setPlayerTitle = title => {
