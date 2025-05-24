@@ -34,12 +34,20 @@ class Playlist {
         this.currentPlaylistTableId = newPlaylist.tableId
         this.currentPlaylistTableName = newPlaylist.playlistName
         // this.currentPlaylistInitialData = await fetchPlaylist(playerState.baseId, this.currentPlaylistTableId)
-        this.currentPlaylistInitialData = await fetchPlaylist(baseId, this.currentPlaylistTableId)
+        this.currentPlaylistInitialData = await fetchPlaylist(this.playerState.baseId, this.currentPlaylistTableId)
 
         this.intervalManager.prepareIntervals()
         this.tracks = this.intervalManager.currentInterval.tracks
 
-        this.playerState.allTracks.push(...this.tracks)
+
+        // this.tracks.forEach(track => {
+        //     this.player.allTracks[track.id] = track.url
+        // })
+        this.tracks.forEach(track => {
+            this.playerState.allTracks[track.id] = track.url
+        })
+
+        // this.playerState.allTracks.push(...this.tracks)
     }
 
     getTrackById(id) {
@@ -52,8 +60,8 @@ class Playlist {
     }
 
     getTrackId(index) {
-        // const track = this.tracks.find((track, i) => i === index)
-        const track = this.pla.allTracks.find((track, i) => i === index)
+        const track = this.tracks.find((track, i) => i === index)
+        // const track = this.playerState.allTracks.find((track, i) => i === index)
 
         return track ? track.id : null
     }

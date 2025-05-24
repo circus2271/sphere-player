@@ -1,8 +1,6 @@
 import { sendLikeDislike, sendSongStats, setPlayerTitle } from './utils/_helpers';
 import { initializePlayerHTMLControls } from './_controls';
 import { loadTrack } from './utils/_loadTrack';
-// import { playerState } from './playerState/PlayerState';
-// import { playerState } from './playerState/PlayerState';
 import PlayerState from './playerState/PlayerState';
 import { likeDislikeService } from './utils/_likeDislikeService';
 
@@ -26,11 +24,6 @@ export class Player {
     if (!this.audioPlayer) {
       throw Error('Error: audioPlayer html element must be set for player to initialize')
     }
-
-    // this.playerState = new PlayerState()
-    // this.playerState = playerState
-
-
   }
 
   async initializePlayer(availablePlaylists, baseId) {
@@ -69,7 +62,6 @@ export class Player {
     // reset
     this.currentTrackIndex = 0;
     this.nextTrackIndex = 1;
-    // const play = playlist
 // debugger
     const retryFirstTrack = () => {
       // debugger
@@ -94,6 +86,7 @@ export class Player {
     .then(blobURL => {
       this.currentBlobURL = blobURL;
       // this.currentTrackId = playlist.getTrackId(this.currentTrackIndex) // should be defined
+      // this.currentTrackId = this.playerState.playlist.getTrackId(this.currentTrackIndex) // should be defined
       this.currentTrackId = this.playerState.playlist.getTrackId(this.currentTrackIndex) // should be defined
 
       this.audioPlayer.src = this.currentBlobURL;
@@ -126,7 +119,8 @@ export class Player {
     document.getElementById('skip-button').disabled = true
 
 
-    const currentTrackId = this.playerState.playlist.getTrackId(this.currentTrackIndex)
+    // const currentTrackId = this.playerState.playlist.getTrackId(this.currentTrackIndex)
+    const currentTrackId = this.currentTrackId
 
     console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
     console.log('currentTrackUrl', currentTrackId)
@@ -226,7 +220,8 @@ export class Player {
 
   async playAndLoadNextTrack({ trackWasDeleted }) {
 
-    console.log('tracks[currentTrackIndex] and encodedURL is ' + playlist.getTrackByIndex(this.currentTrackIndex).url)
+    // console.log('tracks[currentTrackIndex] and encodedURL is ' + playlist.getTrackByIndex(this.currentTrackIndex).url)
+    console.log('tracks[currentTrackIndex] and encodedURL is ' + this.playerState.allTracks[this.currentTrackId].url)
 
     // If there is a next track
     if (this.nextBlobURL) {

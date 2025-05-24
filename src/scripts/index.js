@@ -96,6 +96,7 @@ const initialize = async () => {
   // handlePlayer(availablePlaylists, baseId)
   // const player = new Player()
   const player = new Player()
+
   await player.initializePlayer(availablePlaylists, baseId);
 
 
@@ -114,6 +115,7 @@ const initialize = async () => {
 
     setPlayerTitle('the player is attempting to update..')
     await initialize()
-    playerState.playlistEnded = false // as it is reinitialized
+    // it's not needed
+    // playerState.playlistEnded = false // as it is reinitialized
   })
 })()

@@ -15,8 +15,12 @@ class PlayerState {
     // playlist = playlist
     playlist = null
     // intervalManager = intervalManager
-    intervalManager = new IntervalManager()
-    allTracks = []
+    // intervalManager = new IntervalManager()
+    // allTracks = []
+    // allTracks: {[index: string]: string} = {}
+    // allTracks: {[id: string]: string} = {}
+    allTracks = {}
+
 
     // constructor(playlist, intervalManager) {
     constructor() {
