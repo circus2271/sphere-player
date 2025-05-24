@@ -59,6 +59,7 @@ export class Player {
     // it's made to avoid complexity when reinitializing a player
     // so it's not needed to manually unsubscribe from addEventListener (it's not needed to call removeEventListener)
     this.audioPlayer.onended = async () => this.onTrackEnd()
+    this.audioPlayer.onerror = () => this.onError();
   }
 
   async initializeFirstTwoTracksOfAPlaylist({ firstTrackLoaded }) {
@@ -209,7 +210,7 @@ export class Player {
     // Mirror your 'ended' logic
     const stats = data;
     stats.skipped      = skipped;                // if the user hit “skip”
-    stats.playlistName = this.currentPlaylistTableName;
+    stats.playlistName = this.playerState.playlist.currentPlaylistTableName;
     stats.timestamp    = new Date().toLocaleString('ru-RU');
     // stats.error        = true;                   // mark it as an error
     stats.networkError = reason || event.message ||

@@ -74,6 +74,27 @@ export const loadTrack = ({ tracks, trackIndex, returnOnlyBlob, player }) => {
 
             // specify blob type to hopefully avoid safari bug
             const arrayBuffer = await response.arrayBuffer();
+
+            const declaredFileSize = response.headers.get('content-length')
+
+            /// ...
+            if (arrayBuffer.byteLength !== +declaredFileSize) {
+                throw new Error('chatgpt says that may leed to an error')
+            }
+
+            /// ....
+            try {
+                const audioContext = new AudioContext();
+                await audioContext.decodeAudioData(arrayBuffer.slice(0), () => {}, err => { throw err; });
+            } catch(error) {
+                const errorMessage = 'error while blob decoding'
+                // this.onError(null, errorMessage)
+                this.player.onError(null, errorMessage)
+
+                throw new Error(errorMessage)
+            }
+
+
             const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
 
             return blob
