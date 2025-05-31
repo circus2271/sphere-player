@@ -1,8 +1,4 @@
-import {intervalManager} from "./playlist/_intervalManager";
-import IntervalManager from "./playlist/_intervalManager";
-// import {playlist} from "./playlist/_playlist";
-
-import Playlist from "./playlist/Playlist";
+import Playlist from './playlist/Playlist';
 
 class PlayerState {
     playlistShouldChange = false

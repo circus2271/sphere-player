@@ -3,13 +3,7 @@ import { initializePlayerHTMLControls } from './_controls';
 import { loadTrack } from './utils/_loadTrack';
 import PlayerState from './playerState/PlayerState';
 import { likeDislikeService } from './utils/_likeDislikeService';
-import playerState from "./playerState/PlayerState";
 
-
-// ...
-// let nextTrackBlobSize = null
-// let nextTrackDownloadSpeed = null
-// let nextTrackDownloadTime = null
 
 export class Player {
   currentTrackIndex = 0;
@@ -159,15 +153,10 @@ export class Player {
   }
 
   onError(event, reason) {
-    // const currentTrackUrl = this.currentTrackUrl
-
-    // const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
-    // const currentTrackInitialData = this.allTracks.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
-    // debugger;
     console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
-    // console.log('currentTrackUrl', currentTrackUrl)
-    // debugger
-    const currentTrackId = currentTrackInitialData.id
+
+    // const currentTrackId = currentTrackInitialData.id
+    const currentTrackId = this.currentTrackId
     // Build the same stats payload you use on 'ended'
 
     const data = {

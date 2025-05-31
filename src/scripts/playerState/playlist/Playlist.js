@@ -1,8 +1,5 @@
-import {fetchPlaylist, isObject, setPlayerTitle, updateHostingStats} from '../../utils/_helpers';
-// import { intervalManager } from './_intervalManager';
+import { fetchPlaylist, isObject, setPlayerTitle } from '../../utils/_helpers';
 import IntervalManager from './_intervalManager';
-import PlayerState from "../PlayerState";
-// import { playerState } from './_playerState';
 
 class Playlist {
     currentPlaylistInitialData = null
@@ -10,11 +7,9 @@ class Playlist {
     currentPlaylistTableName = null;
     tracks = []
     isDomainReplaced = false
-    // playerState = new PlayerState()
     #allTracks = null; // this value is deferred from player
 
     constructor({allTracks, baseId}) {
-        // this.intervalManager = new IntervalManager({currentPlaylistInitialData: this.currentPlaylistInitialData})
 
         this.#allTracks = allTracks
         // this.#allTracks = []
@@ -42,7 +37,6 @@ class Playlist {
 
         this.currentPlaylistTableId = newPlaylist.tableId
         this.currentPlaylistTableName = newPlaylist.playlistName
-        // this.currentPlaylistInitialData = await fetchPlaylist(playerState.baseId, this.currentPlaylistTableId)
         this.currentPlaylistInitialData = await fetchPlaylist(this.baseId, this.currentPlaylistTableId)
         // debugger
 
@@ -52,9 +46,6 @@ class Playlist {
         this.tracks = this.intervalManager.currentInterval.tracks
 
 
-        // this.tracks.forEach(track => {
-        //     this.player.allTracks[track.id] = track.url
-        // })
         this.tracks.forEach(track => {
             this.#allTracks[track.id] = track.url
         })
