@@ -1,14 +1,15 @@
-import { sendLikeDislike, sendSongStats, setPlayerTitle } from './utils/_helpers';
+import {collectData, sendLikeDislike, sendSongStats, setPlayerTitle} from './utils/_helpers';
 import { initializePlayerHTMLControls } from './_controls';
 import { loadTrack } from './utils/_loadTrack';
 import PlayerState from './playerState/PlayerState';
 import { likeDislikeService } from './utils/_likeDislikeService';
+import playerState from "./playerState/PlayerState";
 
 
 // ...
 // let nextTrackBlobSize = null
-let nextTrackDownloadSpeed = null
-let nextTrackDownloadTime = null
+// let nextTrackDownloadSpeed = null
+// let nextTrackDownloadTime = null
 
 export class Player {
   currentTrackIndex = 0;
@@ -18,6 +19,9 @@ export class Player {
   nextBlobURL = null;
   currentBlobURL = null;
   audioPlayer = document.getElementById('audioPlayer');
+  nextTrackDownloadSpeed = null
+  nextTrackDownloadTime = null
+
 
   constructor() {
     if (!this.audioPlayer) {
@@ -49,7 +53,7 @@ export class Player {
     // this.audioPlayer.addEventListener('ended', async () => this.onTrackEnd())
     // it's made to avoid complexity when reinitializing a player
     // so it's not needed to manually unsubscribe from addEventListener (it's not needed to call removeEventListener)
-    this.audioPlayer.onended = async (e) => this.onTrackEnd()
+    this.audioPlayer.onended = async (e) => this.onTrackEnd(e.detail)
     this.audioPlayer.onerror = () => this.onError();
   }
 
@@ -105,35 +109,19 @@ export class Player {
     });
   }
 
-  async onTrackEnd() {
-    // if playlist is changing, don't load next song of current playlist
-    const playlistChange = this.playerState.playlistShouldChange
-    // reset this global value
-    this.playerState.playlistShouldChange = false
+  async onTrackEnd({skipped, playlistShouldChange, data}) {
 
     document.getElementById('skip-button').disabled = true
 
 
-    const currentTrackId = this.currentTrackId
-
-    console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
-    console.log('currentTrackUrl', currentTrackId)
-
-
-    // this object will be sent to server
-    const data = {
-      baseId: this.playerState.baseId,
-      tableId: this.playerState.playlist.currentPlaylistTableId,
-      recordId: currentTrackId,
-      currentIndex: this.currentTrackIndex,
-      // first and second tracks of a playlist are without speed and time calculations, so use empty strings instead...
-      downloadingSpeed: nextTrackDownloadSpeed ? nextTrackDownloadSpeed.toFixed(1) : '',
-      downloadingTime: nextTrackDownloadTime ? nextTrackDownloadTime.toFixed(1) : ''
+    if (!data) {
+      data = collectData(this)
     }
-// debugger
-    // reset this global variable
-    nextTrackDownloadSpeed = null
-    nextTrackDownloadTime = null
+
+
+
+    this.nextTrackDownloadSpeed = null
+    this.nextTrackDownloadTime = null
 
     let trackWasDeleted;
     if (likeDislikeService.likeDislikeStatus.scheduled) {
@@ -143,7 +131,7 @@ export class Player {
 
       if (newStatus === 'Dislike') {
         // delete track from current playlist locally
-        this.playerState.playlist.removeTrack(currentTrackId)
+        this.playerState.playlist.removeTrack(data.currentTrackId)
         trackWasDeleted = true
       }
 
@@ -154,7 +142,7 @@ export class Player {
     }
 
     const stats = data
-    stats.skipped = this.playerState.skipped
+    stats.skipped = skipped
     stats.playlistName = this.playerState.playlist.currentPlaylistTableName
     stats.timestamp = new Date().toLocaleString('ru-RU')
 
@@ -163,12 +151,9 @@ export class Player {
       // wait 3 seconds for hopefully pass airtable 5-requeste-at-once limit
     }, 3000)
 
-    // reset skipped to initial value
-    this.playerState.skipped = false
-
     console.log('audioPlayer ended')
     // if track is ended due to playlist change, don't load next track
-    if (!playlistChange) {
+    if (!playlistShouldChange) {
       await this.playAndLoadNextTrack({trackWasDeleted})
     }
   }
@@ -197,10 +182,8 @@ export class Player {
 
     // Mirror your 'ended' logic
     const stats = data;
-    stats.skipped      = skipped;                // if the user hit “skip”
     stats.playlistName = this.playerState.playlist.currentPlaylistTableName;
     stats.timestamp    = new Date().toLocaleString('ru-RU');
-    // stats.error        = true;                   // mark it as an error
     stats.networkError = reason || event.message ||
         (this.audioPlayer.error && `Code ${this.audioPlayer.error.code}`);
 
@@ -214,6 +197,8 @@ export class Player {
 
   async playAndLoadNextTrack({ trackWasDeleted }) {
 
+    // const p = this.playerState
+    // debugger
     // console.log('tracks[currentTrackIndex] and encodedURL is ' + playlist.getTrackByIndex(this.currentTrackIndex).url)
     console.log('tracks[currentTrackIndex] and encodedURL is ' + this.playerState.allTracks[this.currentTrackId].url)
 
@@ -280,8 +265,8 @@ export class Player {
 
               if (blob.size > 0) {
                 const blobSizeMb = blob.size / 1024 / 1024
-                nextTrackDownloadTime = downloadTimeInSeconds
-                nextTrackDownloadSpeed = blobSizeMb/downloadTimeInSeconds
+                this.nextTrackDownloadTime = downloadTimeInSeconds
+                this.nextTrackDownloadSpeed = blobSizeMb/downloadTimeInSeconds
 
                 console.log('Successfully fetched and have content in blob.');
                 return URL.createObjectURL(blob);

@@ -1,5 +1,5 @@
 import { likeDislikeService } from './utils/_likeDislikeService';
-import { REINITIALIZE_APP_EVENT } from './utils/_helpers';
+import {collectData, REINITIALIZE_APP_EVENT} from './utils/_helpers';
 
 
 const playButton = document.getElementById('play-button');
@@ -33,18 +33,19 @@ export const initializePlayerHTMLControls = (playerInstance) => {
     clearInterval(intervalId)
     intervalId = null;
 
+
+
+
     // player 'play' settings and event handlers
 
     // skipButton.addEventListener('click', () => {
     skipButton.onclick = () => {
-        // ставим флаг skipped в значение true
-        // playerInstance.playerState.skipped = true
 
         // здесь должна происходить перемотка трэка в конец,
         // чтобы потом автоматически сработала функция в onend у плеера,
         // там и отправляем всю статистику и данные
         // после отправки данных, возвращаем флаг в значение false (это уже в самом onend обработчике)
-        audioPlayer.dispatchEvent(new Event('ended'))
+        audioPlayer.dispatchEvent(new CustomEvent('ended', {detail: {skipped: true, data: collectData(playerInstance)}}))
     }
     // playButton.addEventListener('click', togglePlayPause);
 
@@ -141,52 +142,26 @@ export const initializePlayerHTMLControls = (playerInstance) => {
             playlistButton.classList.add('playlist--selected')
 
             const newPlaylistName = playlistButton.dataset.playlistName
-            const newPlaylist = playerInstance.playerState.availablePlaylists.find(playlist => playlist.playlistName === newPlaylistName)
+            const availablePlaylists = playerInstance.playerState.availablePlaylists
+            const newPlaylist = availablePlaylists.find(playlist => playlist.playlistName === newPlaylistName)
             const baseId = playerInstance.playerState.baseId
 
             fadeOutPlayingState()
             // disable all buttons until first track is ready
             disableAllButtons()
 
-            // end current track, so statistics and 'like'/'dislike' could be sent
-            playerInstance.playerState.skipped = true
-            playerInstance.playerState.playlistShouldChange = true
-            // audioPlayer.dispatchEvent(new Event('ended'))
-            // const eventDetail = {
-                // skipped: true,
-                // playlistShouldChange: true
-            // }
-            audioPlayer.dispatchEvent(new CustomEvent('ended', {detail: {skipped: true, playlistShouldChange: true}}))
+            audioPlayer.dispatchEvent(new CustomEvent('ended', {detail: {skipped: true, playlistShouldChange: true, data: collectData(playerInstance)}}))
 
 
             await playerInstance.initializePlayer(
-                playerInstance.playerState.availablePlaylists,
-                playerInstance.playerState.baseId,
+                availablePlaylists,
+                baseId,
                 newPlaylist
             )
-            // await playerInstance.playerState.playlist.setPlaylistData({ newPlaylist })
-            // await playerInstance.playerState.playlist.setPlaylistData({ newPlaylist })
-            // cancel loadt rack repeating if playlist has changed
-            // resetRepeatId()
-            // new playlist is set
-            // make sure data is updated
-
-            // try {
-            //     // await player.initializeFirstTwoTracksOfAPlaylist({
-            //     await playerInstance.initializeFirstTwoTracksOfAPlaylist({
-            //         firstTrackLoaded: () => {
-            //             enableAllButtons({exception: 'skip-button'})
-            //         }
-            //     })
-            // } catch (error) {
-            //     console.error(error)
-            //     console.error(`playlist error: can't load first two tracks of a new playlist`)
-            // }
         }
     }
 
     const form = document.querySelector('#like-dislike-form')
-    // form.addEventListener('submit', e => {
     form.onsubmit = e => {
         e.preventDefault()
 

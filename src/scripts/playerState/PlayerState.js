@@ -5,7 +5,6 @@ import IntervalManager from "./playlist/_intervalManager";
 import Playlist from "./playlist/Playlist";
 
 class PlayerState {
-    skipped = false
     playlistShouldChange = false
     globalRepeatId = null
     playlistEnded = false

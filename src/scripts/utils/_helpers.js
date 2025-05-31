@@ -14,6 +14,20 @@ export const setPlayerTitle = title => {
   document.querySelector('#current-playlist').innerHTML = title
 }
 
+export const collectData = (playerInstance) => {
+  const data = {
+    baseId: playerInstance.playerState.baseId,
+    tableId: playerInstance.playerState.playlist.currentPlaylistTableId,
+    recordId: playerInstance.currentTrackId,
+    currentIndex: playerInstance.currentTrackIndex,
+    // first and second tracks of a playlist are without speed and time calculations, so use empty strings instead...
+    downloadingSpeed: playerInstance.nextTrackDownloadSpeed ? playerInstance.nextTrackDownloadSpeed.toFixed(1) : '',
+    downloadingTime: playerInstance.nextTrackDownloadTime ? playerInstance.nextTrackDownloadTime.toFixed(1) : '',
+  }
+
+  return data
+}
+
 // https://stackoverflow.com/a/8511350/9675926
 export const isObject = (x) => typeof x === 'object' && !Array.isArray(x) && x !== null
 
