@@ -38,7 +38,7 @@ export const initializePlayerHTMLControls = (playerInstance) => {
     // skipButton.addEventListener('click', () => {
     skipButton.onclick = () => {
         // ставим флаг skipped в значение true
-        playerInstance.playerState.skipped = true
+        // playerInstance.playerState.skipped = true
 
         // здесь должна происходить перемотка трэка в конец,
         // чтобы потом автоматически сработала функция в onend у плеера,
@@ -53,8 +53,8 @@ export const initializePlayerHTMLControls = (playerInstance) => {
     playButton.onclick =  () => {
         // togglePlayPause()
 
-
-        const hasCurrentInterval = playerInstance.playerState.intervalManager.hasCurrentInterval()
+        // debugger
+        const hasCurrentInterval = playerInstance.playerState.playlist.intervalManager.hasCurrentInterval()
         // const paused = audioPlayer.paused || audioPlayer.ended
         // const playing = !paused
         const shouldStart = audioPlayer.paused || audioPlayer.ended
@@ -142,6 +142,7 @@ export const initializePlayerHTMLControls = (playerInstance) => {
 
             const newPlaylistName = playlistButton.dataset.playlistName
             const newPlaylist = playerInstance.playerState.availablePlaylists.find(playlist => playlist.playlistName === newPlaylistName)
+            const baseId = playerInstance.playerState.baseId
 
             fadeOutPlayingState()
             // disable all buttons until first track is ready
@@ -150,26 +151,37 @@ export const initializePlayerHTMLControls = (playerInstance) => {
             // end current track, so statistics and 'like'/'dislike' could be sent
             playerInstance.playerState.skipped = true
             playerInstance.playerState.playlistShouldChange = true
-            audioPlayer.dispatchEvent(new Event('ended'))
+            // audioPlayer.dispatchEvent(new Event('ended'))
+            // const eventDetail = {
+                // skipped: true,
+                // playlistShouldChange: true
+            // }
+            audioPlayer.dispatchEvent(new CustomEvent('ended', {detail: {skipped: true, playlistShouldChange: true}}))
 
 
-            await playlist.setPlaylistData({ newPlaylist })
-            // cancel loadtrack repeating if playlist has changed
+            await playerInstance.initializePlayer(
+                playerInstance.playerState.availablePlaylists,
+                playerInstance.playerState.baseId,
+                newPlaylist
+            )
+            // await playerInstance.playerState.playlist.setPlaylistData({ newPlaylist })
+            // await playerInstance.playerState.playlist.setPlaylistData({ newPlaylist })
+            // cancel loadt rack repeating if playlist has changed
             // resetRepeatId()
             // new playlist is set
             // make sure data is updated
 
-            try {
-                // await player.initializeFirstTwoTracksOfAPlaylist({
-                await playerInstance.initializeFirstTwoTracksOfAPlaylist({
-                    firstTrackLoaded: () => {
-                        enableAllButtons({exception: 'skip-button'})
-                    }
-                })
-            } catch (error) {
-                console.error(error)
-                console.error(`playlist error: can't load first two tracks of a new playlist`)
-            }
+            // try {
+            //     // await player.initializeFirstTwoTracksOfAPlaylist({
+            //     await playerInstance.initializeFirstTwoTracksOfAPlaylist({
+            //         firstTrackLoaded: () => {
+            //             enableAllButtons({exception: 'skip-button'})
+            //         }
+            //     })
+            // } catch (error) {
+            //     console.error(error)
+            //     console.error(`playlist error: can't load first two tracks of a new playlist`)
+            // }
         }
     }
 

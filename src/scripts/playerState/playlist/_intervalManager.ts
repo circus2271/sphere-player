@@ -13,12 +13,77 @@ type Interval = {
 class IntervalManager {
     #preparedIntervals = null
 
-    constructor(playlist) {
-        this.playlist = playlist
+    // store it as a class property
+    // constructor(public currentPlaylistInitialData: any) {}
+    constructor(public initialPlaylistData: any) {
+        // const p = this.initialPlaylistData
+        //
+        // debugger
     }
 
     hasCurrentInterval() {
         return !!this.currentInterval
+    }
+
+
+
+    prepareIntervals() {
+        this.#preparedIntervals = this.#intervals
+    }
+
+
+    // returns array of objects
+    // for example: [{time: '8-12', tracks: [{id: 'fdf', url: 'https://example.com'}]}]
+    get #intervals(): Interval[] {
+        // const { currentPlaylistInitialData: initialPlaylistData } = this.playlist
+        // THIS function works (getting as an argument) the whole playlist with all the days intervals
+        // IT RETURNS the array with intervals for a particular day. The result of interval sets is time-sorted
+
+        // Get the current day
+        const currentDate = new Date();
+        const currentDay = currentDate.toLocaleString('en-US', { weekday: 'long' });
+
+        // Define an object to store intervals and their respective songs
+        const songIntervals = {};
+        // debugger
+        this.initialPlaylistData.forEach(song => {
+            // Check if the song has an interval for the current day
+            const interval = song.fields[currentDay];
+            if (interval) {
+                // Check if we already have this interval in the songIntervals object
+                if (!songIntervals[interval]) {
+                    songIntervals[interval] = [];
+                }
+                // Add the song's signedUrl to the interval array
+                // songIntervals[interval].push(song.signedUrl);
+                const songUrl = song.fields['Full link']
+                const songId = song.id
+
+                songIntervals[interval].push({url: songUrl, id: songId});
+            }
+        });
+
+        const keys = Object.keys(songIntervals)
+        const sortedKeys = [...keys].sort((a, b) => {
+            const [startA, endA] = a.split('-').map(Number);
+            const [startB, endB] = b.split('-').map(Number);
+
+            // Handle cases where interval wraps around midnight
+            if (startA > endA && (startB <= endB || startA < startB)) return 1;
+            if (startB > endB && (startA <= endA || startB < startA)) return -1;
+
+            return startA - startB;
+        });
+
+
+        const intervals = sortedKeys.map((time, index) => ({
+            time,
+            // encodedURLs: randomize(songIntervals[time])
+            tracks: randomize(songIntervals[time]),
+            index
+        }))
+
+        return intervals
     }
 
     // an object with a structure like follows:
@@ -59,10 +124,6 @@ class IntervalManager {
     }
 
 
-    prepareIntervals() {
-        this.#preparedIntervals = this.#intervals
-    }
-
     changeTracksDomain(callback) {
         this.#preparedIntervals.forEach(interval => {
             interval.tracks.forEach(track => {
@@ -71,59 +132,6 @@ class IntervalManager {
         })
     }
 
-    // returns array of objects
-    // for example: [{time: '8-12', tracks: [{id: 'fdf', url: 'https://example.com'}]}]
-    get #intervals(): Interval[] {
-        const { currentPlaylistInitialData: initialPlaylistData } = this.playlist
-        // THIS function works (getting as an argument) the whole playlist with all the days intervals
-        // IT RETURNS the array with intervals for a particular day. The result of interval sets is time-sorted
-
-        // Get the current day
-        const currentDate = new Date();
-        const currentDay = currentDate.toLocaleString('en-US', { weekday: 'long' });
-
-        // Define an object to store intervals and their respective songs
-        const songIntervals = {};
-
-        initialPlaylistData.forEach(song => {
-            // Check if the song has an interval for the current day
-            const interval = song.fields[currentDay];
-            if (interval) {
-                // Check if we already have this interval in the songIntervals object
-                if (!songIntervals[interval]) {
-                    songIntervals[interval] = [];
-                }
-                // Add the song's signedUrl to the interval array
-                // songIntervals[interval].push(song.signedUrl);
-                const songUrl = song.fields['Full link']
-                const songId = song.id
-
-                songIntervals[interval].push({url: songUrl, id: songId});
-            }
-        });
-
-        const keys = Object.keys(songIntervals)
-        const sortedKeys = [...keys].sort((a, b) => {
-            const [startA, endA] = a.split('-').map(Number);
-            const [startB, endB] = b.split('-').map(Number);
-
-            // Handle cases where interval wraps around midnight
-            if (startA > endA && (startB <= endB || startA < startB)) return 1;
-            if (startB > endB && (startA <= endA || startB < startA)) return -1;
-
-            return startA - startB;
-        });
-
-
-        const intervals = sortedKeys.map((time, index) => ({
-            time,
-            // encodedURLs: randomize(songIntervals[time])
-            tracks: randomize(songIntervals[time]),
-            index
-        }))
-
-        return intervals
-    }
 }
 
 // export const intervalManager = new IntervalManager()

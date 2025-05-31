@@ -14,6 +14,9 @@ export const setPlayerTitle = title => {
   document.querySelector('#current-playlist').innerHTML = title
 }
 
+// https://stackoverflow.com/a/8511350/9675926
+export const isObject = (x) => typeof x === 'object' && !Array.isArray(x) && x !== null
+
 // https://www.freecodecamp.org/news/javascript-debounce-example/
 export function debounce(func, timeout) {
   let timer

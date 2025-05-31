@@ -18,7 +18,6 @@ export class Player {
   nextBlobURL = null;
   currentBlobURL = null;
   audioPlayer = document.getElementById('audioPlayer');
-  playerState = new PlayerState()
 
   constructor() {
     if (!this.audioPlayer) {
@@ -26,14 +25,13 @@ export class Player {
     }
   }
 
-  async initializePlayer(availablePlaylists, baseId) {
-    this.playerState.availablePlaylists = availablePlaylists
-    this.playerState.baseId = baseId
+  async initializePlayer(availablePlaylists, baseId, playlist = null) {
+    this.playerState = new PlayerState({availablePlaylists, baseId})
 
     // Запрашиваем первый плейлист
     const firstPlaylist = availablePlaylists[0]
     // обновляем все данные о плейлисте
-    await this.playerState.playlist.setPlaylistData({ newPlaylist: firstPlaylist })
+    await this.playerState.playlist.setPlaylistData({ newPlaylist: playlist || firstPlaylist })
 
 
     try {
@@ -51,12 +49,11 @@ export class Player {
     // this.audioPlayer.addEventListener('ended', async () => this.onTrackEnd())
     // it's made to avoid complexity when reinitializing a player
     // so it's not needed to manually unsubscribe from addEventListener (it's not needed to call removeEventListener)
-    this.audioPlayer.onended = async () => this.onTrackEnd()
+    this.audioPlayer.onended = async (e) => this.onTrackEnd()
     this.audioPlayer.onerror = () => this.onError();
   }
 
   async initializeFirstTwoTracksOfAPlaylist({ firstTrackLoaded }) {
-    // document.querySelector('#current-playlist').innerHTML =
     setPlayerTitle('loading first track...')
 
     // reset
@@ -85,8 +82,6 @@ export class Player {
     retryFirstTrack()
     .then(blobURL => {
       this.currentBlobURL = blobURL;
-      // this.currentTrackId = playlist.getTrackId(this.currentTrackIndex) // should be defined
-      // this.currentTrackId = this.playerState.playlist.getTrackId(this.currentTrackIndex) // should be defined
       this.currentTrackId = this.playerState.playlist.getTrackId(this.currentTrackIndex) // should be defined
 
       this.audioPlayer.src = this.currentBlobURL;
@@ -119,7 +114,6 @@ export class Player {
     document.getElementById('skip-button').disabled = true
 
 
-    // const currentTrackId = this.playerState.playlist.getTrackId(this.currentTrackIndex)
     const currentTrackId = this.currentTrackId
 
     console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)

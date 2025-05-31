@@ -1,4 +1,4 @@
-import { fetchPlaylist, setPlayerTitle, updateHostingStats } from '../../utils/_helpers';
+import {fetchPlaylist, isObject, setPlayerTitle, updateHostingStats} from '../../utils/_helpers';
 // import { intervalManager } from './_intervalManager';
 import IntervalManager from './_intervalManager';
 import PlayerState from "../PlayerState";
@@ -11,15 +11,24 @@ class Playlist {
     tracks = []
     isDomainReplaced = false
     // playerState = new PlayerState()
-    intervalManager = new IntervalManager(this)
+    #allTracks = null; // this value is deferred from player
 
+    constructor({allTracks, baseId}) {
+        // this.intervalManager = new IntervalManager({currentPlaylistInitialData: this.currentPlaylistInitialData})
 
-    constructor(playerState) {
-        this.playerState = playerState // backfard ref
+        this.#allTracks = allTracks
+        // this.#allTracks = []
+        this.baseId = baseId
+
+        if (!this.baseId) {
+            throw new Error('baseId should be provided')
+        }
+
+        if (!isObject(this.#allTracks)) {
+            throw new Error('this.#allTracks should be an object')
+        }
     }
-    // constructor(playerState) {
-    //     this.playerState = playerState // backfard ref
-    // }
+
 
     setTracksFromCurrentInterval() {
         this.tracks = this.intervalManager.currentInterval.tracks
@@ -34,9 +43,12 @@ class Playlist {
         this.currentPlaylistTableId = newPlaylist.tableId
         this.currentPlaylistTableName = newPlaylist.playlistName
         // this.currentPlaylistInitialData = await fetchPlaylist(playerState.baseId, this.currentPlaylistTableId)
-        this.currentPlaylistInitialData = await fetchPlaylist(this.playerState.baseId, this.currentPlaylistTableId)
+        this.currentPlaylistInitialData = await fetchPlaylist(this.baseId, this.currentPlaylistTableId)
+        // debugger
 
+        this.intervalManager = new IntervalManager(this.currentPlaylistInitialData)
         this.intervalManager.prepareIntervals()
+
         this.tracks = this.intervalManager.currentInterval.tracks
 
 
@@ -44,7 +56,7 @@ class Playlist {
         //     this.player.allTracks[track.id] = track.url
         // })
         this.tracks.forEach(track => {
-            this.playerState.allTracks[track.id] = track.url
+            this.#allTracks[track.id] = track.url
         })
 
         // this.playerState.allTracks.push(...this.tracks)
@@ -100,11 +112,5 @@ class Playlist {
     }
 }
 
-// export const playlist = new Playlist()
-
-// export Playlist
-
-// module.exports = {Playlist}
 
 export default Playlist
-// module.exports = {Playlist}

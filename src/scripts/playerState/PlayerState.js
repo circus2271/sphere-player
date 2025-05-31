@@ -9,24 +9,16 @@ class PlayerState {
     playlistShouldChange = false
     globalRepeatId = null
     playlistEnded = false
-    // currentInterval = null
     baseId = null;
     availablePlaylists = null;
-    // playlist = playlist
     playlist = null
-    // intervalManager = intervalManager
-    // intervalManager = new IntervalManager()
-    // allTracks = []
-    // allTracks: {[index: string]: string} = {}
-    // allTracks: {[id: string]: string} = {}
     allTracks = {}
 
 
-    // constructor(playlist, intervalManager) {
-    constructor() {
-        this.playlist = new Playlist(this)
-
-
+    constructor({availablePlaylists, baseId}) {
+        this.availablePlaylists = availablePlaylists
+        this.baseId = baseId
+        this.playlist = new Playlist({allTracks: this.allTracks, baseId: this.baseId})
     }
 
     resetRepeatId() {
