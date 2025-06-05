@@ -12,9 +12,9 @@
   },
   "browserslist": "> 0.5%, last 2 versions, not dead, iOS 13",
   "devDependencies": {
-    "@parcel/transformer-sass": "^2.9.3",
+    "@parcel/transformer-sass": "^2.15.2",
     "live-server": "^1.2.2",
-    "parcel": "^2.9.3",
+    "parcel": "^2.15.2",
     "rimraf": "^5.0.1",
     "vercel": "^37.12.1"
   },
