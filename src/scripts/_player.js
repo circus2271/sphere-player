@@ -103,7 +103,7 @@ export class Player {
     });
   }
 
-  async onTrackEnd({skipped, playlistShouldChange, data}) {
+  async onTrackEnd({skipped, playlistShouldChange, data} = {}) {
 
     document.getElementById('skip-button').disabled = true
 
