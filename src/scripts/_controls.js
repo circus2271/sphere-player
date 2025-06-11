@@ -47,21 +47,13 @@ export const initializePlayerHTMLControls = (playerInstance) => {
         // после отправки данных, возвращаем флаг в значение false (это уже в самом onend обработчике)
         audioPlayer.dispatchEvent(new CustomEvent('ended', {detail: {skipped: true, data: collectData(playerInstance)}}))
     }
-    // playButton.addEventListener('click', togglePlayPause);
 
-    // let timerId;
-    // let intervalId;
     playButton.onclick =  () => {
-        // togglePlayPause()
 
         // debugger
         const hasCurrentInterval = playerInstance.playerState.playlist.intervalManager.hasCurrentInterval()
-        // const paused = audioPlayer.paused || audioPlayer.ended
-        // const playing = !paused
         const shouldStart = audioPlayer.paused || audioPlayer.ended
         const shouldPause = !shouldStart
-
-        // const wasPaused = audioPlayer.paused || audioPlayer.ended
 
         if (shouldStart) {
             // attempt to start playing
@@ -129,7 +121,6 @@ export const initializePlayerHTMLControls = (playerInstance) => {
         // playlist button is clicked
         if (event.target.closest('.playlist')) {
             const playlistButton = event.target.closest('.playlist');
-            // const playlistName = playlistButton.dataset.playlistName
 
             if (playlistButton.classList.contains('playlist--selected')) {
                 console.log('playlist already selected');
@@ -229,19 +220,6 @@ function disableAllButtons() {
         button.disabled = true
     })
 }
-
-// player audio controls
-// function togglePlayPause() {
-//     if (audioPlayer.paused || audioPlayer.ended) {
-//         playButton.classList.add('playing');
-//         fadeAudioToPlaying();
-//     } else {
-//         playButton.classList.remove('playing');
-//         fadeAudioToPause();
-//     }
-//
-//     temporaryDisableAllButtons()
-// }
 
 function temporaryDisableButton(button) {
     button.setAttribute('disabled', '')

@@ -93,12 +93,9 @@ const initialize = async () => {
   })
 
 
-  // handlePlayer(availablePlaylists, baseId)
-  // const player = new Player()
   const player = new Player()
 
   await player.initializePlayer(availablePlaylists, baseId);
-
 
 }
 
