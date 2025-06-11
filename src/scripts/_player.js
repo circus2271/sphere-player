@@ -1,5 +1,5 @@
 import {collectData, sendLikeDislike, sendSongStats, setPlayerTitle} from './utils/_helpers';
-import {enableSkipButton, initializePlayerHTMLControls } from './_controls';
+import {enableSkipButton, initializePlayerHTMLControls} from './_controls';
 import { loadTrack } from './utils/_loadTrack';
 import PlayerState from './playerState/PlayerState';
 import { likeDislikeService } from './utils/_likeDislikeService';
@@ -95,10 +95,9 @@ export class Player {
     }).then(blobURL => {
       this.nextBlobURL = blobURL;
       this.nextTrackId = this.playerState.playlist.getTrackId(this.nextTrackIndex)
-// alert(5)
+
       enableSkipButton()
 
-      // document.getElementById('skip-button').disabled = false
       console.log('first two tracks of a playlist are initialized')
     }).catch(error => {
       console.error('Error setting the source for the audio player:', error);
@@ -137,10 +136,7 @@ export class Player {
       likeDislikeService.resetLikeDislikeScheduledValues()
     }
 
-    const stats = data
-    stats.skipped = skipped
-    stats.playlistName = this.playerState.playlist.currentPlaylistTableName
-    stats.timestamp = new Date().toLocaleString('ru-RU')
+    const stats = {...data, skipped}
 
     setTimeout(() => {
       sendSongStats(stats)
@@ -157,30 +153,19 @@ export class Player {
   onError(event, reason) {
     console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
 
-    // const currentTrackId = currentTrackInitialData.id
-    const currentTrackId = this.currentTrackId
-    // Build the same stats payload you use on 'ended'
+    const data = collectData(this);
+    const networkError =  reason || event.message ||
+        (this.audioPlayer.error && `Code ${this.audioPlayer.error.code}`)
 
-    const data = {
-      baseId:          this.playerState.baseId,
-      tableId:         this.playerState.playlist.currentPlaylistTableId,
-      // recordId:        this.currentTrackId,       // same ID you use in 'ended'
-      recordId:        currentTrackId,       // same ID you use in 'ended'
-      currentIndex:    this.currentTrackIndex,
-      downloadingSpeed: '',                        // no new download here
-      downloadingTime:  ''
-    };
 
-    // Mirror your 'ended' logic
-    const stats = data;
-    stats.playlistName = this.playerState.playlist.currentPlaylistTableName;
-    stats.timestamp    = new Date().toLocaleString('ru-RU');
-    stats.networkError = reason || event.message ||
-        (this.audioPlayer.error && `Code ${this.audioPlayer.error.code}`);
+    if (networkError) {
+      data.networkError = networkError
+    }
+
 
     // Send with the same 3-second debounce to avoid rate-limits
     setTimeout(() => {
-      sendSongStats(stats);
+      sendSongStats(data);
     }, 2200);
 
     console.warn('Audio playback error, stats sent:', stats);
@@ -188,9 +173,7 @@ export class Player {
 
   async playAndLoadNextTrack({ trackWasDeleted }) {
 
-    // const p = this.playerState
     // debugger
-    // console.log('tracks[currentTrackIndex] and encodedURL is ' + playlist.getTrackByIndex(this.currentTrackIndex).url)
     console.log('tracks[currentTrackIndex] and encodedURL is ' + this.playerState.allTracks[this.currentTrackId].url)
 
     // If there is a next track
@@ -213,10 +196,6 @@ export class Player {
         this.currentTrackIndex = this.nextTrackIndex;
         this.nextTrackIndex++;
       }
-
-      // it's a temporary local variable
-      // const currentInterval = intervalManager.getCurrentInterval(this.currentDayPlaylist);
-      // const currentIntervalData = intervalManager.getCurrentIntervalRelatedData(currentInterval)
 
       const possiblyNewInterval = this.playerState.playlist.intervalManager.currentInterval
       if (possiblyNewInterval.index === -1) {

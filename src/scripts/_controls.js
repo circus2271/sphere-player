@@ -3,7 +3,7 @@ import {collectData, REINITIALIZE_APP_EVENT} from './utils/_helpers';
 
 
 const playButton = document.getElementById('play-button');
-export const skipButton = document.getElementById('skip-button');
+const skipButton = document.getElementById('skip-button');
 let allButtons;
 
 let player;
@@ -222,6 +222,7 @@ function enableAllButtons({exception} = {}) {
 export function enableSkipButton() {
     skipButton.disabled = false
 }
+
 
 function disableAllButtons() {
     allButtons.forEach(button => {

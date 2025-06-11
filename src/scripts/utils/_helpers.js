@@ -23,6 +23,9 @@ export const collectData = (playerInstance) => {
     // first and second tracks of a playlist are without speed and time calculations, so use empty strings instead...
     downloadingSpeed: playerInstance.nextTrackDownloadSpeed ? playerInstance.nextTrackDownloadSpeed.toFixed(1) : '',
     downloadingTime: playerInstance.nextTrackDownloadTime ? playerInstance.nextTrackDownloadTime.toFixed(1) : '',
+
+    playlistName: playerInstance.playerState.playlist.currentPlaylistTableName,
+    timestamp: new Date().toLocaleString('ru-RU'),
   }
 
   return data
@@ -126,13 +129,7 @@ export const sendLikeDislike = async data => {
   
   try {
     
-    const response = await fetch(updateRecordApiEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data)
-    })
+    const response = await send(updateRecordApiEndpoint, data)
     
     return response.json()
     
@@ -154,13 +151,7 @@ export const sendSongStats = async data => {
   
   try {
     
-    const response = await fetch(updateSongStatsApiEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data)
-    })
+    const response = await send(updateSongStatsApiEndpoint, data)
     
     return response.text()
     
@@ -174,13 +165,7 @@ export const updateHostingStats = async ({playlistName}) => {
 
   try {
 
-    const response = await fetch(updateHostingStatsApiEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({playlistName, login, password})
-    })
+    const response = await send(updateHostingStatsApiEndpoint, {playlistName, login, password})
 
     return response.text()
 
@@ -189,3 +174,12 @@ export const updateHostingStats = async ({playlistName}) => {
   }
 }
 
+function send(url, data) {
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data)
+  })
+}
