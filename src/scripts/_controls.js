@@ -3,7 +3,7 @@ import {collectData, REINITIALIZE_APP_EVENT} from './utils/_helpers';
 
 
 const playButton = document.getElementById('play-button');
-const skipButton = document.getElementById('skip-button');
+export const skipButton = document.getElementById('skip-button');
 let allButtons;
 
 let player;
@@ -214,9 +214,13 @@ function fadeAudioToPause() {
 // if no object -> use empty object by default
 function enableAllButtons({exception} = {}) {
     allButtons.forEach(button => {
-        // if (exception && button.id === exception) return
+        if (exception && button.id === exception) return
         button.disabled = false
     })
+}
+
+export function enableSkipButton() {
+    skipButton.disabled = false
 }
 
 function disableAllButtons() {

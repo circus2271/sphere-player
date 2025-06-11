@@ -1,5 +1,5 @@
 import {collectData, sendLikeDislike, sendSongStats, setPlayerTitle} from './utils/_helpers';
-import { initializePlayerHTMLControls } from './_controls';
+import {enableSkipButton, initializePlayerHTMLControls } from './_controls';
 import { loadTrack } from './utils/_loadTrack';
 import PlayerState from './playerState/PlayerState';
 import { likeDislikeService } from './utils/_likeDislikeService';
@@ -95,8 +95,10 @@ export class Player {
     }).then(blobURL => {
       this.nextBlobURL = blobURL;
       this.nextTrackId = this.playerState.playlist.getTrackId(this.nextTrackIndex)
+// alert(5)
+      enableSkipButton()
 
-      document.getElementById('skip-button').disabled = false
+      // document.getElementById('skip-button').disabled = false
       console.log('first two tracks of a playlist are initialized')
     }).catch(error => {
       console.error('Error setting the source for the audio player:', error);
@@ -104,7 +106,7 @@ export class Player {
   }
 
   async onTrackEnd({skipped, playlistShouldChange, data} = {}) {
-
+// debugger
     document.getElementById('skip-button').disabled = true
 
 
@@ -274,7 +276,8 @@ export class Player {
       retry()
         .then(blobURL => {
           this.nextBlobURL = blobURL;
-          this.nextTrackUrl = this.playerState.playlist.tracks[this.nextTrackIndex].url
+          // this.nextTrackId = this.playerState.playlist.tracks[this.nextTrackIndex].id
+          this.nextTrackId = this.playerState.playlist.getTrackId(this.nextTrackIndex)
 
           console.log('track loaded (with or without retry)')
           document.getElementById('skip-button').disabled = false

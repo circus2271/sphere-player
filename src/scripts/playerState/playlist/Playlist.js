@@ -49,32 +49,13 @@ class Playlist {
         this.tracks.forEach(track => {
             this.#allTracks[track.id] = track.url
         })
-
-        // this.playerState.allTracks.push(...this.tracks)
-    }
-
-    getTrackById(id) {
-        return this.tracks.find(track => track.id === id)
-        // return this.playerState.allTracks.find(track => track.id === id)
-    }
-
-    getTrackByIndex(index) {
-        return this.tracks.find((track, i) => i === index)
     }
 
     getTrackId(index) {
         const track = this.tracks.find((track, i) => i === index)
-        // const track = this.playerState.allTracks.find((track, i) => i === index)
 
         return track ? track.id : null
     }
-    // getTrack(id) {
-    //     return this.tracks.find(track => track.id === id)
-    // }
-
-    // removeTrackFromPlaylist(id) {
-    //     this.tracks = this.tracks.filter(track => track.id !== id)
-    // }
 
     changeTracksDomain() {
         if (this.isDomainReplaced) return
@@ -94,8 +75,6 @@ class Playlist {
         this.tracks.forEach(track => changeUrl(track))
 
         this.isDomainReplaced = true
-        // updateHostingStats({playlistName: playlist.currentPlaylistTableName})
-        // updateHostingStats({playlistName: this.currentPlaylistTableName})
     }
 
     removeTrack(id) {
