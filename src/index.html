@@ -6,10 +6,13 @@
   <meta content="Sphere Player" property="og:title">
   <meta content="Sphere Player" property="twitter:title">
   <meta content="width=device-width, initial-scale=1" name="viewport">
-  <link href="~/src/assets/media/icons/favicon.ico" rel="shortcut icon" type="image/x-icon">
-  <link href="~/src/assets/media/icons/favicon.png" rel="icon" type="image/png">
-  <link href="~/src/assets/media/icons/webclip.png" rel="apple-touch-icon">
-  <link rel="stylesheet" href="~/src/assets/styles/index.scss">
+  <link href="data-url:~/src/assets/media/icons/favicon.ico" rel="shortcut icon" type="image/x-icon">
+  <link href="data-url:~/src/assets/media/icons/favicon.png" rel="icon" type="image/png">
+  <link href="data-url:~/src/assets/media/icons/webclip.png" rel="apple-touch-icon">
+<!--  <link rel="stylesheet" href="~/src/assets/styles/index.scss">-->
+  <style>
+    @import '~/src/assets/styles/index.scss';
+  </style>
 </head>
 <body class="ru">
   <div class="initial-login-screen" id="login-screen">
@@ -340,7 +343,12 @@
       </section>
     </div>
   </div>
-  <script type="module" src="~/src/assets/scripts/index.js"></script>
-  <script type="module" src="~/src/assets/scripts/analytics.js"></script>
+<!--  <script type="module" src="~/src/assets/scripts/index.js"></script>-->
+<!--  <script type="module" src="~/src/assets/scripts/analytics.js"></script>-->
+  <script type="module">
+    import '~/src/assets/scripts/index.js';
+    import '~/src/assets/scripts/analytics.js';
+  </script>
+
 </body>
 </html>
