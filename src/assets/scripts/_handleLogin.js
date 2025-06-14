@@ -67,6 +67,11 @@ const setLoginFormErrorMessageHidingTimer = debounce(() => {
 
 
 export const handleLogin = async (callback) => {
+  // it is used to set a background to body
+  // otherwise it will be a flash of white on initial page load
+  // this should be fixed by css, but for now it's easier to do this instead
+  document.body.classList.add('html-parsed')
+
   Promise.all([
     new Promise(resolve => {
       window.addEventListener('requiredDelayTimeIsUp', _ => resolve(), { once: true })
