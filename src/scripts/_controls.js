@@ -96,13 +96,13 @@ export const initializePlayerHTMLControls = (playerInstance) => {
             // it may happen that user stopped a playlist manually, and the time for a playing ended.
             // So, if user tries to resume a playlist in the morning, we need to check if a playlist was played yesterday
             // If so, we'll try to update and restart a player
-            intervalId = setInterval(() => {
-
-                playerInstance.playerState.playlistEnded = !playerInstance.playerState.intervalManager.hasCurrentInterval()
-                if (playerInstance.playerState.playlistEnded) {
-                    clearInterval(intervalId)
-                }
-            }, 1000 * 60) // check every minute
+            // intervalId = setInterval(() => {
+            //
+            //     playerInstance.playerState.playlistEnded = !playerInstance.playerState.intervalManager.hasCurrentInterval()
+            //     if (playerInstance.playerState.playlistEnded) {
+            //         clearInterval(intervalId)
+            //     }
+            // }, 1000 * 60) // check every minute
 
             playButton.classList.remove('playing');
             fadeAudioToPause();
