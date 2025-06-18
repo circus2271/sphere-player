@@ -1,5 +1,6 @@
 import { fetchPlaylist, isObject, setPlayerTitle } from '../../utils/_helpers';
 import IntervalManager from './_intervalManager';
+import {disablePlayButton} from "../../_controls";
 
 class Playlist {
     currentPlaylistInitialData = null
@@ -58,6 +59,7 @@ class Playlist {
             console.warn('playlist is marked as ended')
 
             this.markPlaylistAsEnded()
+            disablePlayButton()
 
             return
         }
