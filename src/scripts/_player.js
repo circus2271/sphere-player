@@ -113,8 +113,6 @@ export class Player {
       data = collectData(this)
     }
 
-
-
     this.nextTrackDownloadSpeed = null
     this.nextTrackDownloadTime = null
 
@@ -212,11 +210,12 @@ export class Player {
       const retry = () => {
         console.log('retry track index:', this.nextTrackIndex)
 
-        if (this.playerState.playlist.intervalManager.currentInterval.index !== possiblyNewInterval.index) {
+        if  (this.playerState.playlist.activeInterval !== possiblyNewInterval.time) {
           console.log('switched playlist interval')
           console.log('current active interval is', possiblyNewInterval.time)
 
-          this.playerState.playlist.setTracksFromCurrentInterval()
+          // this.playerState.playlist.setTracksFromCurrentInterval()
+          this.playerState.playlist.changeInterval()
 
           this.nextTrackIndex = 0; // Start from the first track in the new interval
         } else if (this.nextTrackIndex >= this.playerState.playlist.tracks.length) {

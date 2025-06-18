@@ -8,6 +8,7 @@ class Playlist {
     tracks = []
     isDomainReplaced = false
     #allTracks = null; // this value is deferred from player
+    activeInterval = null
 
     constructor({allTracks, baseId}) {
 
@@ -30,6 +31,8 @@ class Playlist {
     }
 
     async setPlaylistData({ newPlaylist, baseId }) {
+    // async setPlaylistData({ newPlaylist }) {
+    //     debugger
         // reset this value
         this.isDomainReplaced = false
         // show user friendly message
@@ -43,8 +46,15 @@ class Playlist {
         this.intervalManager = new IntervalManager(this.currentPlaylistInitialData)
         this.intervalManager.prepareIntervals()
 
-        this.tracks = this.intervalManager.currentInterval.tracks
+        this.changeInterval()
+    }
 
+    // change or set in this case are the same
+    changeInterval() {
+
+        const {tracks, index, time} = this.intervalManager.currentInterval
+        this.tracks = tracks
+        this.activeInterval = time
 
         this.tracks.forEach(track => {
             this.#allTracks[track.id] = track.url

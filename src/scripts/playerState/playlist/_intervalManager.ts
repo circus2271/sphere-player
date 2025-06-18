@@ -14,11 +14,7 @@ class IntervalManager {
     #preparedIntervals = null
 
     // store it as a class property
-    // constructor(public currentPlaylistInitialData: any) {}
     constructor(public initialPlaylistData: any) {
-        // const p = this.initialPlaylistData
-        //
-        // debugger
     }
 
     hasCurrentInterval() {

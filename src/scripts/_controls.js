@@ -144,6 +144,8 @@ export const initializePlayerHTMLControls = (playerInstance) => {
             audioPlayer.dispatchEvent(new CustomEvent('ended', {detail: {skipped: true, playlistShouldChange: true, data: collectData(playerInstance)}}))
 
 
+            // await playerInstance.playerState.playlist.setPlaylistData({ newPlaylist: newPlaylist })
+
             await playerInstance.initializePlayer(
                 availablePlaylists,
                 baseId,
