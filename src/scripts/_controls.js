@@ -98,7 +98,7 @@ export const initializePlayerHTMLControls = (playerInstance) => {
             // If so, we'll try to update and restart a player
             intervalId = setInterval(() => {
 
-                playerInstance.playerState.playlistEnded = !playerInstance.playerState.intervalManager.hasCurrentInterval()
+                playerInstance.playerState.playlistEnded = !playerInstance.playerState.playlist.intervalManager.hasCurrentInterval()
                 if (playerInstance.playerState.playlistEnded) {
                     clearInterval(intervalId)
                 }
