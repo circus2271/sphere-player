@@ -53,6 +53,12 @@ class Playlist {
     changeInterval() {
 
         const {tracks, index, time} = this.intervalManager.currentInterval
+
+        if (index === -1) {
+            console.warn('no interval. do nothing')
+            return
+        }
+
         this.tracks = tracks
         this.activeInterval = time
 

@@ -1,5 +1,5 @@
 import {collectData, sendLikeDislike, sendSongStats, setPlayerTitle} from './utils/_helpers';
-import {enableSkipButton, initializePlayerHTMLControls} from './_controls';
+import {disablePlayButton, enableSkipButton, initializePlayerHTMLControls} from './_controls';
 import { loadTrack } from './utils/_loadTrack';
 import PlayerState from './playerState/PlayerState';
 import { likeDislikeService } from './utils/_likeDislikeService';
@@ -202,6 +202,8 @@ export class Player {
 
         console.warn('playlist has ended')
         console.warn('if user presses play and there is a new interval already, a player should reinitialize')
+
+        disablePlayButton()
 
         return
       }

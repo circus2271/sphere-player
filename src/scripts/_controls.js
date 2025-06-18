@@ -104,7 +104,8 @@ export const initializePlayerHTMLControls = (playerInstance) => {
                 }
             }, 1000 * 60) // check every minute
 
-            playButton.classList.remove('playing');
+            // playButton.classList.remove('playing');
+            disablePlayButton()
             fadeAudioToPause();
         }
 
@@ -237,6 +238,11 @@ function temporaryDisableAllButtons() {
 }
 
 function fadeOutPlayingState() {
-    playButton.classList.remove('playing')
+    // playButton.classList.remove('playing')
+    disablePlayButton()
     fadeAudioToPause()
+}
+
+export function disablePlayButton() {
+    playButton.classList.remove('playing')
 }
