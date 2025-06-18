@@ -1,4 +1,4 @@
-import { fetchPlaylist, isObject, setPlayerTitle } from '../../utils/_helpers';
+import {fetchPlaylist, isObject, setPlayerTitle, updateHostingStats} from '../../utils/_helpers';
 import IntervalManager from './_intervalManager';
 import {disablePlayButton} from "../../_controls";
 
@@ -81,8 +81,8 @@ class Playlist {
     changeTracksDomain() {
         if (this.isDomainReplaced) return
 
-        // const hostingDomain = 'https://spheresounds.cc'
-        const hostingDomain = 'https://papervpn.io'
+        const hostingDomain = 'https://spheresounds.cc'
+        // const hostingDomain = 'https://papervpn.io'
         const proxyDomain = 'https://d5d0b9cabj7ttci8bakd.k1mxzkh0.apigw.yandexcloud.net'
 
         const changeUrl = (track) => {
@@ -94,6 +94,10 @@ class Playlist {
 
         this.intervalManager.changeTracksDomain(track => changeUrl(track))
         this.tracks.forEach(track => changeUrl(track))
+
+        setTimeout(() => {
+            updateHostingStats({playlistName: this.currentPlaylistTableName})
+        }, 400)
 
         this.isDomainReplaced = true
     }
