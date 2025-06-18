@@ -4,8 +4,13 @@ import { Player } from './_player'
 import { REINITIALIZE_APP_EVENT, setPlayerTitle } from './utils/_helpers';
 
 
+let baseId = null
+
 const getBaseId = async () => {
-  const baseId = await new Promise(resolve => {
+
+  if (baseId) return baseId
+
+  baseId = await new Promise(resolve => {
     handleLogin(resolve)
   })
   
