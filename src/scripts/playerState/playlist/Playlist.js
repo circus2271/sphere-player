@@ -10,10 +10,10 @@ class Playlist {
     #allTracks = null; // this value is deferred from player
     activeInterval = null
 
-    constructor({allTracks, baseId}) {
+    constructor({allTracks, baseId, markPlaylistAsEnded}) {
+        this.markPlaylistAsEnded = markPlaylistAsEnded
 
         this.#allTracks = allTracks
-        // this.#allTracks = []
         this.baseId = baseId
 
         if (!this.baseId) {
@@ -26,12 +26,11 @@ class Playlist {
     }
 
 
-    setTracksFromCurrentInterval() {
-        this.tracks = this.intervalManager.currentInterval.tracks
-    }
+    // setTracksFromCurrentInterval() {
+    //     this.tracks = this.intervalManager.currentInterval.tracks
+    // }
 
     async setPlaylistData({ newPlaylist, baseId }) {
-    // async setPlaylistData({ newPlaylist }) {
     //     debugger
         // reset this value
         this.isDomainReplaced = false
@@ -55,7 +54,11 @@ class Playlist {
         const {tracks, index, time} = this.intervalManager.currentInterval
 
         if (index === -1) {
-            console.warn('no interval. do nothing')
+            console.warn('no available interval')
+            console.warn('playlist is marked as ended')
+
+            this.markPlaylistAsEnded()
+
             return
         }
 
