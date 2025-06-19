@@ -142,6 +142,14 @@ export class Player {
     }, 3000)
 
     console.log('audioPlayer ended')
+
+    if (!this.playerState.playlist.intervalManager.hasCurrentInterval()) {
+      console.warn('playlist is ended')
+      disablePlayButton()
+
+      return
+    }
+
     // if track is ended due to playlist change, don't load next track
     if (!playlistShouldChange) {
       await this.playAndLoadNextTrack({trackWasDeleted})
@@ -203,7 +211,7 @@ export class Player {
         console.warn('playlist has ended')
         console.warn('if user presses play and there is a new interval already, a player should reinitialize')
 
-        disablePlayButton()
+        // disablePlayButton()
 
         return
       }
