@@ -78,20 +78,6 @@ export const initializePlayerHTMLControls = (playerInstance) => {
                 return
             }
 
-            if (hasCurrentInterval) {
-                // check if playlist was ended
-
-                if (playerInstance.playerState.playlistEnded) {
-                    // reset a player
-                    // because it seems it was stopped, had no interval, and now it again has an interval
-
-                    console.warn('attempting to restart a player')
-                    window.dispatchEvent(new CustomEvent(REINITIALIZE_APP_EVENT))
-
-                    return
-                }
-
-            }
 
             playButton.classList.add('playing');
             fadeAudioToPlaying();
