@@ -29,8 +29,8 @@ export class Player {
     // Запрашиваем первый плейлист
     const firstPlaylist = availablePlaylists[0]
     // обновляем все данные о плейлисте
-    await this.playerState.playlist.setPlaylistData({ newPlaylist: playlist || firstPlaylist })
-
+    let noInterval = await this.playerState.playlist.setPlaylistData({ newPlaylist: playlist || firstPlaylist })
+    if (noInterval) return
 
     try {
       await this.initializeFirstTwoTracksOfAPlaylist({

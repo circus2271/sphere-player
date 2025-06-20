@@ -60,6 +60,15 @@ export const initializePlayerHTMLControls = (playerInstance) => {
 
             clearInterval(intervalId)
 
+            if (playerInstance.playerState.playlistEnded) {
+                // reset a player
+                // because it seems it was stopped, had no interval, and now it again has an interval
+
+                console.warn('attempting to restart a player')
+                window.dispatchEvent(new CustomEvent(REINITIALIZE_APP_EVENT))
+
+                return
+            }
 
             if (!hasCurrentInterval) {
                 playerInstance.playerState.playlistEnded = true

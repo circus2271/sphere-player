@@ -18,7 +18,7 @@ class IntervalManager {
     }
 
     hasCurrentInterval() {
-        return !!this.currentInterval
+        return this.currentInterval && this.currentInterval.index !== -1
     }
 
 

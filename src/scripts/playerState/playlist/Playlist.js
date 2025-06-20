@@ -46,7 +46,7 @@ class Playlist {
         this.intervalManager = new IntervalManager(this.currentPlaylistInitialData)
         this.intervalManager.prepareIntervals()
 
-        this.changeInterval()
+        return this.changeInterval() === false
     }
 
     // change or set in this case are the same
@@ -61,7 +61,8 @@ class Playlist {
             this.markPlaylistAsEnded()
             disablePlayButton()
 
-            return
+            setPlayerTitle('no music this time...')
+            return false
         }
 
         this.tracks = tracks
