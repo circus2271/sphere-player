@@ -1,5 +1,5 @@
 import { likeDislikeService } from './utils/_likeDislikeService';
-import {collectData, REINITIALIZE_APP_EVENT} from './utils/_helpers';
+import {collectData, REINITIALIZE_APP_EVENT, tariff} from './utils/_helpers';
 
 
 const playButton = document.getElementById('play-button');
@@ -60,7 +60,7 @@ export const initializePlayerHTMLControls = (playerInstance) => {
 
             clearInterval(intervalId)
 
-            if (playerInstance.playerState.playlistEnded) {
+            if (!tariff.stream && playerInstance.playerState.playlistEnded) {
                 // reset a player
                 // because it seems it was stopped, had no interval, and now it again has an interval
 

@@ -1,4 +1,4 @@
-import {debounce, pageLanguage} from './_helpers.js'
+import {debounce, pageLanguage, tariff} from './_helpers.js'
 import { loginApiEndpoint } from './_apiEndpoints.js'
 import { credentials } from './_credentials';
 
@@ -78,6 +78,7 @@ export const handleLogin = async (callback) => {
     })
   ]).then(() => {
     if (credentials.login === 'Instream') {
+      tariff.stream = true
       // hide like/dislike buttons
       document.querySelector('#like-dislike-form').style.visibility = 'hidden'
     }

@@ -14,6 +14,10 @@ export const setPlayerTitle = title => {
   document.querySelector('#current-playlist').innerHTML = title
 }
 
+export const tariff = {
+  stream: false
+}
+
 export const collectData = (playerInstance) => {
   const data = {
     baseId: playerInstance.playerState.baseId,
