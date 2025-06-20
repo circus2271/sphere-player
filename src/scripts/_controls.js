@@ -60,7 +60,8 @@ export const initializePlayerHTMLControls = (playerInstance) => {
 
             clearInterval(intervalId)
 
-            if (!tariff.stream && playerInstance.playerState.playlistEnded) {
+            // if (!tariff.stream && playerInstance.playerState.playlistEnded) {
+            if (playerInstance.playerState.playlistEnded) {
                 // reset a player
                 // because it seems it was stopped, had no interval, and now it again has an interval
 
