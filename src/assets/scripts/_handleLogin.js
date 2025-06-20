@@ -1,6 +1,7 @@
 import {debounce, pageLanguage} from './_helpers.js'
 import { loginApiEndpoint } from './_apiEndpoints.js'
 
+let username;
 const loginScreenAnimationDuration = 250
 const loginPopupAnimationDuration = loginScreenAnimationDuration
 const loadingPlaceholderAnimationDuration = loginScreenAnimationDuration
@@ -75,7 +76,14 @@ export const handleLogin = async (callback) => {
       window.addEventListener('loggedInFromBrowserMemory', _ => resolve(), { once: true })
       window.addEventListener('loggedInFromInput', _ => resolve(), { once: true })
     })
-  ]).then(() => removeFullpagePopup())
+  ]).then(() => {
+    if (username === 'Instream') {
+      // hide like/dislike buttons
+      document.querySelector('#like-dislike-form').style.visibility = 'hidden'
+    }
+
+    removeFullpagePopup()
+  })
   
   const requiredLoadingMinDelayMilliseconds = 250
   setTimeout(() => {
@@ -83,7 +91,7 @@ export const handleLogin = async (callback) => {
   }, requiredLoadingMinDelayMilliseconds)
   
   
-  const username = localStorage.getItem('login')
+  username = localStorage.getItem('login')
   const password = localStorage.getItem('password')
   
   if (username && password) {
@@ -122,7 +130,7 @@ export const handleLogin = async (callback) => {
     e.preventDefault()
     console.log('form submitted')
     
-    const username = usernameInput.value
+    username = usernameInput.value
     const password = passwordInput.value
     if (password.trim().length === 0) {
       // empty password
