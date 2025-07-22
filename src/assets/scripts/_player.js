@@ -530,17 +530,6 @@ export class Player {
       }
     })
 
-    const logOutButtons = document.querySelectorAll('.js-logout-buttons-wrapper button')
-    logOutButtons.forEach(button => {
-      button.onclick = () => {
-        localStorage.removeItem('login');
-        localStorage.removeItem('password');
-
-        // this will refresh a page
-        window.location = window.location
-      }
-    })
-
     // finally, enable all buttons
     enableAllButtons({exception: 'skip-button'})
   }
