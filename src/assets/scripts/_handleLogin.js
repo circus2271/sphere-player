@@ -68,6 +68,19 @@ const setLoginFormErrorMessageHidingTimer = debounce(() => {
 
 
 export const handleLogin = async (callback) => {
+  // it is used to set a background to body
+  // otherwise it will be a flash of white on initial page load
+  // this should be fixed by css, but for now it's easier to do this instead
+  document.body.classList.add('html-parsed')
+
+  // check url if it has login and password in it
+  const searchParams = new URL(window.location.href).searchParams
+  const trial = searchParams.get('tariff') === 'trial'
+  if (trial) {
+    localStorage.setItem('login', searchParams.get('login'))
+    localStorage.setItem('password', searchParams.get('password'))
+  }
+
   Promise.all([
     new Promise(resolve => {
       window.addEventListener('requiredDelayTimeIsUp', _ => resolve(), { once: true })
@@ -77,7 +90,7 @@ export const handleLogin = async (callback) => {
       window.addEventListener('loggedInFromInput', _ => resolve(), { once: true })
     })
   ]).then(() => {
-    if (username === 'Instream') {
+    if (trial || username === 'Instream') {
       // hide like/dislike buttons
       document.querySelector('#like-dislike-form').style.visibility = 'hidden'
     }
