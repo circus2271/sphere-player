@@ -1,5 +1,6 @@
 import {debounce, pageLanguage} from './_helpers.js'
 import { loginApiEndpoint } from './_apiEndpoints.js'
+import { credentials } from './_credentials';
 
 const loginScreenAnimationDuration = 250
 const loginPopupAnimationDuration = loginScreenAnimationDuration
@@ -75,17 +76,25 @@ export const handleLogin = async (callback) => {
       window.addEventListener('loggedInFromBrowserMemory', _ => resolve(), { once: true })
       window.addEventListener('loggedInFromInput', _ => resolve(), { once: true })
     })
-  ]).then(() => removeFullpagePopup())
+  ]).then(() => {
+    if (credentials.login === 'Instream') {
+      // hide like/dislike buttons
+      document.querySelector('#like-dislike-form').style.visibility = 'hidden'
+    }
+
+    removeFullpagePopup()
+  })
   
   const requiredLoadingMinDelayMilliseconds = 250
   setTimeout(() => {
     window.dispatchEvent(new CustomEvent('requiredDelayTimeIsUp'))
   }, requiredLoadingMinDelayMilliseconds)
   
-  
-  const username = localStorage.getItem('login')
-  const password = localStorage.getItem('password')
-  
+
+  const username = credentials.login
+  const password = credentials.password
+  // const {login: username, password} = credentials
+
   if (username && password) {
     const loginResponse = await logIn(username, password)
     
@@ -136,10 +145,10 @@ export const handleLogin = async (callback) => {
       const { baseId, placeName } = response;
       document.querySelector('#place-name').innerHTML = placeName;
       callback(baseId)
-      
-      localStorage.setItem('login', username)
-      localStorage.setItem('password', password)
-      
+
+      credentials.login = username
+      credentials.password = password
+
       window.dispatchEvent(new CustomEvent('loggedInFromInput'))
       return
     } else {
