@@ -2,7 +2,20 @@ import { handleLogin } from './utils/_handleLogin'
 import { getRecordsApiEndpoint } from './utils/_apiEndpoints'
 import { Player } from './_player'
 import { REINITIALIZE_APP_EVENT, setPlayerTitle } from './utils/_helpers';
+import { credentials } from './utils/_credentials';
 
+
+// set a handler to logout buttons
+// (do it here, so buttons will be active almost instantly, without waiting for a first track to load)
+const logOutButtons = document.querySelectorAll('.js-logout-buttons-wrapper button')
+logOutButtons.forEach(button => {
+  button.onclick = () => {
+    credentials.reset()
+
+    // this will refresh a page
+    window.location = window.location
+  }
+})
 
 let baseId = null
 

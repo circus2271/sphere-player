@@ -19,6 +19,14 @@ class Credentials {
         this.#password = password
         localStorage.setItem('password', this.#password)
     }
+
+    reset() {
+      this.#password = null
+      this.#login = null
+
+      localStorage.removeItem('password')
+      localStorage.removeItem('login')
+    }
 }
 
 export const credentials = new Credentials()

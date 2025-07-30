@@ -321,3 +321,17 @@ ul {
     }
   }
 }
+
+.logout-buttons-wrapper button {
+   background: #ededed;
+   font-size: 20px;
+   font-weight: 400;
+   padding: 15px;
+   background-color: #eaeaea;
+   border-radius: 20px;
+   margin: 50px auto 30px;
+
+   @media screen and (min-width: 695px) {
+     margin: 140px auto 30px;
+   }
+}
