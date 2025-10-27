@@ -301,6 +301,17 @@ ul {
     color: #000;
     font-weight: 500;
     margin: 0 0 12px;
+
+    &.mirror-link {
+      // font-size: 21px;
+      font-size: 23px;
+      margin-bottom: 28.5px;
+    
+      @media screen and (min-width: 695px) {
+      // font-size: 24px;
+   }
+    }
+    
   }
 
   ul {
