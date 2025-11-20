@@ -1,28 +1,28 @@
-import { handleLogin } from './_handleLogin'
+// import { handleLogin } from './_handleLogin'
 import { getRecordsApiEndpoint } from './_apiEndpoints'
 import { Player } from './_player'
 
 
 // set a handler to logout buttons
 // (do it here, so buttons will be active almost instantly, without waiting for a first track to load)
-const logOutButtons = document.querySelectorAll('.js-logout-buttons-wrapper button')
-logOutButtons.forEach(button => {
-  button.onclick = () => {
-    localStorage.removeItem('login');
-    localStorage.removeItem('password');
+// const logOutButtons = document.querySelectorAll('.js-logout-buttons-wrapper button')
+// logOutButtons.forEach(button => {
+//   button.onclick = () => {
+//     localStorage.removeItem('login');
+//     localStorage.removeItem('password');
 
-    // this will refresh a page
-    window.location = window.location
-  }
-})
+//     // this will refresh a page
+//     window.location = window.location
+//   }
+// })
 
-const getBaseId = async () => {
-  const baseId = await new Promise(resolve => {
-    handleLogin(resolve)
-  })
+// const getBaseId = async () => {
+//   const baseId = await new Promise(resolve => {
+//     handleLogin(resolve)
+//   })
   
-  return baseId
-}
+//   return baseId
+// }
 
 // const records = [
 //   {
@@ -46,7 +46,9 @@ const getBaseId = async () => {
 // ];
 
 (async () => {
-  const baseId = await getBaseId()
+  // const baseId = await getBaseId()
+  const baseId = 'id goes here'
+  // const baseId = ''
   const queryParams = { baseId, tableId: 'Info' }
   const searchParams = new URLSearchParams(queryParams)
   const urlToFetchRecords = `${getRecordsApiEndpoint}?${searchParams}`
@@ -84,7 +86,7 @@ const getBaseId = async () => {
     })
   }
   
-  renderPlaylistsMarkup();
+  // renderPlaylistsMarkup();
   
   
   console.log('ap', playlistsInfo)

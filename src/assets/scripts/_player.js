@@ -242,7 +242,7 @@ export class Player {
     }).then(blobURL => {
       this.nextBlobURL = blobURL;
       this.nextTrackUrl = this.tracks[this.nextTrackIndex]
-
+// debugger
       document.getElementById('skip-button').disabled = false
       console.log('first two tracks of a playlist are initialized')
     }).catch(error => {
@@ -445,90 +445,90 @@ export class Player {
 
     // if playlist button is clicked
     // change playlist and load first two tracks of it
-    document.querySelector('#playlists').addEventListener('click', async (event) => {
+    // document.querySelector('#playlists').addEventListener('click', async (event) => {
 
-      // playlist button is clicked
-      if (event.target.closest('.playlist')) {
-        const playlistButton = event.target.closest('.playlist');
-        // const playlistName = playlistButton.dataset.playlistName
+    //   // playlist button is clicked
+    //   if (event.target.closest('.playlist')) {
+    //     const playlistButton = event.target.closest('.playlist');
+    //     // const playlistName = playlistButton.dataset.playlistName
 
-        if (playlistButton.classList.contains('playlist--selected')) {
-          console.log('playlist already selected');
-          return;
-        }
-        resetRepeatId()
-
-
-        document.querySelector('.playlist--selected').classList.remove('playlist--selected')
-        playlistButton.classList.add('playlist--selected')
-
-        const newPlaylistName = playlistButton.dataset.playlistName
-        const newPlaylist = this.availablePlaylists.find(playlist => playlist.playlistName === newPlaylistName)
-
-        fadeOutPlayingState()
-        // disable all buttons until first track is ready
-        disableAllButtons()
-
-        // end current track, so statistics and 'like'/'dislike' could be sent
-        skipped = true
-        playlistShouldChange = true
-        this.audioPlayer.dispatchEvent(new Event('ended'))
+    //     if (playlistButton.classList.contains('playlist--selected')) {
+    //       console.log('playlist already selected');
+    //       return;
+    //     }
+    //     resetRepeatId()
 
 
-        await this.setPlaylistData({ newPlaylist })
-        // cancel loadtrack repeating if playlist has changed
-        // resetRepeatId()
-        // new playlist is set
-        // make sure data is updated
+    //     document.querySelector('.playlist--selected').classList.remove('playlist--selected')
+    //     playlistButton.classList.add('playlist--selected')
 
-        try {
-          await this.initializeFirstTwoTracksOfAPlaylist({
-            firstTrackLoaded: () => {
-              enableAllButtons({exception: 'skip-button'})
-            }
-          })
-        } catch (error) {
-          console.error(`playlist error: can't load first two tracks of a new playlist`)
-        }
-      }
-    })
+    //     const newPlaylistName = playlistButton.dataset.playlistName
+    //     const newPlaylist = this.availablePlaylists.find(playlist => playlist.playlistName === newPlaylistName)
 
-    const form = document.querySelector('#like-dislike-form')
-    form.addEventListener('submit', e => {
-      e.preventDefault()
+    //     fadeOutPlayingState()
+    //     // disable all buttons until first track is ready
+    //     disableAllButtons()
 
-      const submitter = e.submitter
-      const like = submitter.id === 'like-button'
-      const dislike = submitter.id === 'dislike-button'
+    //     // end current track, so statistics and 'like'/'dislike' could be sent
+    //     skipped = true
+    //     playlistShouldChange = true
+    //     this.audioPlayer.dispatchEvent(new Event('ended'))
 
-      if (like) {
-        if (likeDislikeStatus.scheduled && likeDislikeStatus.newStatus === 'Like') {
-          resetLikeDislikeScheduledValues()
 
-          return
-        }
+    //     await this.setPlaylistData({ newPlaylist })
+    //     // cancel loadtrack repeating if playlist has changed
+    //     // resetRepeatId()
+    //     // new playlist is set
+    //     // make sure data is updated
 
-        if (likeDislikeStatus.scheduled && likeDislikeStatus.newStatus === 'Dislike') {
-          resetLikeDislikeScheduledValues()
-        }
+    //     try {
+    //       await this.initializeFirstTwoTracksOfAPlaylist({
+    //         firstTrackLoaded: () => {
+    //           enableAllButtons({exception: 'skip-button'})
+    //         }
+    //       })
+    //     } catch (error) {
+    //       console.error(`playlist error: can't load first two tracks of a new playlist`)
+    //     }
+    //   }
+    // })
 
-        scheduleLikeDislike({ newStatus: 'Like' })
-      }
+    // const form = document.querySelector('#like-dislike-form')
+    // form.addEventListener('submit', e => {
+    //   e.preventDefault()
 
-      if (dislike) {
-        if (likeDislikeStatus.scheduled && likeDislikeStatus.newStatus === 'Dislike') {
-          resetLikeDislikeScheduledValues()
+    //   const submitter = e.submitter
+    //   const like = submitter.id === 'like-button'
+    //   const dislike = submitter.id === 'dislike-button'
 
-          return
-        }
+    //   if (like) {
+    //     if (likeDislikeStatus.scheduled && likeDislikeStatus.newStatus === 'Like') {
+    //       resetLikeDislikeScheduledValues()
 
-        if (likeDislikeStatus.scheduled && likeDislikeStatus.newStatus === 'Like') {
-          resetLikeDislikeScheduledValues()
-        }
+    //       return
+    //     }
 
-        scheduleLikeDislike({ newStatus: 'Dislike' })
-      }
-    })
+    //     if (likeDislikeStatus.scheduled && likeDislikeStatus.newStatus === 'Dislike') {
+    //       resetLikeDislikeScheduledValues()
+    //     }
+
+    //     scheduleLikeDislike({ newStatus: 'Like' })
+    //   }
+
+    //   if (dislike) {
+    //     if (likeDislikeStatus.scheduled && likeDislikeStatus.newStatus === 'Dislike') {
+    //       resetLikeDislikeScheduledValues()
+
+    //       return
+    //     }
+
+    //     if (likeDislikeStatus.scheduled && likeDislikeStatus.newStatus === 'Like') {
+    //       resetLikeDislikeScheduledValues()
+    //     }
+
+    //     scheduleLikeDislike({ newStatus: 'Dislike' })
+    //   }
+    // })
 
     // finally, enable all buttons
     enableAllButtons({exception: 'skip-button'})
