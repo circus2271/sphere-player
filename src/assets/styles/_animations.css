@@ -1,0 +1,75 @@
+/* DESCRETE ANIMATIONS */
+
+/* 
+  animate dots when loading
+  the name "loading-3" is used because it was a third attempt to do this...
+  (and not because there are 3 dots in this animation (in markup))
+*/
+
+@keyframes loading-3-first-dot {
+  0% {
+    opacity: 0;
+  }
+  
+  25% {
+    opacity: 1;
+  }
+  
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes loading-3-second-dot {
+  0% {
+    opacity: 0;
+  }
+  
+  50% {
+    opacity: 1;
+  }
+  
+  100% {
+    opacity: 1;
+  }
+}
+
+
+@keyframes loading-3-third-dot {
+  0% {
+    opacity: 0;
+  }
+  
+  75% {
+    opacity: 1;
+  }
+  
+  100% {
+    opacity: 1;
+  }
+}
+
+.dots span:nth-of-type(1) {
+  animation: loading-3-first-dot var(--animation-duration) infinite steps(1);
+}
+
+
+.dots span:nth-of-type(2) {
+  animation: loading-3-second-dot var(--animation-duration) infinite steps(1);
+}
+
+
+.dots span:nth-of-type(3) {
+  animation: loading-3-third-dot var(--animation-duration) infinite steps(1);
+}
+
+.dots span {
+  opacity: 0;
+/*   animation-timing-function: linear;
+  animation-timing-function: ease;
+  animation-timing-function: ease-in;
+  animation-timing-function: ease-out;
+  animation-timing-function: ease-in-out; */
+  
+  --animation-duration: 1.6s;
+}

@@ -1,5 +1,7 @@
 import { updateRecordApiEndpoint, updateSongStatsApiEndpoint, getRecordsApiEndpoint } from './_apiEndpoints'
 
+export const dotsHtml = `<span class="dots"><span>.</span><span>.</span><span>.</span></span></span>`
+
 export const pageLanguage = document.body.classList.contains('ru') ? 'ru' : 'en'
 
 // https://www.freecodecamp.org/news/javascript-debounce-example/
