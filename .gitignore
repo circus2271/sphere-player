@@ -6,3 +6,5 @@ node_modules
 .DS_Store
 .vercel
 src/assets/scripts/inline.me
+inline.me
+

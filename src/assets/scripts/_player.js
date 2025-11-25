@@ -1,5 +1,5 @@
 import fetchRetry from 'fetch-retry'
-import { randomize, sendLikeDislike, sendSongStats, fetchPlaylist } from './_helpers';
+import { randomize, sendLikeDislike, sendSongStats, fetchPlaylist, dotsHtml } from './_helpers';
 
 const fetchWithRetry = fetchRetry(fetch);
 
@@ -192,7 +192,7 @@ export class Player {
 
   async setPlaylistData({ newPlaylist }) {
     // show user friendly message
-    document.querySelector('#current-playlist').innerHTML = 'loading playlist...'
+    document.querySelector('#current-playlist').innerHTML = `loading playlist${dotsHtml}`
 
     this.currentPlaylistTableId = newPlaylist.tableId
     this.currentPlaylistTableName = newPlaylist.playlistName
@@ -205,7 +205,7 @@ export class Player {
   }
 
   async initializeFirstTwoTracksOfAPlaylist({ firstTrackLoaded }) {
-    document.querySelector('#current-playlist').innerHTML = 'loading first track...'
+    document.querySelector('#current-playlist').innerHTML = `loading first track${dotsHtml}`
 
     // reset
     this.currentTrackIndex = 0;
