@@ -161,9 +161,20 @@ export class Player {
       stats.skipped = skipped
       stats.playlistName = this.currentPlaylistTableName
       stats.timestamp = new Date().toLocaleString('ru-RU')
+      
+      let deviceUniqueId = localStorage.getItem('deviceUniqueId')
+      if (!deviceUniqueId) {
+        const time = new Date().getTime().toString()
+        const id = time.slice(time.length-5)
+        localStorage.setItem('deviceUniqueId', id)
+
+        deviceUniqueId = id
+      }
+      stats.deviceUniqueId = deviceUniqueId
 
       setTimeout(() => {
         sendSongStats(stats)
+        // debugger
         // wait 3 seconds for hopefully pass airtable 5-requeste-at-once limit
       }, 3000)
 
