@@ -693,6 +693,10 @@ export class Player {
       const currentInterval = data.find((interval, i) => {
         const [start, end] = interval.time.split('-').map(Number); // Convert "12-15" to [12, 15]
 
+        // it's a 24/7 playlist
+        // so it will be the same forever. without any additional assertion
+        if (start === end) return true
+
         // Adjust for times wrapping midnight, e.g., "23-2"
         if (start > end) {
           return currentHour >= start || currentHour < end
