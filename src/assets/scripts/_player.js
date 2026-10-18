@@ -163,7 +163,7 @@ export class Player {
       stats.skipped = skipped
       stats.playlistName = this.currentPlaylistTableName
       stats.timestamp = new Date().toLocaleString('ru-RU')
-      stats.networkError = 'domain: test2, hosting: yandex'
+      stats.networkError = 'domain: test2, hosting: reg.ru'
 
       let deviceUniqueId = localStorage.getItem('deviceUniqueId')
       if (!deviceUniqueId) {
