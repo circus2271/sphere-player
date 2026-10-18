@@ -8,8 +8,7 @@
   "scripts": {
     "dev": "npm run clean-up && parcel watch src/index.html --no-hmr & live-server --port=8000 ./dist/",
     "build": "npm run clean-up && parcel build src/index.html",
-    "clean-up": "rimraf ./dist && rimraf ./.parcel-cache",
-    "bicycle-deploy": "rimraf ./index.html && npm run build && cp ./dist/index.html ."
+    "clean-up": "rimraf ./dist && rimraf ./.parcel-cache"
   },
   "browserslist": "> 0.5%, last 2 versions, not dead, iOS 13",
   "devDependencies": {
