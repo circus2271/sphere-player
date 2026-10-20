@@ -17,7 +17,8 @@ concurrency:
 env:
   # Пока сайт на ЛОГИН.github.io/ИМЯ-РЕПОЗИТОРИЯ/ , база это имя репозитория.
   # Когда подключишь свой домен, замени строку на:  PUBLIC_URL: /
-  PUBLIC_URL: /${{ github.event.repository.name }}/
+  #PUBLIC_URL: /${{ github.event.repository.name }}/
+  PUBLIC_URL: /
 
 jobs:
   build:
