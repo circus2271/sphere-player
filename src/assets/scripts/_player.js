@@ -1,5 +1,5 @@
 import fetchRetry from 'fetch-retry'
-import { randomize, sendLikeDislike, sendSongStats, fetchPlaylist, dotsHtml } from './_helpers';
+import { randomize, sendLikeDislike, sendSongStats, fetchPlaylist, setPlayerTitle } from './_helpers';
 
 const fetchWithRetry = fetchRetry(fetch);
 
@@ -50,6 +50,11 @@ const resetRepeatId = () => globalRepeatId = null
 let nextTrackDownloadSpeed = null
 let nextTrackDownloadTime = null
 
+const errors = {
+  noMusicInAPlaylist: 'No music in a playlist',
+  noCurrentInterval: 'Not a music time'
+}
+
 export class Player {
   currentTrackIndex = 0;
   nextTrackIndex = 1;
@@ -66,6 +71,7 @@ export class Player {
   currentPlaylistTableId = null;
   currentPlaylistTableName = null;
   allButtons = document.querySelectorAll('button');
+  playlistButtons = document.querySelectorAll('.playlists button');
   audioPlayer = document.getElementById('audioPlayer');
   baseId = null;
   availablePlaylists = null;
@@ -78,134 +84,153 @@ export class Player {
   }
 
   async initializePlayer(availablePlaylists, baseId) {
+    this.initializePlayerHTMLControls()
+
     this.availablePlaylists = availablePlaylists
     this.baseId = baseId
+
+    // 'ended' handler must be registered before the first playlist is loaded,
+    // so it works even if the first playlist fails and user switches to another one
+    this.audioPlayer.addEventListener('ended', () => this.onTrackEnded())
 
     // Запрашиваем первый плейлист
     const firstPlaylist = availablePlaylists[0]
     // обновляем все данные о плейлисте
-    await this.setPlaylistData({ newPlaylist: firstPlaylist })
-
+    try {
+      await this.setPlaylistData({ newPlaylist: firstPlaylist })
+    } catch (error) {
+      console.error(error)
+      this.enableAllPlaylistButtons()
+      return
+    }
 
     try {
       await this.initializeFirstTwoTracksOfAPlaylist({
         firstTrackLoaded: () => {
-          this.initializePlayerHTMLControls();
           document.body.classList.add('first-track-loaded');
+          this.enableAllButtons({exception: 'skip-button'})
         }
       })
     } catch (error) {
-      // console.log('no tracks')
-      // this.initializePlayerHTMLControls()
-      console.error(`can't first two tracks`)
+      console.error(`can't load first two tracks`)
+    }
+  }
+
+  // called when a track ends (or when "ended" event is dispatched manually: skip / playlist change)
+  // sends like/dislike and stats of the ended track, then plays next one
+  async onTrackEnded() {
+    // if playlist is changing, don't load next song of current playlist
+    const playlistChange = playlistShouldChange
+    // reset this global value
+    playlistShouldChange = false
+
+    document.getElementById('skip-button').disabled = true
+
+
+
+    const currentTrackUrl = this.currentTrackUrl
+    // console.log('currentDayPlaylist', this.currentDayPlaylist)
+
+    // const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.signedUrl === currentTrackUrl)
+    const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
+    // debugger;
+    console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
+    console.log('currentTrackUrl', currentTrackUrl)
+    // debugger
+    const currentTrackId = currentTrackInitialData.id
+
+
+    // this object will be sent to server
+    const data = {
+      baseId: this.baseId,
+      tableId: this.currentPlaylistTableId,
+      recordId: currentTrackId,
+      currentIndex: this.currentTrackIndex,
+      // first and second tracks of a playlist are without speed and time calculations, so use empty strings instead...
+      downloadingSpeed: nextTrackDownloadSpeed ? nextTrackDownloadSpeed.toFixed(1) : '',
+      downloadingTime: nextTrackDownloadTime ? nextTrackDownloadTime.toFixed(1) : ''
     }
 
-    this.audioPlayer.addEventListener('ended', async (event) => {
-      // if playlist is changing, don't load next song of current playlist
-      const playlistChange = playlistShouldChange
-      // reset this global value
-      playlistShouldChange = false
+    // console.log('dataaaa', data)
+    // debugger
+    // reset this global variable
+    nextTrackDownloadSpeed = null
+    nextTrackDownloadTime = null
 
-      document.getElementById('skip-button').disabled = true
+    let trackWasDeleted;
+    if (likeDislikeStatus.scheduled) {
+      const newStatus = likeDislikeStatus.newStatus
+      // set 'Like' or 'Dislike' that will be sent to server
+      data.newStatus = newStatus
 
-
-
-      const currentTrackUrl = this.currentTrackUrl
-      // console.log('currentDayPlaylist', this.currentDayPlaylist)
-
-      // const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.signedUrl === currentTrackUrl)
-      const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
-      // debugger;
-      console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
-      console.log('currentTrackUrl', currentTrackUrl)
-      // debugger
-      const currentTrackId = currentTrackInitialData.id
-
-
-      // this object will be sent to server
-      const data = {
-        baseId: this.baseId,
-        tableId: this.currentPlaylistTableId,
-        recordId: currentTrackId,
-        currentIndex: this.currentTrackIndex,
-        // first and second tracks of a playlist are without speed and time calculations, so use empty strings instead...
-        downloadingSpeed: nextTrackDownloadSpeed ? nextTrackDownloadSpeed.toFixed(1) : '',
-        downloadingTime: nextTrackDownloadTime ? nextTrackDownloadTime.toFixed(1) : ''
+      if (newStatus === 'Dislike') {
+        // delete track from current playlist locally
+        this.tracks = this.tracks.filter(track => track !== currentTrackUrl)
+        trackWasDeleted = true
       }
-
-      // console.log('dataaaa', data)
-      // debugger
-      // reset this global variable
-      nextTrackDownloadSpeed = null
-      nextTrackDownloadTime = null
-
-      let trackWasDeleted;
-      if (likeDislikeStatus.scheduled) {
-        const newStatus = likeDislikeStatus.newStatus
-        // set 'Like' or 'Dislike' that will be sent to server
-        data.newStatus = newStatus
-
-        if (newStatus === 'Dislike') {
-          // delete track from current playlist locally
-          this.tracks = this.tracks.filter(track => track !== currentTrackUrl)
-          trackWasDeleted = true
-        }
-
-        setTimeout(() => {
-          sendLikeDislike(data)
-        }, 1200) // wait too overcome the 5 request per second limit
-        resetLikeDislikeScheduledValues()
-      }
-
-      const stats = data
-      stats.skipped = skipped
-      stats.playlistName = this.currentPlaylistTableName
-      stats.timestamp = new Date().toLocaleString('ru-RU')
-      
-      let deviceUniqueId = localStorage.getItem('deviceUniqueId')
-      if (!deviceUniqueId) {
-        const time = new Date().getTime().toString()
-        const id = time.slice(time.length-5)
-        localStorage.setItem('deviceUniqueId', id)
-
-        deviceUniqueId = id
-      }
-      stats.deviceUniqueId = deviceUniqueId
 
       setTimeout(() => {
-        sendSongStats(stats)
-        // debugger
-        // wait 3 seconds for hopefully pass airtable 5-requeste-at-once limit
-      }, 3000)
+        sendLikeDislike(data)
+      }, 1200) // wait too overcome the 5 request per second limit
+      resetLikeDislikeScheduledValues()
+    }
 
-      // reset skipped to initial value
-      skipped = false
+    const stats = data
+    stats.skipped = skipped
+    stats.playlistName = this.currentPlaylistTableName
+    stats.timestamp = new Date().toLocaleString('ru-RU')
+    
+    let deviceUniqueId = localStorage.getItem('deviceUniqueId')
+    if (!deviceUniqueId) {
+      const time = new Date().getTime().toString()
+      const id = time.slice(time.length-5)
+      localStorage.setItem('deviceUniqueId', id)
 
-      console.log('audioPlayer ended')
-      // if track is ended due to playlist change, don't load next track
-      if (!playlistChange) {
-        await this.playAndLoadNextTrack({ trackWasDeleted })
-      }
-    });
+      deviceUniqueId = id
+    }
+    stats.deviceUniqueId = deviceUniqueId
 
+    setTimeout(() => {
+      sendSongStats(stats)
+      // debugger
+      // wait 3 seconds for hopefully pass airtable 5-requeste-at-once limit
+    }, 3000)
+
+    // reset skipped to initial value
+    skipped = false
+
+    console.log('audioPlayer ended')
+    // if track is ended due to playlist change, don't load next track
+    if (!playlistChange) {
+      await this.playAndLoadNextTrack({ trackWasDeleted })
+    }
   }
 
   async setPlaylistData({ newPlaylist }) {
     // show user friendly message
-    document.querySelector('#current-playlist').innerHTML = `loading playlist${dotsHtml}`
+    setPlayerTitle(`loading playlist`, {addDots: true})
 
     this.currentPlaylistTableId = newPlaylist.tableId
     this.currentPlaylistTableName = newPlaylist.playlistName
     this.currentPlaylistInitialData = await fetchPlaylist(this.baseId, this.currentPlaylistTableId)
     this.currentDayPlaylist = this.getCurrentDaySongsInPlaylist(this.currentPlaylistInitialData);
+    if (this.currentDayPlaylist.length === 0) {
+      // no tracks in a playlist
+      setPlayerTitle(errors.noMusicInAPlaylist)
+      throw new Error(errors.noMusicInAPlaylist)
+    }
     const currentInterval = this.getCurrentInterval(this.currentDayPlaylist)
+    if (!currentInterval) {
+      setPlayerTitle(errors.noCurrentInterval)
+      throw new Error(errors.noCurrentInterval)
+    }
     this.currentIntervalData = this.getCurrentIntervalRelatedData(currentInterval)
     this.currentIntervalIndex = this.currentIntervalData.index;
     this.tracks = this.currentIntervalData.urls;
   }
 
   async initializeFirstTwoTracksOfAPlaylist({ firstTrackLoaded }) {
-    document.querySelector('#current-playlist').innerHTML = `loading first track${dotsHtml}`
+    setPlayerTitle(`loading first track`, {addDots: true})
 
     // reset
     this.currentTrackIndex = 0;
@@ -244,8 +269,7 @@ export class Player {
       firstTrackLoaded()
 
       // show the name of a playlist to an user
-      document.querySelector('#current-playlist').innerHTML = this.currentPlaylistTableName
-
+      setPlayerTitle(this.currentPlaylistTableName)
 
       console.log('first blob should be ready');
       // document.getElementById('skip-button').disabled = true
@@ -406,16 +430,22 @@ export class Player {
 
     // get "exception" key from an object;
     // if no object -> use empty object by default
-    const enableAllButtons = ({exception} = {}) => {
+    this.enableAllButtons = ({exception} = {}) => {
       this.allButtons.forEach(button => {
-        // if (exception && button.id === exception) return
+        if (exception && button.id === exception) return
         button.disabled = false
       })
     }
 
-    const disableAllButtons = () => {
+    this.disableAllButtons = () => {
       this.allButtons.forEach(button => {
         button.disabled = true
+      })
+    }
+
+    this.enableAllPlaylistButtons = () => {
+      this.playlistButtons.forEach(button => {
+        button.disabled = false
       })
     }
 
@@ -478,15 +508,20 @@ export class Player {
 
         fadeOutPlayingState()
         // disable all buttons until first track is ready
-        disableAllButtons()
+        this.disableAllButtons()
 
         // end current track, so statistics and 'like'/'dislike' could be sent
         skipped = true
         playlistShouldChange = true
         this.audioPlayer.dispatchEvent(new Event('ended'))
 
-
-        await this.setPlaylistData({ newPlaylist })
+        try {
+          await this.setPlaylistData({ newPlaylist })
+        } catch (error) {
+          console.error(error)
+          this.enableAllPlaylistButtons()
+          return
+        }
         // cancel loadtrack repeating if playlist has changed
         // resetRepeatId()
         // new playlist is set
@@ -495,7 +530,8 @@ export class Player {
         try {
           await this.initializeFirstTwoTracksOfAPlaylist({
             firstTrackLoaded: () => {
-              enableAllButtons({exception: 'skip-button'})
+              document.body.classList.add('first-track-loaded');
+              this.enableAllButtons({exception: 'skip-button'})
             }
           })
         } catch (error) {
@@ -541,8 +577,8 @@ export class Player {
       }
     })
 
-    // finally, enable all buttons
-    enableAllButtons({exception: 'skip-button'})
+    // buttons are NOT enabled here:
+    // they are enabled when the first track is loaded (or only playlist buttons on error)
   }
 
   loadTrack({ tracks, trackIndex, returnOnlyBlob }) {

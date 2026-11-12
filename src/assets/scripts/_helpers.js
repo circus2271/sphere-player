@@ -1,7 +1,5 @@
 import { updateRecordApiEndpoint, updateSongStatsApiEndpoint, getRecordsApiEndpoint } from './_apiEndpoints'
 
-export const dotsHtml = `<span class="dots"><span>.</span><span>.</span><span>.</span></span></span>`
-
 export const pageLanguage = document.body.classList.contains('ru') ? 'ru' : 'en'
 
 // https://www.freecodecamp.org/news/javascript-debounce-example/
@@ -15,6 +13,21 @@ export function debounce(func, timeout) {
   }
 }
 
+const dotsHtml = `<span class="dots"><span>.</span><span>.</span><span>.</span></span>`
+
+// set addDots as optional value (default is no dots)
+// may be useful to animate loading status
+export const setPlayerTitle = (title, {addDots} = {addDots: false}) => {
+  document.querySelector('#current-playlist').innerHTML = `${title}${addDots ? dotsHtml : ''}`
+}
+
+// set addDots as optional value (default is no dots)
+// may be useful to animate loading status
+// export const setPlayerTitle = (title, {addDots} = {addDots: false}) => {
+//   document.querySelector('#current-playlist').innerHTML = `${title}${addDots ? `
+//     <span class="dots"><span>.</span><span>.</span><span>.</span></span></span>
+//   `.trim() : ''}`
+// }
 
 // fetch playlists from airtable
 export const fetchPlaylist = async (baseId, tableId) => {
@@ -34,7 +47,6 @@ export const fetchPlaylist = async (baseId, tableId) => {
     console.log(error)
   }
 }
-
 
 // function for shuffling array
 export function shuffle(array) {

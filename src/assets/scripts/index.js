@@ -1,6 +1,7 @@
 import { handleLogin } from './_handleLogin'
 import { getRecordsApiEndpoint } from './_apiEndpoints'
 import { Player } from './_player'
+import { setPlayerTitle } from './_helpers';
 
 
 // set a handler to logout buttons
@@ -66,7 +67,7 @@ const getBaseId = async () => {
       const selected = i === 0
       
       if (selected) {
-        document.querySelector('#current-playlist').innerHTML = playlistName
+        setPlayerTitle(playlistName)
       }
       
       const html = `
@@ -97,7 +98,11 @@ const getBaseId = async () => {
       tableId
     }
   })
-  
+
+  if (availablePlaylists.length === 0) {
+    setPlayerTitle('No playlists, yet')
+    return
+  }
   
   // handlePlayer(availablePlaylists, baseId)
   const player = new Player()
