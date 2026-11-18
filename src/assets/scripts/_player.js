@@ -56,13 +56,13 @@ const errors = {
 }
 
 export class Player {
-  // tracks of all playlists loaded so far (to find track data even after playlist has changed)
-  allTracks = []
   currentTrackIndex = 0;
   nextTrackIndex = 1;
-  // track urls are used as a lightweight version of id
-  currentTrackUrl = null;
-  nextTrackUrl = null;
+  // track info: { url, recordId, tableId, playlistName }
+  // it is saved when a track is loaded, so stats are always sent to the playlist (table) the track belongs to,
+  // even if playlist has been changed since then
+  currentTrack = null;
+  nextTrack = null;
   tracks = null;
   currentIntervalData = null;
   nextBlobURL = null;
@@ -134,23 +134,26 @@ export class Player {
 
 
 
-    const currentTrackUrl = this.currentTrackUrl
-    // console.log('currentDayPlaylist', this.currentDayPlaylist)
+    const currentTrack = this.currentTrack
+    // the track won't be played anymore (playlist is changing):
+    // forget it, so its stats are not sent twice if 'ended' is dispatched again before a new track is loaded
+    if (playlistChange) this.currentTrack = null
 
-    // const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.signedUrl === currentTrackUrl)
-    const currentTrackInitialData = this.findTrackData(currentTrackUrl)
-    // debugger;
     console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
-    console.log('currentTrackUrl', currentTrackUrl)
-    // debugger
-    const currentTrackId = currentTrackInitialData.id
+    console.log('currentTrack', currentTrack)
 
+    // no track was loaded (for example, the first playlist failed to load): nothing to send
+    if (!currentTrack) {
+      skipped = false
+      resetLikeDislikeScheduledValues()
+      return
+    }
 
     // this object will be sent to server
     const data = {
       baseId: this.baseId,
-      tableId: this.currentPlaylistTableId,
-      recordId: currentTrackId,
+      tableId: currentTrack.tableId,
+      recordId: currentTrack.recordId,
       currentIndex: this.currentTrackIndex,
       // first and second tracks of a playlist are without speed and time calculations, so use empty strings instead...
       downloadingSpeed: nextTrackDownloadSpeed ? nextTrackDownloadSpeed.toFixed(1) : '',
@@ -171,7 +174,7 @@ export class Player {
 
       if (newStatus === 'Dislike') {
         // delete track from current playlist locally
-        this.tracks = this.tracks.filter(track => track !== currentTrackUrl)
+        this.tracks = this.tracks.filter(track => track !== currentTrack.url)
         trackWasDeleted = true
       }
 
@@ -183,7 +186,7 @@ export class Player {
 
     const stats = data
     stats.skipped = skipped
-    stats.playlistName = this.currentPlaylistTableName
+    stats.playlistName = currentTrack.playlistName
     stats.timestamp = new Date().toLocaleString('ru-RU')
     if (mirror) stats.networkError = mirror.statsLabel
     
@@ -213,26 +216,33 @@ export class Player {
     }
   }
 
-  findTrackData(trackUrl) {
-    return this.currentPlaylistInitialData?.find(trackData => trackData.fields['Full link'] === trackUrl)
-      || this.allTracks.find(trackData => trackData.fields['Full link'] === trackUrl)
+  // info about a track of the current playlist, that is needed to send stats and like/dislike
+  getTrackInfo(trackUrl) {
+    const trackData = this.currentPlaylistInitialData.find(trackData => trackData.fields['Full link'] === trackUrl)
+
+    return {
+      url: trackUrl,
+      recordId: trackData?.id,
+      tableId: this.currentPlaylistTableId,
+      playlistName: this.currentPlaylistTableName,
+    }
   }
 
   // <audio> failed to load/play current track: send stats with the error
   onPlaybackError() {
-    const currentTrackInitialData = this.currentTrackUrl && this.findTrackData(this.currentTrackUrl)
-    if (!currentTrackInitialData) return
+    const currentTrack = this.currentTrack
+    if (!currentTrack) return
 
     const mediaError = this.audioPlayer.error
     const stats = {
       baseId: this.baseId,
-      tableId: this.currentPlaylistTableId,
-      recordId: currentTrackInitialData.id,
+      tableId: currentTrack.tableId,
+      recordId: currentTrack.recordId,
       currentIndex: this.currentTrackIndex,
       downloadingSpeed: '',
       downloadingTime: '',
       skipped,
-      playlistName: this.currentPlaylistTableName,
+      playlistName: currentTrack.playlistName,
       timestamp: new Date().toLocaleString('ru-RU'),
       networkError: [mirror?.statsLabel, mediaError && `Code ${mediaError.code} ${mediaError.message || ''}`.trim()]
         .filter(Boolean).join('; '),
@@ -254,7 +264,6 @@ export class Player {
     this.currentPlaylistInitialData = playlistData && mirror
       ? replaceUrls(playlistData, mirror.proxyDomain)
       : playlistData
-    if (playlistData) this.allTracks.push(...playlistData)
     this.currentDayPlaylist = this.getCurrentDaySongsInPlaylist(this.currentPlaylistInitialData);
     if (this.currentDayPlaylist.length === 0) {
       // no tracks in a playlist
@@ -304,7 +313,7 @@ export class Player {
     retryFirstTrack()
     .then(blobURL => {
       this.currentBlobURL = blobURL;
-      this.currentTrackUrl = this.tracks[this.currentTrackIndex]
+      this.currentTrack = this.getTrackInfo(this.tracks[this.currentTrackIndex])
 
       this.audioPlayer.src = this.currentBlobURL;
 
@@ -318,7 +327,7 @@ export class Player {
       return retrySecondTrack();
     }).then(blobURL => {
       this.nextBlobURL = blobURL;
-      this.nextTrackUrl = this.tracks[this.nextTrackIndex]
+      this.nextTrack = this.getTrackInfo(this.tracks[this.nextTrackIndex])
 
       document.getElementById('skip-button').disabled = false
       console.log('first two tracks of a playlist are initialized')
@@ -341,8 +350,8 @@ export class Player {
 
       this.currentBlobURL = this.nextBlobURL;
       this.nextBlobURL = null;
-      this.currentTrackUrl = this.nextTrackUrl
-      this.nextTrackUrl = null;
+      this.currentTrack = this.nextTrack
+      this.nextTrack = null;
       this.audioPlayer.src = this.currentBlobURL;
       this.audioPlayer.play();
       // console.log(tracks[currentTrackIndex]);
@@ -403,10 +412,13 @@ export class Player {
           })
       }
 
+      // known issue: if playlist is changed while this track is loading,
+      // the loaded track may replace the next track of the new playlist
+      // (it will be played once instead of it, and its stats will be sent to that track record)
       retry()
         .then(blobURL => {
           this.nextBlobURL = blobURL;
-          this.nextTrackUrl = this.tracks[this.nextTrackIndex]
+          this.nextTrack = this.getTrackInfo(this.tracks[this.nextTrackIndex])
 
         // })
         // .then(() => {
