@@ -1,5 +1,5 @@
 import fetchRetry from 'fetch-retry'
-import { randomize, sendLikeDislike, sendSongStats, fetchPlaylist, setPlayerTitle } from './_helpers';
+import { randomize, sendLikeDislike, sendSongStats, fetchPlaylist, setPlayerTitle, replaceUrls, mirror } from './_helpers';
 
 const fetchWithRetry = fetchRetry(fetch);
 
@@ -56,6 +56,8 @@ const errors = {
 }
 
 export class Player {
+  // tracks of all playlists loaded so far (to find track data even after playlist has changed)
+  allTracks = []
   currentTrackIndex = 0;
   nextTrackIndex = 1;
   // track urls are used as a lightweight version of id
@@ -92,6 +94,10 @@ export class Player {
     // 'ended' handler must be registered before the first playlist is loaded,
     // so it works even if the first playlist fails and user switches to another one
     this.audioPlayer.addEventListener('ended', () => this.onTrackEnded())
+    // on mirror pages send stats when a track fails to play
+    if (mirror) {
+      this.audioPlayer.addEventListener('error', () => this.onPlaybackError())
+    }
 
     // Запрашиваем первый плейлист
     const firstPlaylist = availablePlaylists[0]
@@ -132,7 +138,7 @@ export class Player {
     // console.log('currentDayPlaylist', this.currentDayPlaylist)
 
     // const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.signedUrl === currentTrackUrl)
-    const currentTrackInitialData = this.currentPlaylistInitialData.find(trackData => trackData.fields['Full link'] === currentTrackUrl)
+    const currentTrackInitialData = this.findTrackData(currentTrackUrl)
     // debugger;
     console.log('%ccurrentTrackIndex', 'color: green', this.currentTrackIndex)
     console.log('currentTrackUrl', currentTrackUrl)
@@ -179,6 +185,7 @@ export class Player {
     stats.skipped = skipped
     stats.playlistName = this.currentPlaylistTableName
     stats.timestamp = new Date().toLocaleString('ru-RU')
+    if (mirror) stats.networkError = mirror.statsLabel
     
     let deviceUniqueId = localStorage.getItem('deviceUniqueId')
     if (!deviceUniqueId) {
@@ -206,13 +213,48 @@ export class Player {
     }
   }
 
+  findTrackData(trackUrl) {
+    return this.currentPlaylistInitialData?.find(trackData => trackData.fields['Full link'] === trackUrl)
+      || this.allTracks.find(trackData => trackData.fields['Full link'] === trackUrl)
+  }
+
+  // <audio> failed to load/play current track: send stats with the error
+  onPlaybackError() {
+    const currentTrackInitialData = this.currentTrackUrl && this.findTrackData(this.currentTrackUrl)
+    if (!currentTrackInitialData) return
+
+    const mediaError = this.audioPlayer.error
+    const stats = {
+      baseId: this.baseId,
+      tableId: this.currentPlaylistTableId,
+      recordId: currentTrackInitialData.id,
+      currentIndex: this.currentTrackIndex,
+      downloadingSpeed: '',
+      downloadingTime: '',
+      skipped,
+      playlistName: this.currentPlaylistTableName,
+      timestamp: new Date().toLocaleString('ru-RU'),
+      networkError: [mirror?.statsLabel, mediaError && `Code ${mediaError.code} ${mediaError.message || ''}`.trim()]
+        .filter(Boolean).join('; '),
+    }
+
+    // wait to hopefully pass airtable 5-requests-at-once limit
+    setTimeout(() => sendSongStats(stats), 2200)
+
+    console.warn('Audio playback error, stats sent:', stats)
+  }
+
   async setPlaylistData({ newPlaylist }) {
     // show user friendly message
     setPlayerTitle(`loading playlist`, {addDots: true})
 
     this.currentPlaylistTableId = newPlaylist.tableId
     this.currentPlaylistTableName = newPlaylist.playlistName
-    this.currentPlaylistInitialData = await fetchPlaylist(this.baseId, this.currentPlaylistTableId)
+    const playlistData = await fetchPlaylist(this.baseId, this.currentPlaylistTableId)
+    this.currentPlaylistInitialData = playlistData && mirror
+      ? replaceUrls(playlistData, mirror.proxyDomain)
+      : playlistData
+    if (playlistData) this.allTracks.push(...playlistData)
     this.currentDayPlaylist = this.getCurrentDaySongsInPlaylist(this.currentPlaylistInitialData);
     if (this.currentDayPlaylist.length === 0) {
       // no tracks in a playlist

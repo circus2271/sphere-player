@@ -29,6 +29,39 @@ export const setPlayerTitle = (title, {addDots} = {addDots: false}) => {
 //   `.trim() : ''}`
 // }
 
+// mirror pages are marked with a class on <body>:
+//   <body class="playru">        – src/playru/index.html, tracks via Yandex Cloud proxy
+//   <body class="playru-regru"> – src/playru-reg.ru/index.html, tracks via reg.ru proxy
+// on the main page (no such class) mirror is null
+const mirrors = {
+  'playru': {
+    proxyDomain: 'https://storage.yandexcloud.net/sphere-bucket',
+    // sent as `networkError` in song stats, to tell pages apart
+    statsLabel: 'domain: test2, hosting: yandex',
+  },
+  'playru-regru': {
+    proxyDomain: 'https://s3.regru.cloud/sphere-bucket',
+    statsLabel: 'domain: test2, hosting: reg.ru',
+  },
+}
+const mirrorName = Object.keys(mirrors).find(name => document.body.classList.contains(name))
+export const mirror = mirrorName ? mirrors[mirrorName] : null
+
+// replace track host (spheresounds.cc) with a proxy domain (mutates and returns playlist)
+export const replaceUrls = (playlist, proxyDomain) => {
+  const hostingDomain = 'https://spheresounds.cc'
+
+  playlist.forEach(trackData => {
+    const initialUrl = trackData.fields['Full link']
+
+    if (!initialUrl || !initialUrl.startsWith(hostingDomain)) return
+
+    trackData.fields['Full link'] = initialUrl.replace(hostingDomain, proxyDomain)
+  })
+
+  return playlist
+}
+
 // fetch playlists from airtable
 export const fetchPlaylist = async (baseId, tableId) => {
   const queryParams = { baseId, tableId }

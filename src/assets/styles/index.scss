@@ -1,3 +1,10 @@
+// set these variables before importing this file to change how assets are bundled
+// (see index.inline.scss):
+//   'data-url:' – inline fonts/images into html (page works as a single file, no requests for assets)
+$asset-url-prefix: '' !default;
+// show heavy background images only after html is parsed (useful when they are inlined)
+$defer-background: false !default;
+
 @import 'normalize';
 @import 'fonts';
 @import 'breakpoints';
@@ -10,7 +17,14 @@
 
 body {
   border-bottom: 1px none #4f4e4e;
-  background-image: url('~/src/assets/media/images/bg-lines-003-light.png'), url('~/src/assets/media/images/777-55-4-monochrome-min.png');
+  @if not $defer-background {
+    background-image: url('#{$asset-url-prefix}~/src/assets/media/images/bg-lines-003-light.png'), url('#{$asset-url-prefix}~/src/assets/media/images/777-55-4-monochrome-min.png');
+  }
+  @else {
+    &.html-parsed {
+      background-image: url('#{$asset-url-prefix}~/src/assets/media/images/bg-lines-003-light.png'), url('#{$asset-url-prefix}~/src/assets/media/images/777-55-4-monochrome-min.png');
+    }
+  }
   background-position: 50% 50%, 0px 0px;
   background-size: cover, auto;
   background-repeat: repeat, repeat;

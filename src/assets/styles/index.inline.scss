@@ -1,0 +1,7 @@
+// styles for mirror pages (src/playru, src/playru-reg.ru):
+// fonts and images are inlined into html via 'data-url:', so a page doesn't request them separately
+$asset-url-prefix: 'data-url:';
+// inlined background is heavy: show it only after html is parsed (otherwise there is a flash of white)
+$defer-background: true;
+
+@import 'index';

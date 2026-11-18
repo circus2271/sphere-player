@@ -1,4 +1,5 @@
 dist
+dist-regru
 .parcel-cache
 node_modules
 .git

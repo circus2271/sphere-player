@@ -6,15 +6,21 @@
     "url": "git+ssh://git@github.com/circus2271/sphere-player.git"
   },
   "scripts": {
-    "dev": "npm run clean-up && parcel watch src/index.html --no-hmr & live-server --port=8000 ./dist/",
-    "build": "npm run clean-up && parcel build src/index.html",
-    "clean-up": "rimraf ./dist && rimraf ./.parcel-cache"
+    "dev": "npm run clean-up && parcel watch src/index.html src/playru/index.html src/playru-reg.ru/index.html --no-hmr & live-server --port=8000 ./dist/",
+    "build": "npm run clean-up && parcel build src/index.html src/playru/index.html src/playru-reg.ru/index.html",
+    "build:regru": "rimraf ./dist-regru && parcel build src/playru-reg.ru/index.html --dist-dir dist-regru",
+    "clean-up": "rimraf ./dist && rimraf ./dist-regru && rimraf ./.parcel-cache"
+  },
+  "@parcel/bundler-default": {
+    "disableSharedBundles": true
   },
   "browserslist": "> 0.5%, last 2 versions, not dead, iOS 13",
   "devDependencies": {
-    "@parcel/transformer-sass": "^2.9.3",
+    "@parcel/optimizer-data-url": "^2.15.2",
+    "@parcel/transformer-inline-string": "^2.15.2",
+    "@parcel/transformer-sass": "^2.15.2",
     "live-server": "^1.2.2",
-    "parcel": "^2.9.3",
+    "parcel": "^2.15.2",
     "rimraf": "^5.0.1",
     "vercel": "^37.12.1"
   },
@@ -22,8 +28,6 @@
     "@vercel/analytics": "^1.1.3",
     "@vercel/edge": "^1.1.2",
     "fetch-retry": "^5.0.6",
-    "howler": "^2.2.3",
-    "node-html-parser": "^6.1.13",
-    "yarn": "^1.22.22"
+    "node-html-parser": "^6.1.13"
   }
 }
