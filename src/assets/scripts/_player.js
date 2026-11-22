@@ -63,6 +63,15 @@ export class Player {
   // even if playlist has been changed since then
   currentTrack = null;
   nextTrack = null;
+  // [waiting for next track] set when a track has ended, but the next one isn't downloaded yet:
+  // the next track will be played as soon as it is downloaded
+  waitingForNextTrack = null;
+  // set when a streamed track failed to load before user pressed play:
+  // it will be skipped when user presses play (not right away, so playback doesn't start by itself)
+  skipStreamedTrackOnPlay = false;
+  // removes 'canplaythrough'/'error' listeners that start downloading the second track of a playlist
+  // (set until the first track can play through)
+  cancelSecondTrackDownloadStart = null;
   tracks = null;
   currentIntervalData = null;
   nextBlobURL = null;
@@ -94,6 +103,9 @@ export class Player {
     // 'ended' handler must be registered before the first playlist is loaded,
     // so it works even if the first playlist fails and user switches to another one
     this.audioPlayer.addEventListener('ended', () => this.onTrackEnded())
+    // the first track of a playlist is streamed from its url (see initializeFirstTwoTracksOfAPlaylist):
+    // if it fails to load, skip to the next track
+    this.audioPlayer.addEventListener('error', () => this.onStreamedTrackError())
     // on mirror pages send stats when a track fails to play
     if (mirror) {
       this.audioPlayer.addEventListener('error', () => this.onPlaybackError())
@@ -228,6 +240,23 @@ export class Player {
     }
   }
 
+  onStreamedTrackError() {
+    // tracks played from a blob are already downloaded, only a streamed track can fail to load
+    if (this.currentBlobURL || !this.currentTrack) return
+
+    const userPressedPlay = document.getElementById('play-button').classList.contains('playing')
+    if (!userPressedPlay) {
+      // the track failed while being preloaded: skip it when user presses play
+      console.warn('streamed track failed to load, it will be skipped on play', this.currentTrack.url)
+      this.skipStreamedTrackOnPlay = true
+      return
+    }
+
+    console.warn('streamed track failed to load, skip to the next track', this.currentTrack.url)
+    skipped = true
+    this.audioPlayer.dispatchEvent(new Event('ended'))
+  }
+
   // <audio> failed to load/play current track: send stats with the error
   onPlaybackError() {
     const currentTrack = this.currentTrack
@@ -292,14 +321,8 @@ export class Player {
     // const nextTrackIndex = this.nextTrackIndex
     // const currentTrackIndex = this.currentTrackIndex
 
-    const retryFirstTrack = () => {
-      return this.loadTrack({ tracks: this.tracks, trackIndex: this.currentTrackIndex})
-      .catch(() => {
-
-        this.currentTrackIndex++
-        return retryFirstTrack()
-      })
-    }
+    this.waitingForNextTrack = null; // [waiting for next track] new playlist: stop waiting for a track of the old one
+    this.skipStreamedTrackOnPlay = false;
 
     const retrySecondTrack = () => {
       return this.loadTrack({ tracks: this.tracks, trackIndex: this.nextTrackIndex })
@@ -310,33 +333,56 @@ export class Player {
       })
     }
 
-    retryFirstTrack()
-    .then(blobURL => {
-      this.currentBlobURL = blobURL;
-      this.currentTrack = this.getTrackInfo(this.tracks[this.currentTrackIndex])
+    // the first track is not downloaded to a blob: it is streamed by <audio> (html5 audio) right from its url.
+    // preload="auto": browser starts loading it right away, where it's allowed;
+    // where it's not (iOS may not load media before user interaction), loading starts when user presses play.
+    // if the track fails to load, it is skipped (see onStreamedTrackError)
+    // revoke a blob of a previous playlist's track (if any)
+    if (this.currentBlobURL) URL.revokeObjectURL(this.currentBlobURL)
+    this.currentBlobURL = null;
+    this.audioPlayer.preload = 'auto'
 
-      this.audioPlayer.src = this.currentBlobURL;
+    // the second track starts downloading only when the first one can play through
+    // (it is loaded enough to be played to the end without stopping),
+    // so they don't share the network. if the first track fails to load, the second one is downloaded right away
+    // (on iOS the first track may be loaded only after user presses play, then the second one waits for it too)
+    const startSecondTrackDownload = () => {
+      this.cancelSecondTrackDownloadStart()
+      console.log('first track can play through (or failed), start downloading the second track')
 
-      firstTrackLoaded()
+      retrySecondTrack()
+      .then(blobURL => {
+        this.nextBlobURL = blobURL;
+        this.nextTrack = this.getTrackInfo(this.tracks[this.nextTrackIndex])
 
-      // show the name of a playlist to an user
-      setPlayerTitle(this.currentPlaylistTableName)
+        document.getElementById('skip-button').disabled = false
+        console.log('first two tracks of a playlist are initialized')
+        this.playNextTrackIfWaiting() // [waiting for next track]
+      }).catch(error => {
+        console.error('Error setting the source for the audio player:', error);
+      });
+    }
+    // if a previous playlist's first track didn't get to 'canplaythrough', don't wait for it anymore
+    if (this.cancelSecondTrackDownloadStart) this.cancelSecondTrackDownloadStart()
+    this.cancelSecondTrackDownloadStart = () => {
+      this.audioPlayer.removeEventListener('canplaythrough', startSecondTrackDownload)
+      this.audioPlayer.removeEventListener('error', startSecondTrackDownload)
+      this.cancelSecondTrackDownloadStart = null
+    }
+    this.audioPlayer.addEventListener('canplaythrough', startSecondTrackDownload)
+    this.audioPlayer.addEventListener('error', startSecondTrackDownload)
 
-      console.log('first blob should be ready');
-      // document.getElementById('skip-button').disabled = true
-      return retrySecondTrack();
-    }).then(blobURL => {
-      this.nextBlobURL = blobURL;
-      this.nextTrack = this.getTrackInfo(this.tracks[this.nextTrackIndex])
+    this.audioPlayer.src = this.tracks[this.currentTrackIndex]
+    this.currentTrack = this.getTrackInfo(this.tracks[this.currentTrackIndex])
 
-      document.getElementById('skip-button').disabled = false
-      console.log('first two tracks of a playlist are initialized')
-    }).catch(error => {
-      console.error('Error setting the source for the audio player:', error);
-    });
+    firstTrackLoaded()
+
+    // show the name of a playlist to an user
+    setPlayerTitle(this.currentPlaylistTableName)
   }
 
-  async playAndLoadNextTrack({ trackWasDeleted }) {
+  // [waiting for next track] play: false — switch to the next track, but don't start playing it (user pressed pause while waiting)
+  async playAndLoadNextTrack({ trackWasDeleted, play = true }) {
     // debugger
     // If there is a next track
     // updateState(tracks[currentTrackIndex]);
@@ -353,7 +399,7 @@ export class Player {
       this.currentTrack = this.nextTrack
       this.nextTrack = null;
       this.audioPlayer.src = this.currentBlobURL;
-      this.audioPlayer.play();
+      if (play) this.audioPlayer.play();
       // console.log(tracks[currentTrackIndex]);
       if (!trackWasDeleted) {
         // update indexes only if previous track wasnt' deleted
@@ -424,12 +470,36 @@ export class Player {
         // .then(() => {
           console.log('track loaded (with or without retry)')
           document.getElementById('skip-button').disabled = false
+          this.playNextTrackIfWaiting() // [waiting for next track]
         });
+    } else {
+      // [waiting for next track] the next track isn't downloaded yet: play it as soon as it is downloaded
+      this.waitingForNextTrack = { trackWasDeleted }
     }
+  }
+
+  // [waiting for next track]
+  // if a track ends before the next one is downloaded, there is a pause (silence),
+  // and the next track starts as soon as it is downloaded. how it works:
+  // 1. playAndLoadNextTrack: there is no downloaded next track -> remember it in this.waitingForNextTrack
+  // 2. the next track is downloaded -> playNextTrackIfWaiting() is called and plays it
+  //    (if user pressed pause while waiting, the track is switched, but not played)
+  // 3. togglePlayPause: while waiting, the play/pause button only changes its state
+  // 4. a new playlist is selected -> waiting is reset (initializeFirstTwoTracksOfAPlaylist)
+  // search for "[waiting for next track]" to find all the related code
+  playNextTrackIfWaiting() {
+    if (!this.waitingForNextTrack) return
+
+    const { trackWasDeleted } = this.waitingForNextTrack
+    this.waitingForNextTrack = null
+    // if user pressed pause while waiting, switch to the next track, but don't play it
+    const userPressedPlay = document.getElementById('play-button').classList.contains('playing')
+    this.playAndLoadNextTrack({ trackWasDeleted, play: userPressedPlay })
   }
 
   initializePlayerHTMLControls() {
     const audioPlayer = this.audioPlayer
+    const player = this
 
     // player 'play' settings and event handlers
     const playButton = document.getElementById('play-button');
@@ -456,7 +526,8 @@ export class Player {
     function fadeAudioToPlaying() {
       let volume = 0.0;
       audioPlayer.volume = volume;
-      audioPlayer.play();
+      // play() fails if a streamed track can't be loaded (it is handled in onStreamedTrackError)
+      audioPlayer.play().catch(error => console.warn('audio play() failed:', error.message));
 
       const fadeInterval = setInterval(function () {
         volume += 0.05;  // increase by 0.05 until 1.0
@@ -505,8 +576,23 @@ export class Player {
 
     // player audio controls
     function togglePlayPause() {
+      // [waiting for next track]
+      if (player.waitingForNextTrack) {
+        // the next track is still downloading (nothing is playing):
+        // only toggle the button, the track will start after download only if the button is 'playing'
+        playButton.classList.toggle('playing')
+        temporaryDisableAllButtons()
+        return
+      }
+
       if (audioPlayer.paused || audioPlayer.ended) {
         playButton.classList.add('playing');
+        if (player.skipStreamedTrackOnPlay) {
+          // the first track failed to load before user pressed play: skip to the next one
+          player.skipStreamedTrackOnPlay = false
+          skipped = true
+          audioPlayer.dispatchEvent(new Event('ended'))
+        }
         fadeAudioToPlaying();
       } else {
         playButton.classList.remove('playing');
