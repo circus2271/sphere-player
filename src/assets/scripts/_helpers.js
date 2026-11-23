@@ -37,11 +37,11 @@ const mirrors = {
   'playru': {
     proxyDomain: 'https://storage.yandexcloud.net/sphere-bucket',
     // sent as `networkError` in song stats, to tell pages apart
-    statsLabel: 'domain: test2, hosting: yandex',
+    statsLabel: 'domain: playru, hosting: yandex',
   },
   'playru-regru': {
     proxyDomain: 'https://s3.regru.cloud/sphere-bucket',
-    statsLabel: 'domain: test2, hosting: reg.ru',
+    statsLabel: 'domain: playru-r, music on: reg.ru (page is on github pages)',
   },
 }
 const mirrorName = Object.keys(mirrors).find(name => document.body.classList.contains(name))
