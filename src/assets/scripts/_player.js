@@ -269,7 +269,8 @@ export class Player {
       skipped,
       playlistName: currentTrack.playlistName,
       timestamp: new Date().toLocaleString('ru-RU'),
-      networkError: [mirror?.statsLabel, mediaError && `Code ${mediaError.code} ${mediaError.message || ''}`.trim()]
+      // "Error: " tells player errors apart from other values of networkError (for example, a mirror label)
+      networkError: 'Error: ' + [mediaError && `code ${mediaError.code} ${mediaError.message || ''}`.trim(), mirror?.statsLabel]
         .filter(Boolean).join('; '),
     }
 
