@@ -465,6 +465,8 @@ export class Player {
     } else {
       // [waiting for next track] the next track isn't downloaded yet: play it as soon as it is downloaded
       this.waitingForNextTrack = { trackWasDeleted }
+      // skip doesn't stop <audio> by itself, and nothing should be playing while waiting
+      this.audioPlayer.pause()
     }
   }
 
@@ -592,6 +594,9 @@ export class Player {
     }
 
     const temporaryDisableButton = (button) => {
+      // already disabled (for example, skip while the next track is downloading): leave it as is
+      if (button.disabled) return
+
       button.setAttribute('disabled', '')
       setTimeout(() => {
         button.removeAttribute('disabled')
